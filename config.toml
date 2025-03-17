@@ -1,0 +1,62 @@
+[Buttons]
+ScrollUp = "W"
+ScrollDown = "S"
+Select = "E"
+
+[Sound]
+Select = ""
+Exit = ""
+ScrollUp = ""
+ScrollDown = ""
+
+[WasdMenu]
+FreezePlayer = false
+
+[ScreenMenu]
+TextColor = "orange"
+PositionX = -5.5
+PositionY = 0.0
+Background = true
+BackgroundHeight = 0
+BackgroundWidth = 0.2
+Font = "Arial Bold"
+Size = 32
+FreezePlayer = false
+ShowResolutionsOption = true
+
+[Resolutions]
+"1920x1080" = { PositionX = -9.0, PositionY = 0.0 }
+"1680x1050" = { PositionX = -8.2, PositionY = 0.0 }
+"1600x900" = { PositionX = -9.0, PositionY = 0.0 }
+"1440x1080" = { PositionX = -6.8, PositionY = 0.0 }
+"1280x1080" = { PositionX = -6.0, PositionY = 0.0 }
+"1280x720" = { PositionX = -9.0, PositionY = 0.0 }
+"1280x1024" = { PositionX = -6.3, PositionY = 0.0 }
+"1024x768" = { PositionX = -6.8, PositionY = 0.0 }
+"800x600" = { PositionX = -6.8, PositionY = 0.0 }
+
+[Lang]
+[Lang.en]
+Prev = "Prev"
+Next = "Next"
+Exit = "Exit"
+Disabled = "Disabled"
+Scroll = "[{0}/{1}] Scroll"
+Select = "[{0}] Select"
+
+[Lang.tr]
+Prev = "Geri"
+Next = "İleri"
+Exit = "Çıkış"
+Disabled = "Kapalı"
+Scroll = "[{0}/{1}] Kaydır"
+Select = "[{0}] Seç"
+
+[Lang.ro]
+Prev = "Inapoi"
+Next = "Inainte"
+Exit = "Iesire"
+Disabled = "Dezactivata"
+Scroll = "[{0}/{1}] Navigheaza"
+Select = "[{0}] Selecteaza"
+

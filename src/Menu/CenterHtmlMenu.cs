@@ -14,8 +14,9 @@ public class CenterHtmlMenu(string title) : BaseMenu(title)
     public string NextPageColor { get; set; } = "yellow";
     public string CloseColor { get; set; } = "red";
 
-    public override void Display(CCSPlayerController player)
+    public override void Display(CCSPlayerController player, int time = 0)
     {
+        MenuTime = time;
         MenuManager.OpenMenu(player, this, (p, m) => new CenterHtmlMenuInstance(p, m));
     }
 }

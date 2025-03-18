@@ -12,8 +12,9 @@ public class ChatMenu(string title) : BaseMenu(title)
     public char NextPageColor { get; set; } = ChatColors.Yellow;
     public char CloseColor { get; set; } = ChatColors.Red;
 
-    public override void Display(CCSPlayerController player)
+    public override void Display(CCSPlayerController player, int time = 0)
     {
+        MenuTime = time;
         MenuManager.OpenMenu(player, this, (p, m) => new ChatMenuInstance(p, m));
     }
 }

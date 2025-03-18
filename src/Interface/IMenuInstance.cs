@@ -12,7 +12,6 @@ public interface IMenuInstance
     IMenu Menu { get; }
     int MenuTime { get; }
     IMenu? PrevMenu { get; }
-    int PrevMenuTime { get; }
 
     void NextPage();
     void PrevPage();

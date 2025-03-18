@@ -66,6 +66,16 @@ menu.AddItem("Option After Reset", (p, o) =>
 });
 ```
 
+5. You can set the time for the menu. When the time is up, the menu is automatically closed.
+```csharp
+menu.Display(menu, 10);
+// OR
+ConsoleMenu menu = new("Console Menu")
+{
+    MenuTime = 20
+};
+```
+
 # References
 ## This project was prepared with the help of the following sources.
 * `ChatMenu`,`ConsoleMenu`,`CenterHtmlMenu` => [CounterStrikeSharp](https://github.com/roflmuffin/CounterStrikeSharp) by [roflmuffin](https://github.com/roflmuffin)

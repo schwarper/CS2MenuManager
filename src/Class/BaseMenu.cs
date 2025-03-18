@@ -1,5 +1,8 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Timers;
+using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
+using static CS2MenuManager.CS2MenuManager;
 
 namespace CS2MenuManager;
 
@@ -10,7 +13,7 @@ public abstract class BaseMenu(string title) : IMenu
     public bool ExitButton { get; set; } = true;
     public int MenuTime { get; set; } = 0;
     public IMenu? PrevMenu { get; set; }
-    public int PrevMenuTime { get; set; } = 0;
+    public Timer? Timer { get; set; }
 
     public virtual ItemOption AddItem(string display, Action<CCSPlayerController, ItemOption> onSelect)
     {
@@ -26,16 +29,16 @@ public abstract class BaseMenu(string title) : IMenu
         return option;
     }
 
-    public abstract void Display(CCSPlayerController player);
+    public abstract void Display(CCSPlayerController player, int time);
 
-    public void DisplayToAll()
+    public void DisplayToAll(int time)
     {
         List<CCSPlayerController> players = Utilities.GetPlayers();
 
         foreach (CCSPlayerController player in players)
         {
             if (!player.IsBot)
-                Display(player);
+                Display(player, time);
         }
     }
 }
@@ -47,7 +50,6 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     public IMenu Menu => menu;
     public int MenuTime => menu.MenuTime;
     public IMenu? PrevMenu => menu.PrevMenu;
-    public int PrevMenuTime => menu.PrevMenuTime;
     public CCSPlayerController Player { get; set; } = player;
     public int Page { get; set; }
     public int CurrentOffset { get; set; }
@@ -66,10 +68,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
         PrevPageOffsets.Clear();
     }
 
-    public virtual void Close()
-    {
-        MenuManager.CloseActiveMenu(Player);
-    }
+    public virtual void Close() => MenuManager.CloseActiveMenu(Player, CloseMenuAction.Reset);
 
     public void OnKeyPress(CCSPlayerController player, int key)
     {
@@ -133,6 +132,6 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
 
     public void PrevSubMenu()
     {
-        PrevMenu?.Display(Player);
+        PrevMenu?.Display(Player, PrevMenu.MenuTime);
     }
 }

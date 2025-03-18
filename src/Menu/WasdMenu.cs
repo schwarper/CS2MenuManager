@@ -10,8 +10,9 @@ namespace CS2MenuManager;
 
 public class WasdMenu(string title) : BaseMenu(title)
 {
-    public override void Display(CCSPlayerController player)
+    public override void Display(CCSPlayerController player, int time = 0)
     {
+        MenuTime = time;
         MenuManager.OpenMenu(player, this, (p, m) => new WasdMenuInstance(p, m));
     }
 }

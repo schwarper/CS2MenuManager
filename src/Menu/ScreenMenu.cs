@@ -1,5 +1,6 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Entities;
 using System.Text;
 using static CounterStrikeSharp.API.Core.Listeners;
 using static CS2MenuManager.ConfigManager;
@@ -10,6 +11,15 @@ namespace CS2MenuManager;
 
 public class ScreenMenu(string title) : BaseMenu(title)
 {
+    public string TextColor { get; set; } = Config.ScreenMenu.TextColor;
+    public bool Background { get; set; } = Config.ScreenMenu.Background;
+    public float BackgroundHeight { get; set; } = Config.ScreenMenu.BackgroundHeight;
+    public float BackgroundWidth { get; set; } = Config.ScreenMenu.BackgroundWidth;
+    public string Font { get; set; } = Config.ScreenMenu.Font;
+    public int Size { get; set; } = Config.ScreenMenu.Size;
+    public bool FreezePlayer { get; set; } = Config.ScreenMenu.FreezePlayer;
+    public bool ShowResolutionsOption { get; set; } = Config.ScreenMenu.ShowResolutionsOption;
+
     public override void Display(CCSPlayerController player, int time = 0)
     {
         MenuTime = time;
@@ -22,10 +32,10 @@ public class ScreenMenuInstance : BaseMenuInstance
     public override int NumPerPage => 5;
     public PlayerButtons OldButton;
     public CPointWorldText? WorldText;
-
+     
     public ScreenMenuInstance(CCSPlayerController player, IMenu menu) : base(player, menu)
     {
-        var firstEnabledOption = Menu.ItemOptions
+        var firstEnabledOption = menu.ItemOptions
             .Select((option, index) => new { Option = option, Index = index })
             .FirstOrDefault(x => x.Option.DisableOption == DisableOption.None);
 
@@ -35,12 +45,15 @@ public class ScreenMenuInstance : BaseMenuInstance
         Plugin.RegisterListener<CheckTransmit>(OnCheckTransmit);
         Plugin.RegisterListener<OnEntityDeleted>(OnEntityDeleted);
 
-        if (Config.ScreenMenu.FreezePlayer)
-            player.Freeze();
+        if (((ScreenMenu)Menu).FreezePlayer)
+            Player.Freeze();
     }
 
     public override void Display()
     {
+        if (Menu is not ScreenMenu screenMenu)
+            return;
+
         StringBuilder builder = new();
         builder.AppendLine(" ");
         builder.AppendLine(Menu.Title);
@@ -64,7 +77,7 @@ public class ScreenMenuInstance : BaseMenuInstance
 
         if (WorldText == null || !WorldText.IsValid)
         {
-            WorldText = CreateWorldText(builder.ToString());
+            WorldText = CreateWorldText(builder.ToString(), screenMenu.Size, screenMenu.TextColor, screenMenu.Font, screenMenu.Background, screenMenu.BackgroundHeight, screenMenu.BackgroundWidth);
 
             if (WorldText == null || !WorldText.IsValid)
             {
@@ -88,8 +101,8 @@ public class ScreenMenuInstance : BaseMenuInstance
         if (WorldText != null && WorldText.IsValid)
             WorldText.Remove();
 
-        if (Config.ScreenMenu.FreezePlayer)
-            Player.Unfreeze();
+        if (((ScreenMenu)Menu).FreezePlayer)
+            Player.Freeze();
 
         if (!string.IsNullOrEmpty(Config.Sound.Exit))
             Player.ExecuteClientCommand($"play {Config.Sound.Exit}");

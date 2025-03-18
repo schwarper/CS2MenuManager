@@ -10,6 +10,14 @@ namespace CS2MenuManager;
 
 public class WasdMenu(string title) : BaseMenu(title)
 {
+    public string TitleColor { get; set; } = "green";
+    public string ScrollUpDownColor { get; set; } = "cyan";
+    public string ExitColor { get; set; } = "purple";
+    public string SelectedOptionColor { get; set; } = "orange";
+    public string OptionColor { get; set; } = "white";
+    public string DisabledOptionColor { get; set; } = "grey";
+    public bool FreezePlayer { get; set; } = Config.WasdMenu.FreezePlayer;
+
     public override void Display(CCSPlayerController player, int time = 0)
     {
         MenuTime = time;
@@ -34,8 +42,8 @@ public class WasdMenuInstance : BaseMenuInstance
         RemoveOnTickListener();
         Plugin.RegisterListener<OnTick>(OnTick);
 
-        if (Config.WasdMenu.FreezePlayer)
-            player.Freeze();
+        if (((WasdMenu)Menu).FreezePlayer)
+            Player.Freeze();
     }
 
     public void OnTick()
@@ -85,24 +93,27 @@ public class WasdMenuInstance : BaseMenuInstance
 
     public override void Display()
     {
+        if (Menu is not WasdMenu wasdMenu)
+            return;
+
         const string MenuSelectionLeft = "<img src='https://raw.githubusercontent.com/oqyh/cs2-Kill-Sound-GoldKingZ/main/Resources/left.gif' class=''>";
         const string MenuSelectionRight = "<img src='https://raw.githubusercontent.com/oqyh/cs2-Kill-Sound-GoldKingZ/main/Resources/right.gif' class=''>";
-        const string Prefix = "<font color='green'>";
+        string Prefix = $"<font color='{wasdMenu.TitleColor}'>";
         const string OptionsBelow = "<img src='https://raw.githubusercontent.com/oqyh/cs2-Kill-Sound-GoldKingZ/main/Resources/arrow.gif' class=''> <img src='https://raw.githubusercontent.com/oqyh/cs2-Kill-Sound-GoldKingZ/main/Resources/arrow.gif' class=''> <img src='https://raw.githubusercontent.com/oqyh/cs2-Kill-Sound-GoldKingZ/main/Resources/arrow.gif' class=''>";
 
         StringBuilder builder = new();
-        builder.Append("           <font color='cyan'>")
+        builder.Append($"           <font color='{wasdMenu.ScrollUpDownColor}'>")
                .Append(Player.Localizer("Scroll", Config.Buttons.ScrollUp, Config.Buttons.ScrollDown))
                .Append(" - ")
                .Append(Player.Localizer("Select", Config.Buttons.Select))
-               .Append(" </font> <br><font color='purple'>[ <img src='https://raw.githubusercontent.com/oqyh/cs2-Kill-Sound-GoldKingZ/main/Resources/tab.gif' class=''> - ")
+               .Append($" </font> <br><font color='{wasdMenu.ExitColor}'>[ <img src='https://raw.githubusercontent.com/oqyh/cs2-Kill-Sound-GoldKingZ/main/Resources/tab.gif' class=''> - ")
                .Append(Player.Localizer("Exit"))
                .Append(" ]");
 
         string buttomText = builder.ToString();
 
         builder.Clear();
-        builder.AppendLine($"{Prefix}{Menu.Title}</u><font color='white'><br>");
+        builder.AppendLine($"{Prefix}{Menu.Title}</u><br>");
 
         int keyOffset = 1;
         int maxIndex = Math.Min(CurrentOffset + MenuItemsPerPage, Menu.ItemOptions.Count);
@@ -111,7 +122,7 @@ public class WasdMenuInstance : BaseMenuInstance
             ItemOption option = Menu.ItemOptions[i];
             if (i == CurrentChoiceIndex)
             {
-                builder.AppendLine($"{MenuSelectionLeft} {keyOffset++}. {option.Text} {MenuSelectionRight} <br>");
+                builder.AppendLine($"{MenuSelectionLeft} <font color='{wasdMenu.SelectedOptionColor}'>{keyOffset++}. {option.Text} {MenuSelectionRight}</font> <br>");
             }
             else
             {
@@ -119,11 +130,11 @@ public class WasdMenuInstance : BaseMenuInstance
                 {
                     case DisableOption.None:
                     case DisableOption.DisableShowNumber:
-                        builder.AppendLine($"{keyOffset++}. {option.Text} <br>");
+                        builder.AppendLine($"<font color='{wasdMenu.OptionColor}'>{keyOffset++}. {option.Text}</font> <br>");
                         break;
                     case DisableOption.DisableHideNumber:
                         keyOffset++;
-                        builder.AppendLine($"{option.Text} <br>");
+                        builder.AppendLine($"<font color='{wasdMenu.DisabledOptionColor}'>{option.Text}</font> <br>");
                         break;
                 }
             }
@@ -146,7 +157,7 @@ public class WasdMenuInstance : BaseMenuInstance
         RemoveOnTickListener();
         Player.PrintToCenterHtml(" ");
 
-        if (Config.WasdMenu.FreezePlayer)
+        if (((WasdMenu)Menu).FreezePlayer)
             Player.Unfreeze();
 
         if (!string.IsNullOrEmpty(Config.Sound.Exit))

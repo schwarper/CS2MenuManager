@@ -81,7 +81,7 @@ public static class Library
         return handle.Value;
     }
 
-    public static CPointWorldText? CreateWorldText(string text)
+    public static CPointWorldText? CreateWorldText(string text, int size, string textColor, string font, bool background, float backgroundheight, float backgroundwidth)
     {
         CPointWorldText entity = Utilities.CreateEntityByName<CPointWorldText>("point_worldtext")!;
 
@@ -92,19 +92,19 @@ public static class Library
 
         entity.MessageText = text;
         entity.Enabled = true;
-        entity.FontSize = Config.ScreenMenu.Size;
+        entity.FontSize = size;
         entity.Fullbright = true;
-        entity.Color = Color.FromName(Config.ScreenMenu.TextColor);
-        entity.WorldUnitsPerPx = 0.25f / 1050 * Config.ScreenMenu.Size;
-        entity.FontName = Config.ScreenMenu.Font;
+        entity.Color = Color.FromName(textColor);
+        entity.WorldUnitsPerPx = 0.25f / 1050 * size;
+        entity.FontName = font;
         entity.JustifyHorizontal = PointWorldTextJustifyHorizontal_t.POINT_WORLD_TEXT_JUSTIFY_HORIZONTAL_LEFT;
         entity.JustifyVertical = PointWorldTextJustifyVertical_t.POINT_WORLD_TEXT_JUSTIFY_VERTICAL_CENTER;
         entity.ReorientMode = PointWorldTextReorientMode_t.POINT_WORLD_TEXT_REORIENT_NONE;
         entity.RenderMode = RenderMode_t.kRenderNormal;
 
-        entity.DrawBackground = Config.ScreenMenu.Background;
-        entity.BackgroundBorderHeight = Config.ScreenMenu.BackgroundHeight;
-        entity.BackgroundBorderWidth = Config.ScreenMenu.BackgroundWidth;
+        entity.DrawBackground = background;
+        entity.BackgroundBorderHeight = backgroundheight;
+        entity.BackgroundBorderWidth = backgroundwidth;
 
         entity.DispatchSpawn();
         return entity;

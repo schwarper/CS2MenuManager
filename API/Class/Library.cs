@@ -4,17 +4,17 @@ using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Utils;
 using System.Drawing;
-using static CS2MenuManager.ConfigManager;
+using System.Text;
+using System.Text.RegularExpressions;
+using static CS2MenuManager.API.Class.ConfigManager;
 
-namespace CS2MenuManager;
+namespace CS2MenuManager.API.Class;
 
-public static class Library
+internal static partial class Library
 {
-    public class VectorData
-    {
-        public Vector Position { get; set; } = new();
-        public QAngle Angle { get; set; } = new();
-    }
+    [GeneratedRegex("<[^>]+>", RegexOptions.Compiled)] private static partial Regex TagRegex();
+
+    public readonly record struct VectorData(Vector Position, QAngle Angle);
 
     public static CCSPlayerPawn? GetPlayerPawn(this CCSPlayerController player)
     {
@@ -136,25 +136,72 @@ public static class Library
 
         if (Config.Lang.TryGetValue(cultureInfo.Name, out Dictionary<string, string>? lang) && lang.TryGetValue(key, out string? text))
         {
-            Console.WriteLine($"Found with full culture: {cultureInfo.Name}, key: {key}, text: {text}");
             return string.Format(text, args);
         }
 
         string shortName = cultureInfo.TwoLetterISOLanguageName.ToLower();
-        Console.WriteLine($"Trying fallback with short name: {shortName}");
         if (Config.Lang.TryGetValue(shortName, out lang) && lang.TryGetValue(key, out text))
         {
-            Console.WriteLine($"Found with short culture: {shortName}, key: {key}, text: {text}");
             return string.Format(text, args);
         }
 
         if (Config.Lang.TryGetValue("en", out lang) && lang.TryGetValue(key, out text))
         {
-            Console.WriteLine($"Falling back to default language 'en' for key: {key}");
             return string.Format(text, args);
         }
 
-        Console.WriteLine($"No translation found for key: {key}");
         return key;
+    }
+
+    public static string TruncateHtml(this string html, int maxLength)
+    {
+        if (maxLength <= 0 || string.IsNullOrEmpty(html))
+            return html;
+
+        string textOnly = TagRegex().Replace(html, string.Empty);
+        if (textOnly.Length <= maxLength)
+            return html;
+
+        var tagStack = new Stack<string>();
+        var result = new StringBuilder();
+        int visibleLength = 0, i = 0;
+
+        while (i < html.Length && visibleLength < maxLength)
+        {
+            if (html[i] == '<')
+            {
+                var match = TagRegex().Match(html, i);
+                if (match.Success && match.Index == i)
+                {
+                    string tag = match.Value;
+                    result.Append(tag);
+                    i += tag.Length;
+
+                    if (!tag.StartsWith("</", StringComparison.Ordinal))
+                    {
+                        string tagName = tag.Split([' ', '>', '/'], StringSplitOptions.RemoveEmptyEntries)[0].TrimStart('<');
+                        if (!tag.EndsWith("/>", StringComparison.Ordinal) && !tagName.StartsWith('!'))
+                            tagStack.Push(tagName);
+                    }
+                    else if (tagStack.Count > 0)
+                    {
+                        tagStack.Pop();
+                    }
+
+                    continue;
+                }
+            }
+
+            result.Append(html[i]);
+            visibleLength++;
+            i++;
+        }
+
+        while (tagStack.Count > 0)
+        {
+            result.Append($"</{tagStack.Pop()}>");
+        }
+
+        return result.ToString();
     }
 }

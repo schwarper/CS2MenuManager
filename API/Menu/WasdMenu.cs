@@ -1,36 +1,99 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CS2MenuManager.API.Class;
+using CS2MenuManager.API.Enum;
+using CS2MenuManager.API.Interface;
 using System.Text;
 using static CounterStrikeSharp.API.Core.Listeners;
-using static CS2MenuManager.Buttons;
-using static CS2MenuManager.ConfigManager;
-using static CS2MenuManager.CS2MenuManager;
+using static CS2MenuManager.API.Class.ConfigManager;
+using static CS2MenuManager.API.Class.Buttons;
 
-namespace CS2MenuManager;
+namespace CS2MenuManager.API.Menu;
 
-public class WasdMenu(string title) : BaseMenu(title)
+/// <summary>
+/// Represents a WASD menu with customizable colors and options.
+/// </summary>
+/// <param name="title">The title of the menu.</param>
+/// <param name="plugin">The plugin associated with the menu.</param>
+public class WasdMenu(string title, BasePlugin plugin) : BaseMenu(title, plugin)
 {
+    /// <summary>
+    /// Gets or sets the color of the title.
+    /// </summary>
     public string TitleColor { get; set; } = "green";
+
+    /// <summary>
+    /// Gets or sets the color of the scroll up/down buttons.
+    /// </summary>
     public string ScrollUpDownColor { get; set; } = "cyan";
+
+    /// <summary>
+    /// Gets or sets the color of the exit button.
+    /// </summary>
     public string ExitColor { get; set; } = "purple";
+
+    /// <summary>
+    /// Gets or sets the color of the selected option.
+    /// </summary>
     public string SelectedOptionColor { get; set; } = "orange";
+
+    /// <summary>
+    /// Gets or sets the color of the options.
+    /// </summary>
     public string OptionColor { get; set; } = "white";
+
+    /// <summary>
+    /// Gets or sets the color of the disabled options.
+    /// </summary>
     public string DisabledOptionColor { get; set; } = "grey";
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the player is frozen while the menu is open.
+    /// </summary>
     public bool FreezePlayer { get; set; } = Config.WasdMenu.FreezePlayer;
 
+    /// <summary>
+    /// Displays the menu to the specified player for a specified duration.
+    /// </summary>
+    /// <param name="player">The player to whom the menu is displayed.</param>
+    /// <param name="time">The duration for which the menu is displayed.</param>
     public override void Display(CCSPlayerController player, int time = 0)
     {
         MenuTime = time;
         MenuManager.OpenMenu(player, this, (p, m) => new WasdMenuInstance(p, m));
     }
 }
+
+/// <summary>
+/// Represents an instance of a WASD menu with player-specific data.
+/// </summary>
 public class WasdMenuInstance : BaseMenuInstance
 {
+    /// <summary>
+    /// Gets or sets the index of the currently selected option.
+    /// </summary>
     public int CurrentChoiceIndex;
+
+    /// <summary>
+    /// Gets the number of items displayed per page.
+    /// </summary>
     public override int NumPerPage => 5;
+
+    /// <summary>
+    /// Gets or sets the display string for the menu.
+    /// </summary>
     public string DisplayString = "";
+
+    /// <summary>
+    /// Gets or sets the previous button state.
+    /// </summary>
     public PlayerButtons OldButton;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="WasdMenuInstance"/> class.
+    /// </summary>
+    /// <param name="player">The player associated with this menu instance.</param>
+    /// <param name="menu">The menu associated with this instance.</param>
     public WasdMenuInstance(CCSPlayerController player, IMenu menu) : base(player, menu)
     {
         var firstEnabledOption = Menu.ItemOptions
@@ -40,12 +103,15 @@ public class WasdMenuInstance : BaseMenuInstance
         CurrentChoiceIndex = firstEnabledOption != null ? firstEnabledOption.Index : throw new ArgumentException("No non-disabled menu option found.");
 
         RemoveOnTickListener();
-        Plugin.RegisterListener<OnTick>(OnTick);
+        Menu.Plugin.RegisterListener<OnTick>(OnTick);
 
         if (((WasdMenu)Menu).FreezePlayer)
             Player.Freeze();
     }
 
+    /// <summary>
+    /// Handles the tick event for the menu.
+    /// </summary>
     public void OnTick()
     {
         PlayerButtons button = Player.Buttons;
@@ -91,6 +157,9 @@ public class WasdMenuInstance : BaseMenuInstance
         }
     }
 
+    /// <summary>
+    /// Displays the menu to the player.
+    /// </summary>
     public override void Display()
     {
         if (Menu is not WasdMenu wasdMenu)
@@ -126,17 +195,16 @@ public class WasdMenuInstance : BaseMenuInstance
             }
             else
             {
-                switch (option.DisableOption)
+                builder.AppendLine(option.DisableOption switch
                 {
-                    case DisableOption.None:
-                    case DisableOption.DisableShowNumber:
-                        builder.AppendLine($"<font color='{wasdMenu.OptionColor}'>{keyOffset++}. {option.Text}</font> <br>");
-                        break;
-                    case DisableOption.DisableHideNumber:
-                        keyOffset++;
-                        builder.AppendLine($"<font color='{wasdMenu.DisabledOptionColor}'>{option.Text}</font> <br>");
-                        break;
-                }
+                    DisableOption.None or DisableOption.DisableShowNumber =>
+                        $"<font color='{wasdMenu.OptionColor}'>{keyOffset}. {option.Text}</font> <br>",
+                    DisableOption.DisableHideNumber =>
+                        $"<font color='{wasdMenu.DisabledOptionColor}'>{option.Text}</font> <br>",
+                    _ => string.Empty
+                });
+
+                keyOffset++;
             }
         }
 
@@ -151,6 +219,9 @@ public class WasdMenuInstance : BaseMenuInstance
         DisplayString = builder.ToString();
     }
 
+    /// <summary>
+    /// Closes the menu.
+    /// </summary>
     public override void Close()
     {
         base.Close();
@@ -166,9 +237,12 @@ public class WasdMenuInstance : BaseMenuInstance
 
     private void RemoveOnTickListener()
     {
-        Plugin.RemoveListener<OnTick>(OnTick);
+        Menu.Plugin.RemoveListener<OnTick>(OnTick);
     }
 
+    /// <summary>
+    /// Chooses the currently selected option.
+    /// </summary>
     public void Choose()
     {
         if (CurrentChoiceIndex >= 0 && CurrentChoiceIndex < Menu.ItemOptions.Count)
@@ -193,6 +267,9 @@ public class WasdMenuInstance : BaseMenuInstance
         }
     }
 
+    /// <summary>
+    /// Scrolls down to the next option.
+    /// </summary>
     public void ScrollDown()
     {
         int startIndex = CurrentChoiceIndex;
@@ -221,6 +298,9 @@ public class WasdMenuInstance : BaseMenuInstance
             Player.ExecuteClientCommand($"play {Config.Sound.ScrollDown}");
     }
 
+    /// <summary>
+    /// Scrolls up to the previous option.
+    /// </summary>
     public void ScrollUp()
     {
         int startIndex = CurrentChoiceIndex;

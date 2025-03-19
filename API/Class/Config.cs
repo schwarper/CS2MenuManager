@@ -3,13 +3,13 @@ using System.Reflection;
 using Tomlyn;
 using Tomlyn.Model;
 
-namespace CS2MenuManager;
+namespace CS2MenuManager.API.Class;
 
-public static class ConfigManager
+internal static class ConfigManager
 {
     public class Cfg
     {
-        public Buttons Buttons { get; set; } = new();
+        public ButtonsKey Buttons { get; set; } = new();
         public Sound Sound { get; set; } = new();
         public WasdMenuSettings WasdMenu { get; set; } = new();
         public ScreenMenu ScreenMenu { get; set; } = new();
@@ -17,7 +17,7 @@ public static class ConfigManager
         public Dictionary<string, Dictionary<string, string>> Lang { get; set; } = [];
     }
 
-    public class Buttons
+    public class ButtonsKey
     {
         public string ScrollUp { get; set; } = string.Empty;
         public string ScrollDown { get; set; } = string.Empty;
@@ -53,6 +53,7 @@ public static class ConfigManager
 
     public static Cfg Config { get; set; } = new();
     private static readonly string ConfigFilePath;
+    private static bool _isSet = false;
 
     static ConfigManager()
     {
@@ -70,9 +71,13 @@ public static class ConfigManager
 
     public static void LoadConfig()
     {
+        if (_isSet)
+            return;
+
         if (!File.Exists(ConfigFilePath))
             throw new FileNotFoundException($"Configuration file not found: {ConfigFilePath}");
 
+        _isSet = true;
         string configText = File.ReadAllText(ConfigFilePath);
         TomlTable model = Toml.ToModel(configText);
 
@@ -103,6 +108,7 @@ public static class ConfigManager
         Config.ScreenMenu.ShowResolutionsOption = bool.Parse(screenTable["ShowResolutionsOption"].ToString()!);
 
         TomlTable resolutionsTable = (TomlTable)model["Resolutions"];
+
         foreach (KeyValuePair<string, object> resolution in resolutionsTable)
         {
             if (resolution.Value is TomlTable innerTable)
@@ -118,11 +124,7 @@ public static class ConfigManager
         {
             if (lang.Value is TomlTable innerTable)
             {
-                if (!Config.Lang.TryGetValue(lang.Key, out Dictionary<string, string>? innerDict))
-                {
-                    innerDict = [];
-                    Config.Lang[lang.Key] = innerDict;
-                }
+                var innerDict = Config.Lang.GetValueOrDefault(lang.Key) ?? (Config.Lang[lang.Key] = []);
 
                 foreach (KeyValuePair<string, object> item in innerTable)
                 {

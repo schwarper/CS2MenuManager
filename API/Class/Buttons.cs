@@ -1,10 +1,16 @@
 ﻿using CounterStrikeSharp.API;
 
-namespace CS2MenuManager;
+namespace CS2MenuManager.API.Class;
 
-public class Buttons
+/// <summary>
+/// Represents a collection of button mappings for player controls.
+/// </summary>
+public static class Buttons
 {
-    public static Dictionary<string, PlayerButtons> ButtonMapping { get; } = new()
+    /// <summary>
+    /// Gets the dictionary mapping button names to their corresponding <see cref="PlayerButtons"/> values.
+    /// </summary>
+    public static readonly IReadOnlyDictionary<string, PlayerButtons> ButtonMapping = new Dictionary<string, PlayerButtons>
     {
         { "Alt1", PlayerButtons.Alt1 },
         { "Alt2", PlayerButtons.Alt2 },

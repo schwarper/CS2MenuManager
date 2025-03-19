@@ -1,38 +1,104 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Modules.Entities;
+using CS2MenuManager.API.Class;
+using CS2MenuManager.API.Enum;
+using CS2MenuManager.API.Interface;
 using System.Text;
 using static CounterStrikeSharp.API.Core.Listeners;
-using static CS2MenuManager.ConfigManager;
-using static CS2MenuManager.CS2MenuManager;
-using static CS2MenuManager.Library;
+using static CS2MenuManager.API.Class.ConfigManager;
+using static CS2MenuManager.API.Class.Library;
 
-namespace CS2MenuManager;
+namespace CS2MenuManager.API.Menu;
 
-public class ScreenMenu(string title) : BaseMenu(title)
+/// <summary>
+/// Represents a screen menu with customizable text and background options.
+/// </summary>
+/// <param name="title">The title of the menu.</param>
+/// <param name="plugin">The plugin associated with the menu.</param>
+public class ScreenMenu(string title, BasePlugin plugin) : BaseMenu(title, plugin)
 {
+    /// <summary>
+    /// Gets or sets the color of the text.
+    /// </summary>
     public string TextColor { get; set; } = Config.ScreenMenu.TextColor;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the menu has a background.
+    /// </summary>
     public bool Background { get; set; } = Config.ScreenMenu.Background;
+
+    /// <summary>
+    /// Gets or sets the height of the background.
+    /// </summary>
     public float BackgroundHeight { get; set; } = Config.ScreenMenu.BackgroundHeight;
+
+    /// <summary>
+    /// Gets or sets the width of the background.
+    /// </summary>
     public float BackgroundWidth { get; set; } = Config.ScreenMenu.BackgroundWidth;
+
+    /// <summary>
+    /// Gets or sets the font used for the text.
+    /// </summary>
     public string Font { get; set; } = Config.ScreenMenu.Font;
+
+    /// <summary>
+    /// Gets or sets the size of the text.
+    /// </summary>
     public int Size { get; set; } = Config.ScreenMenu.Size;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the player is frozen while the menu is open.
+    /// </summary>
     public bool FreezePlayer { get; set; } = Config.ScreenMenu.FreezePlayer;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the menu shows a resolutions option.
+    /// </summary>
     public bool ShowResolutionsOption { get; set; } = Config.ScreenMenu.ShowResolutionsOption;
 
+    /// <summary>
+    /// Displays the menu to the specified player for a specified duration.
+    /// </summary>
+    /// <param name="player">The player to whom the menu is displayed.</param>
+    /// <param name="time">The duration for which the menu is displayed.</param>
     public override void Display(CCSPlayerController player, int time = 0)
     {
         MenuTime = time;
         MenuManager.OpenMenu(player, this, (p, m) => new ScreenMenuInstance(p, m));
     }
 }
+
+/// <summary>
+/// Represents an instance of a screen menu with player-specific data.
+/// </summary>
 public class ScreenMenuInstance : BaseMenuInstance
 {
+    /// <summary>
+    /// Gets or sets the index of the currently selected option.
+    /// </summary>
     public int CurrentChoiceIndex = 0;
+
+    /// <summary>
+    /// Gets the number of items displayed per page.
+    /// </summary>
     public override int NumPerPage => 5;
+
+    /// <summary>
+    /// Gets or sets the previous button state.
+    /// </summary>
     public PlayerButtons OldButton;
+
+    /// <summary>
+    /// Gets or sets the world text entity used to display the menu.
+    /// </summary>
     public CPointWorldText? WorldText;
-     
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ScreenMenuInstance"/> class.
+    /// </summary>
+    /// <param name="player">The player associated with this menu instance.</param>
+    /// <param name="menu">The menu associated with this instance.</param>
     public ScreenMenuInstance(CCSPlayerController player, IMenu menu) : base(player, menu)
     {
         var firstEnabledOption = menu.ItemOptions
@@ -41,14 +107,17 @@ public class ScreenMenuInstance : BaseMenuInstance
 
         CurrentChoiceIndex = firstEnabledOption != null ? firstEnabledOption.Index : throw new ArgumentException("No non-disabled menu option found.");
 
-        Plugin.RegisterListener<OnTick>(OnTick);
-        Plugin.RegisterListener<CheckTransmit>(OnCheckTransmit);
-        Plugin.RegisterListener<OnEntityDeleted>(OnEntityDeleted);
+        Menu.Plugin.RegisterListener<OnTick>(OnTick);
+        Menu.Plugin.RegisterListener<CheckTransmit>(OnCheckTransmit);
+        Menu.Plugin.RegisterListener<OnEntityDeleted>(OnEntityDeleted);
 
         if (((ScreenMenu)Menu).FreezePlayer)
             Player.Freeze();
     }
 
+    /// <summary>
+    /// Displays the menu to the player.
+    /// </summary>
     public override void Display()
     {
         if (Menu is not ScreenMenu screenMenu)
@@ -91,12 +160,15 @@ public class ScreenMenuInstance : BaseMenuInstance
         }
     }
 
+    /// <summary>
+    /// Closes the menu.
+    /// </summary>
     public override void Close()
     {
         base.Close();
-        Plugin.RemoveListener<OnTick>(OnTick);
-        Plugin.RemoveListener<CheckTransmit>(OnCheckTransmit);
-        Plugin.RemoveListener<OnEntityDeleted>(OnEntityDeleted);
+        Menu.Plugin.RemoveListener<OnTick>(OnTick);
+        Menu.Plugin.RemoveListener<CheckTransmit>(OnCheckTransmit);
+        Menu.Plugin.RemoveListener<OnEntityDeleted>(OnEntityDeleted);
 
         if (WorldText != null && WorldText.IsValid)
             WorldText.Remove();
@@ -108,6 +180,9 @@ public class ScreenMenuInstance : BaseMenuInstance
             Player.ExecuteClientCommand($"play {Config.Sound.Exit}");
     }
 
+    /// <summary>
+    /// Handles the tick event for the menu.
+    /// </summary>
     public void OnTick()
     {
         PlayerButtons button = Player.Buttons;
@@ -160,11 +235,14 @@ public class ScreenMenuInstance : BaseMenuInstance
                 return;
             }
 
-            WorldText.Teleport(vectorData.Position, vectorData.Angle, null);
+            WorldText.Teleport(vectorData.Value.Position, vectorData.Value.Angle, null);
             WorldText.AcceptInput("SetParent", viewModel, null, "!activator");
         }
     }
 
+    /// <summary>
+    /// Chooses the currently selected option.
+    /// </summary>
     public void Choose()
     {
         if (CurrentChoiceIndex < 0 || CurrentChoiceIndex >= Menu.ItemOptions.Count) return;
@@ -188,6 +266,9 @@ public class ScreenMenuInstance : BaseMenuInstance
         }
     }
 
+    /// <summary>
+    /// Scrolls down to the next option.
+    /// </summary>
     public void ScrollDown()
     {
         int startIndex = CurrentChoiceIndex;
@@ -208,6 +289,9 @@ public class ScreenMenuInstance : BaseMenuInstance
             Player.ExecuteClientCommand($"play {Config.Sound.ScrollDown}");
     }
 
+    /// <summary>
+    /// Scrolls up to the previous option.
+    /// </summary>
     public void ScrollUp()
     {
         int startIndex = CurrentChoiceIndex;
@@ -228,6 +312,10 @@ public class ScreenMenuInstance : BaseMenuInstance
             Player.ExecuteClientCommand($"play {Config.Sound.ScrollUp}");
     }
 
+    /// <summary>
+    /// Handles the check transmit event for the menu.
+    /// </summary>
+    /// <param name="infoList">The list of check transmit information.</param>
     public void OnCheckTransmit(CCheckTransmitInfoList infoList)
     {
         if (WorldText == null) return;
@@ -238,6 +326,10 @@ public class ScreenMenuInstance : BaseMenuInstance
         }
     }
 
+    /// <summary>
+    /// Handles the entity deleted event for the menu.
+    /// </summary>
+    /// <param name="entity">The entity that was deleted.</param>
     public void OnEntityDeleted(CEntityInstance entity)
     {
         if (WorldText != null && WorldText.IsValid && WorldText == entity)

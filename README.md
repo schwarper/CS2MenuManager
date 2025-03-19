@@ -20,20 +20,10 @@ Discord link : [Discord server](https://discord.gg/4zQfUzjk36)
 * Restart your server for the changes to take effect. You will need to use this API in your plugins.
 
 # Usage
-1. First, you need to load the plugin into your main plugin file. If you skip this step, the plugin will throw an exception.
-```csharp
-using CS2MenuManager;
-
-public override void Load(bool hotReload)
-{
-    ICS2MenuManager.Load(this);
-}
-```
-
-2. You can create any type of menu. All menu types have a similar structure. Here's an example of how to create a Chat Menu:
+1. You can create any type of menu. All menu types have a similar structure. Here's an example of how to create a Chat Menu:
 Supported menus: `ChatMenu`, `ConsoleMenu`, `CenterHtmlMenu`, `WasdMenu`, `ScreenMenu`
 ```csharp
-ChatMenu menu = new("Title");
+ChatMenu menu = new("Title", this);
 
 menu.AddItem("Option 1", (p, o) =>
 {
@@ -46,13 +36,13 @@ menu.AddItem("Option 3X", DisableOption.DisableHideNumber);
 menu.Display(player);
 ```
 
-3. You can add submenus to any menu. Here's how to link a submenu:
+2. You can add submenus to any menu. Here's how to link a submenu:
 ```csharp
 menu.PrevMenu = AnySubMenu();
 
 private static CenterHtmlMenu AnySubMenu()
 {
-    CenterHtmlMenu menu = new("Title");
+    CenterHtmlMenu menu = new("Title", this);
     //...
     return menu;
 }
@@ -66,11 +56,11 @@ menu.AddItem("Option After Reset", (p, o) =>
 });
 ```
 
-5. You can set the time for the menu. When the time is up, the menu is automatically closed.
+3. You can set the time for the menu. When the time is up, the menu is automatically closed.
 ```csharp
 menu.Display(menu, 10);
 // OR
-ConsoleMenu menu = new("Console Menu")
+ConsoleMenu menu = new("Console Menu", this)
 {
     MenuTime = 20
 };

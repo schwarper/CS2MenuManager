@@ -63,6 +63,10 @@ jobs:
         run: |
           mkdir -p release
           cd BuildOutput
+          # Delete .nupkg ve .xml files
+          rm -f *.nupkg
+          rm -f *.xml
+          # Create zip
           zip -r ../CS2MenuManager-v${{ env.BUILD_NUMBER }}-${{ env.GITHUB_SHA_SHORT }}.zip *
 
       - name: Create GitHub Release
@@ -75,8 +79,17 @@ jobs:
           release_name: v1.0.${{ env.BUILD_NUMBER }}
           draft: false
           prerelease: false
-          body: | 
-            `${{ github.event.head_commit.message }}`
+          body: |
+            ## Release Notes for v1.0.${{ env.BUILD_NUMBER }}
+
+            ### Changes:
+            - ${{ github.event.pull_request.title || github.event.head_commit.message }}
+          
+            ### Description:
+            ${{ github.event.pull_request.body }}
+
+            ### Feedback:
+            - If you encounter any issues, please report them [here](https://github.com/${{ github.repository }}/issues).
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1

@@ -1,9 +1,6 @@
 ﻿using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Modules.Commands;
-using CounterStrikeSharp.API.Modules.Entities;
 using CS2MenuManager.API.Enum;
 using CS2MenuManager.API.Interface;
-using CS2MenuManager.API.Menu;
 using static CS2MenuManager.API.Class.ConfigManager;
 using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
 
@@ -66,17 +63,10 @@ public static class MenuManager
             menu.Plugin.AddTimer(menu.MenuTime, () => CloseActiveMenu(player, CloseMenuAction.Close)) :
             null;
 
-        var instance = createInstance.Invoke(player, menu);
+        IMenuInstance instance = createInstance.Invoke(player, menu);
 
         if (instance is BaseMenuInstance baseMenuInstance)
-        {
-            Console.WriteLine("YES");
             baseMenuInstance.RegisterOnKeyPress();
-        }
-        else
-        {
-            Console.WriteLine("NO");
-        }
 
         ActiveMenus[player.Handle] = (instance, timer);
         ActiveMenus[player.Handle].Instance.Display();

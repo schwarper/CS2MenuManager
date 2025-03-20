@@ -124,7 +124,7 @@ internal static class ConfigManager
         {
             if (lang.Value is TomlTable innerTable)
             {
-                var innerDict = Config.Lang.GetValueOrDefault(lang.Key) ?? (Config.Lang[lang.Key] = []);
+                Dictionary<string, string> innerDict = Config.Lang.GetValueOrDefault(lang.Key) ?? (Config.Lang[lang.Key] = []);
 
                 foreach (KeyValuePair<string, object> item in innerTable)
                 {

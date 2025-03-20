@@ -37,7 +37,7 @@ public class ConsoleMenuInstance(CCSPlayerController player, IMenu menu) : BaseM
     /// </summary>
     public override void Display()
     {
-        var builder = new StringBuilder();
+        StringBuilder builder = new();
 
         builder.AppendLine(Menu.Title);
         builder.AppendLine("---");

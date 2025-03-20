@@ -140,17 +140,9 @@ internal static partial class Library
         }
 
         string shortName = cultureInfo.TwoLetterISOLanguageName.ToLower();
-        if (Config.Lang.TryGetValue(shortName, out lang) && lang.TryGetValue(key, out text))
-        {
-            return string.Format(text, args);
-        }
-
-        if (Config.Lang.TryGetValue("en", out lang) && lang.TryGetValue(key, out text))
-        {
-            return string.Format(text, args);
-        }
-
-        return key;
+        return Config.Lang.TryGetValue(shortName, out lang) && lang.TryGetValue(key, out text)
+            ? string.Format(text, args)
+            : Config.Lang.TryGetValue("en", out lang) && lang.TryGetValue(key, out text) ? string.Format(text, args) : key;
     }
 
     public static string TruncateHtml(this string html, int maxLength)
@@ -162,15 +154,15 @@ internal static partial class Library
         if (textOnly.Length <= maxLength)
             return html;
 
-        var tagStack = new Stack<string>();
-        var result = new StringBuilder();
+        Stack<string> tagStack = new();
+        StringBuilder result = new();
         int visibleLength = 0, i = 0;
 
         while (i < html.Length && visibleLength < maxLength)
         {
             if (html[i] == '<')
             {
-                var match = TagRegex().Match(html, i);
+                Match match = TagRegex().Match(html, i);
                 if (match.Success && match.Index == i)
                 {
                     string tag = match.Value;

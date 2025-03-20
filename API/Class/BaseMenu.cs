@@ -4,9 +4,6 @@ using CounterStrikeSharp.API.Modules.Commands;
 using CS2MenuManager.API.Enum;
 using CS2MenuManager.API.Interface;
 using CS2MenuManager.API.Menu;
-using static CounterStrikeSharp.API.Core.BasePlugin;
-using System.Xml.Linq;
-using CounterStrikeSharp.API.Modules.Entities;
 
 namespace CS2MenuManager.API.Class;
 
@@ -169,7 +166,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     /// </summary>
     protected virtual int MenuItemsPerPage => NumPerPage;
 
-    private static readonly Dictionary<string, CommandInfo.CommandListenerCallback> listeners = [];
+    private readonly Dictionary<string, CommandInfo.CommandListenerCallback> listeners = [];
 
     /// <summary>
     /// Displays the menu to the player.
@@ -184,7 +181,6 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
         CurrentOffset = 0;
         Page = 0;
         PrevPageOffsets.Clear();
-        Console.WriteLine("RESET");
     }
 
     /// <summary>
@@ -192,7 +188,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     /// </summary>
     public virtual void Close()
     {
-        this.DeregisterOnKeyPress();
+        DeregisterOnKeyPress();
         MenuManager.CloseActiveMenu(Player, CloseMenuAction.Reset);
     }
     /// <summary>
@@ -279,7 +275,11 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
         for (int i = 1; i <= 9; ++i)
         {
             int key = i;
-            HookResult _func(CCSPlayerController? player, CommandInfo info) => OnCommandListener(player, info, key);
+            HookResult _func(CCSPlayerController? player, CommandInfo info)
+            {
+                return OnCommandListener(player, info, key);
+            }
+
             listeners[$"css_{i}"] = _func;
             Menu.Plugin.AddCommandListener($"css_{i}", _func);
         }
@@ -287,7 +287,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
 
     internal void DeregisterOnKeyPress()
     {
-        foreach (var kvp in listeners)
+        foreach (KeyValuePair<string, CommandInfo.CommandListenerCallback> kvp in listeners)
             Menu.Plugin.RemoveCommandListener(kvp.Key, kvp.Value, HookMode.Pre);
 
         listeners.Clear();

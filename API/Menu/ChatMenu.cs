@@ -2,7 +2,6 @@
 using CounterStrikeSharp.API.Modules.Utils;
 using CS2MenuManager.API.Class;
 using CS2MenuManager.API.Enum;
-using System.Text;
 
 namespace CS2MenuManager.API.Menu;
 

@@ -104,12 +104,10 @@ public class ScreenMenuInstance : BaseMenuInstance
     /// <param name="menu">The menu associated with this instance.</param>
     public ScreenMenuInstance(CCSPlayerController player, IMenu menu) : base(player, menu)
     {
-        ScreenMenu screenMenu = (ScreenMenu)Menu;
-
         Menu.Plugin.RegisterListener<OnTick>(OnTick);
         Menu.Plugin.RegisterListener<CheckTransmit>(OnCheckTransmit);
         Menu.Plugin.RegisterListener<OnEntityDeleted>(OnEntityDeleted);
-        if (screenMenu.FreezePlayer) Player.Freeze();
+        if (((ScreenMenu)Menu).FreezePlayer) Player.Freeze();
     }
 
     /// <summary>

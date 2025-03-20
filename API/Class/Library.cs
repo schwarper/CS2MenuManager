@@ -112,25 +112,6 @@ internal static partial class Library
         return entity;
     }
 
-    public static CPointWorldText? CreateDecoyWorldText()
-    {
-        CPointWorldText entity = Utilities.CreateEntityByName<CPointWorldText>("point_worldtext")!;
-
-        if (entity == null || !entity.IsValid)
-        {
-            return null;
-        }
-
-        entity.MessageText = "test";
-        entity.Enabled = true;
-        entity.JustifyHorizontal = PointWorldTextJustifyHorizontal_t.POINT_WORLD_TEXT_JUSTIFY_HORIZONTAL_LEFT;
-        entity.JustifyVertical = PointWorldTextJustifyVertical_t.POINT_WORLD_TEXT_JUSTIFY_VERTICAL_CENTER;
-        entity.ReorientMode = PointWorldTextReorientMode_t.POINT_WORLD_TEXT_REORIENT_NONE;
-        entity.RenderMode = RenderMode_t.kRenderNormal;
-        entity.DispatchSpawn();
-        return entity;
-    }
-
     public static void Freeze(this CCSPlayerController player)
     {
         player.PlayerPawn.Value?.ChangeMoveType(MoveType_t.MOVETYPE_OBSOLETE);

@@ -293,13 +293,6 @@ public class ScreenMenuInstance : BaseMenuInstance
             }
         }
 
-        PlayerButtons tab = ButtonMapping["Tab"];
-        if ((button & tab) == tab)
-        {
-            Close();
-            return;
-        }
-
         OldButton = button;
 
         if (WorldText != null)

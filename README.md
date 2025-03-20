@@ -8,7 +8,7 @@ Discord nickname: schwarper
 
 Discord link : [Discord server](https://discord.gg/4zQfUzjk36)
 
-# Installation
+# Installation 
 
 1. Download:
 * Download the latest release from [GitHub Releases](https://github.com/schwarper/CS2MenuManager/releases).

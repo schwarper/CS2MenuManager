@@ -23,6 +23,8 @@ internal static class ConfigManager
         public string ScrollUp { get; set; } = string.Empty;
         public string ScrollDown { get; set; } = string.Empty;
         public string Select { get; set; } = string.Empty;
+        public string Prev { get; set; } = string.Empty;
+        public string Exit { get; set; } = string.Empty;
     }
 
     public class Sound
@@ -86,6 +88,8 @@ internal static class ConfigManager
         Config.Buttons.ScrollUp = buttons["ScrollUp"].ToString()!;
         Config.Buttons.ScrollDown = buttons["ScrollDown"].ToString()!;
         Config.Buttons.Select = buttons["Select"].ToString()!;
+        Config.Buttons.Prev = buttons["Prev"].ToString()!;
+        Config.Buttons.Exit = buttons["Exit"].ToString()!;
 
         TomlTable soundTable = (TomlTable)model["Sound"];
         Config.Sound.Select = soundTable["Select"].ToString()!;
@@ -109,7 +113,6 @@ internal static class ConfigManager
         Config.ScreenMenu.ShowResolutionsOption = bool.Parse(screenTable["ShowResolutionsOption"].ToString()!);
 
         TomlTable resolutionsTable = (TomlTable)model["Resolutions"];
-
         foreach (KeyValuePair<string, object> resolution in resolutionsTable)
         {
             if (resolution.Value is TomlTable innerTable)

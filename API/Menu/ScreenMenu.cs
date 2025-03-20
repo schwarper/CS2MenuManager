@@ -115,10 +115,11 @@ public class ScreenMenuInstance : BaseMenuInstance
     /// </summary>
     public override void Display()
     {
-        if (Menu is not ScreenMenu screenMenu) return;
+        if (Menu is not ScreenMenu screenMenu)
+            return;
 
         StringBuilder builder = new();
-        int totalPages = (int)Math.Ceiling((double)Menu.ItemOptions.Count / NumPerPage);
+        int totalPages = (int)Math.Ceiling((double)Menu.ItemOptions.Count / MenuItemsPerPage);
         int currentPage = Page + 1;
 
         builder.AppendLine(" ");
@@ -139,9 +140,7 @@ public class ScreenMenuInstance : BaseMenuInstance
         for (int i = 0; i < visibleOptions.Count; i++)
         {
             if (i == dynamicStartIndex)
-            {
                 builder.AppendLine(" ");
-            }
 
             (string text, int _) = visibleOptions[i];
             string displayLine = (i == CurrentChoiceIndex) ? $"> {text}" : $"  {text}";
@@ -149,14 +148,12 @@ public class ScreenMenuInstance : BaseMenuInstance
         }
 
         builder.AppendLine(" ");
-        builder.AppendLine(Player.Localizer("Scroll", Config.Buttons.ScrollUp, Config.Buttons.ScrollDown));
-        builder.AppendLine(Player.Localizer("Select", Config.Buttons.Select));
+        builder.AppendLine(Player.Localizer("ScrollKey", Config.Buttons.ScrollUp, Config.Buttons.ScrollDown));
+        builder.AppendLine(Player.Localizer("SelectKey", Config.Buttons.Select));
         builder.AppendLine(" ");
 
         if (WorldText == null || !WorldText.IsValid)
-        {
             WorldText = CreateWorldText(builder.ToString(), screenMenu.Size, screenMenu.TextColor, screenMenu.Font, screenMenu.Background, screenMenu.BackgroundHeight, screenMenu.BackgroundWidth);
-        }
         else
         {
             WorldText.MessageText = builder.ToString();
@@ -184,7 +181,8 @@ public class ScreenMenuInstance : BaseMenuInstance
     private void ScrollDown()
     {
         List<(string Text, int GlobalIndex)> visibleOptions = GetVisibleOptions();
-        if (visibleOptions.Count == 0) return;
+        if (visibleOptions.Count == 0)
+            return;
 
         CurrentChoiceIndex = (CurrentChoiceIndex + 1) % visibleOptions.Count;
         Display();
@@ -196,7 +194,8 @@ public class ScreenMenuInstance : BaseMenuInstance
     private void ScrollUp()
     {
         List<(string Text, int GlobalIndex)> visibleOptions = GetVisibleOptions();
-        if (visibleOptions.Count == 0) return;
+        if (visibleOptions.Count == 0)
+            return;
 
         CurrentChoiceIndex = (CurrentChoiceIndex - 1 + visibleOptions.Count) % visibleOptions.Count;
         Display();
@@ -217,7 +216,7 @@ public class ScreenMenuInstance : BaseMenuInstance
             case -1: NextPage(); return;
             case -2: PrevPage(); return;
             case -3: Close(); return;
-            case -4: Close(); ResolutionMenu(Player, Menu.Plugin).Display(Player, 0); return;
+            case -4: Close(); ResolutionMenu(Player, Menu.Plugin, Menu).Display(Player, 0); return;
             default:
                 ItemOption option = Menu.ItemOptions[globalIndex];
 
@@ -294,13 +293,6 @@ public class ScreenMenuInstance : BaseMenuInstance
             }
         }
 
-        PlayerButtons tab = ButtonMapping["Tab"];
-        if ((button & tab) == tab)
-        {
-            Close();
-            return;
-        }
-
         OldButton = button;
 
         if (WorldText != null)
@@ -328,10 +320,11 @@ public class ScreenMenuInstance : BaseMenuInstance
 
     private void OnEntityDeleted(CEntityInstance entity)
     {
-        if (WorldText != null && WorldText.IsValid && WorldText == entity) Close();
+        if (WorldText != null && WorldText.IsValid && WorldText == entity)
+            Close();
     }
 
-    private static ScreenMenu ResolutionMenu(CCSPlayerController player, BasePlugin plugin)
+    private static ScreenMenu ResolutionMenu(CCSPlayerController player, BasePlugin plugin, IMenu prevMenu)
     {
         ScreenMenu menu = new(player.Localizer("SelectResolution"), plugin)
         {
@@ -343,6 +336,7 @@ public class ScreenMenuInstance : BaseMenuInstance
             menu.AddItem(resolution.Key, (p, o) =>
             {
                 SetPlayerResolution(p, resolution.Value);
+                prevMenu.Display(p, prevMenu.MenuTime);
             });
         }
 

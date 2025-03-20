@@ -63,19 +63,13 @@ public class ConsoleMenuInstance(CCSPlayerController player, IMenu menu) : BaseM
         }
 
         if (HasPrevButton)
-        {
             builder.AppendLine($"css_7 -> {Player.Localizer("Prev")}");
-        }
 
         if (HasNextButton)
-        {
             builder.AppendLine($"css_8 -> {Player.Localizer("Next")}");
-        }
 
         if (Menu.ExitButton)
-        {
             builder.AppendLine($"css_9 -> {Player.Localizer("Exit")}");
-        }
 
         Player.PrintToConsole(builder.ToString());
     }

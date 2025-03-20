@@ -105,16 +105,6 @@ public interface IMenuInstance
     IMenu Menu { get; }
 
     /// <summary>
-    /// Gets the time duration for which the menu is displayed.
-    /// </summary>
-    int MenuTime { get; }
-
-    /// <summary>
-    /// Gets the previous menu.
-    /// </summary>
-    IMenu? PrevMenu { get; }
-
-    /// <summary>
     /// Navigates to the next page of the menu.
     /// </summary>
     void NextPage();

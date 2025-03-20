@@ -7,19 +7,15 @@ internal static class ResolutionManager
 {
     public class Resolution
     {
-        public float PositionX;
-        public float PositionY;
+        public float PositionX = Config.ScreenMenu.PositionX;
+        public float PositionY = Config.ScreenMenu.PositionY;
     }
 
     public static readonly Dictionary<IntPtr, Resolution> Resolutions = [];
 
     public static Resolution GetDefaultResolution()
     {
-        return new Resolution()
-        {
-            PositionX = Config.ScreenMenu.PositionX,
-            PositionY = Config.ScreenMenu.PositionY
-        };
+        return new();
     }
 
     public static Resolution GetPlayerResolution(CCSPlayerController player)

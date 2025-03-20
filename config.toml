@@ -2,6 +2,7 @@
 ScrollUp = "W"
 ScrollDown = "S"
 Select = "E"
+Exit = "Tab"
 
 [Sound]
 Select = ""

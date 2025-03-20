@@ -40,11 +40,6 @@ public abstract class BaseMenu(string title, BasePlugin plugin) : IMenu
     public IMenu? PrevMenu { get; set; }
 
     /// <summary>
-    /// Gets or sets the timer associated with the menu.
-    /// </summary>
-    public Timer? Timer { get; set; }
-
-    /// <summary>
     /// Gets the plugin instance.
     /// </summary>
     public BasePlugin Plugin { get; } = plugin;
@@ -107,31 +102,6 @@ public abstract class BaseMenu(string title, BasePlugin plugin) : IMenu
 public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) : IMenuInstance
 {
     /// <summary>
-    /// Gets the number of items displayed per page.
-    /// </summary>
-    public virtual int NumPerPage => 6;
-
-    /// <summary>
-    /// Gets the stack of previous page offsets.
-    /// </summary>
-    public Stack<int> PrevPageOffsets { get; } = new();
-
-    /// <summary>
-    /// Gets the menu associated with this instance.
-    /// </summary>
-    public IMenu Menu => menu;
-
-    /// <summary>
-    /// Gets the time duration for which the menu is displayed.
-    /// </summary>
-    public int MenuTime => menu.MenuTime;
-
-    /// <summary>
-    /// Gets the previous menu in the navigation hierarchy.
-    /// </summary>
-    public IMenu? PrevMenu => menu.PrevMenu;
-
-    /// <summary>
     /// Gets or sets the player associated with this menu instance.
     /// </summary>
     public CCSPlayerController Player { get; set; } = player;
@@ -145,6 +115,21 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     /// Gets or sets the current offset of the menu items.
     /// </summary>
     public int CurrentOffset { get; set; }
+
+    /// <summary>
+    /// Gets the number of items displayed per page.
+    /// </summary>
+    public virtual int NumPerPage => 6;
+
+    /// <summary>
+    /// Gets the stack of previous page offsets.
+    /// </summary>
+    public Stack<int> PrevPageOffsets { get; } = new();
+
+    /// <summary>
+    /// Gets the menu associated with this instance.
+    /// </summary>
+    public IMenu Menu => menu;
 
     /// <summary>
     /// Gets a value indicating whether the menu has a previous button.
@@ -161,17 +146,28 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     /// </summary>
     protected bool HasExitButton => Menu.ExitButton;
 
-    /// <summary>
-    /// Gets the number of menu items displayed per page.
-    /// </summary>
-    protected virtual int MenuItemsPerPage => NumPerPage;
-
-    private readonly Dictionary<string, CommandInfo.CommandListenerCallback> listeners = [];
+    private readonly Dictionary<string, CommandInfo.CommandListenerCallback> _listeners = [];
 
     /// <summary>
-    /// Displays the menu to the player.
+    /// Navigates to the next page of the menu.
     /// </summary>
-    public virtual void Display() { }
+    public void NextPage()
+    {
+        PrevPageOffsets.Push(CurrentOffset);
+        CurrentOffset += NumPerPage;
+        Page++;
+        Display();
+    }
+
+    /// <summary>
+    /// Navigates to the previous page of the menu.
+    /// </summary>
+    public void PrevPage()
+    {
+        Page--;
+        CurrentOffset = PrevPageOffsets.Pop();
+        Display();
+    }
 
     /// <summary>
     /// Resets the menu to its initial state.
@@ -191,6 +187,12 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
         DeregisterOnKeyPress();
         MenuManager.CloseActiveMenu(Player, CloseMenuAction.Reset);
     }
+
+    /// <summary>
+    /// Displays the menu to the player.
+    /// </summary>
+    public virtual void Display() { }
+
     /// <summary>
     /// Handles key press events for the menu.
     /// </summary>
@@ -198,7 +200,8 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     /// <param name="key">The key that was pressed.</param>
     public void OnKeyPress(CCSPlayerController player, int key)
     {
-        if (player.Handle != Player.Handle || Menu is WasdMenu or ScreenMenu) return;
+        if (player.Handle != Player.Handle || Menu is WasdMenu or ScreenMenu)
+            return;
 
         switch (key)
         {
@@ -218,33 +221,10 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
         }
     }
 
-    /// <summary>
-    /// Navigates to the next page of the menu.
-    /// </summary>
-    public void NextPage()
+    internal void PrevSubMenu()
     {
-        PrevPageOffsets.Push(CurrentOffset);
-        CurrentOffset += MenuItemsPerPage;
-        Page++;
-        Display();
-    }
-
-    /// <summary>
-    /// Navigates to the previous page of the menu.
-    /// </summary>
-    public void PrevPage()
-    {
-        Page--;
-        CurrentOffset = PrevPageOffsets.Pop();
-        Display();
-    }
-
-    /// <summary>
-    /// Navigates to the previous submenu.
-    /// </summary>
-    public void PrevSubMenu()
-    {
-        PrevMenu?.Display(Player, PrevMenu.MenuTime);
+        if (menu.PrevMenu is IMenu prevMenu)
+            prevMenu.Display(Player, prevMenu.MenuTime);
     }
 
     private void HandleMenuItemSelection(int key)
@@ -275,25 +255,26 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
         for (int i = 1; i <= 9; ++i)
         {
             int key = i;
+
             HookResult _func(CCSPlayerController? player, CommandInfo info)
             {
-                return OnCommandListener(player, info, key);
+                return OnCommandListener(player, key);
             }
 
-            listeners[$"css_{i}"] = _func;
+            _listeners[$"css_{i}"] = _func;
             Menu.Plugin.AddCommandListener($"css_{i}", _func);
         }
     }
 
     internal void DeregisterOnKeyPress()
     {
-        foreach (KeyValuePair<string, CommandInfo.CommandListenerCallback> kvp in listeners)
+        foreach (KeyValuePair<string, CommandInfo.CommandListenerCallback> kvp in _listeners)
             Menu.Plugin.RemoveCommandListener(kvp.Key, kvp.Value, HookMode.Pre);
 
-        listeners.Clear();
+        _listeners.Clear();
     }
 
-    private HookResult OnCommandListener(CCSPlayerController? player, CommandInfo info, int key)
+    private HookResult OnCommandListener(CCSPlayerController? player, int key)
     {
         if (player != Player)
             return HookResult.Continue;

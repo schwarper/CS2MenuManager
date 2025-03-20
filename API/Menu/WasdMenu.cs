@@ -137,7 +137,7 @@ public class WasdMenuInstance : BaseMenuInstance
 
         if ((button & PlayerButtons.Moveleft) == 0 && (OldButton & PlayerButtons.Moveleft) != 0)
         {
-            if (PrevMenu == null)
+            if (Menu.PrevMenu == null)
                 Close();
             else
                 PrevSubMenu();
@@ -186,7 +186,7 @@ public class WasdMenuInstance : BaseMenuInstance
         builder.AppendLine($"{Prefix}{Menu.Title}</u><br>");
 
         int keyOffset = 1;
-        int maxIndex = Math.Min(CurrentOffset + MenuItemsPerPage, Menu.ItemOptions.Count);
+        int maxIndex = Math.Min(CurrentOffset + NumPerPage, Menu.ItemOptions.Count);
         for (int i = CurrentOffset; i < maxIndex; i++)
         {
             ItemOption option = Menu.ItemOptions[i];
@@ -209,7 +209,7 @@ public class WasdMenuInstance : BaseMenuInstance
             }
         }
 
-        if (Menu.ItemOptions.Count > MenuItemsPerPage)
+        if (Menu.ItemOptions.Count > NumPerPage)
         {
             builder.AppendLine(OptionsBelow);
         }
@@ -285,7 +285,7 @@ public class WasdMenuInstance : BaseMenuInstance
 
         } while (Menu.ItemOptions[CurrentChoiceIndex].DisableOption != DisableOption.None);
 
-        int lastVisibleIndex = CurrentOffset + MenuItemsPerPage - 1;
+        int lastVisibleIndex = CurrentOffset + NumPerPage - 1;
         if (CurrentChoiceIndex > lastVisibleIndex)
         {
             NextPage();

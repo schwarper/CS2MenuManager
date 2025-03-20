@@ -115,7 +115,8 @@ public class ScreenMenuInstance : BaseMenuInstance
     /// </summary>
     public override void Display()
     {
-        if (Menu is not ScreenMenu screenMenu) return;
+        if (Menu is not ScreenMenu screenMenu)
+            return;
 
         StringBuilder builder = new();
         int totalPages = (int)Math.Ceiling((double)Menu.ItemOptions.Count / NumPerPage);
@@ -139,9 +140,7 @@ public class ScreenMenuInstance : BaseMenuInstance
         for (int i = 0; i < visibleOptions.Count; i++)
         {
             if (i == dynamicStartIndex)
-            {
                 builder.AppendLine(" ");
-            }
 
             (string text, int _) = visibleOptions[i];
             string displayLine = (i == CurrentChoiceIndex) ? $"> {text}" : $"  {text}";
@@ -154,9 +153,7 @@ public class ScreenMenuInstance : BaseMenuInstance
         builder.AppendLine(" ");
 
         if (WorldText == null || !WorldText.IsValid)
-        {
             WorldText = CreateWorldText(builder.ToString(), screenMenu.Size, screenMenu.TextColor, screenMenu.Font, screenMenu.Background, screenMenu.BackgroundHeight, screenMenu.BackgroundWidth);
-        }
         else
         {
             WorldText.MessageText = builder.ToString();
@@ -184,7 +181,8 @@ public class ScreenMenuInstance : BaseMenuInstance
     private void ScrollDown()
     {
         List<(string Text, int GlobalIndex)> visibleOptions = GetVisibleOptions();
-        if (visibleOptions.Count == 0) return;
+        if (visibleOptions.Count == 0)
+            return;
 
         CurrentChoiceIndex = (CurrentChoiceIndex + 1) % visibleOptions.Count;
         Display();
@@ -196,7 +194,8 @@ public class ScreenMenuInstance : BaseMenuInstance
     private void ScrollUp()
     {
         List<(string Text, int GlobalIndex)> visibleOptions = GetVisibleOptions();
-        if (visibleOptions.Count == 0) return;
+        if (visibleOptions.Count == 0)
+            return;
 
         CurrentChoiceIndex = (CurrentChoiceIndex - 1 + visibleOptions.Count) % visibleOptions.Count;
         Display();
@@ -328,7 +327,8 @@ public class ScreenMenuInstance : BaseMenuInstance
 
     private void OnEntityDeleted(CEntityInstance entity)
     {
-        if (WorldText != null && WorldText.IsValid && WorldText == entity) Close();
+        if (WorldText != null && WorldText.IsValid && WorldText == entity)
+            Close();
     }
 
     private static ScreenMenu ResolutionMenu(CCSPlayerController player, BasePlugin plugin)

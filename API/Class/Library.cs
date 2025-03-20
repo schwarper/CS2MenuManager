@@ -4,10 +4,10 @@ using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Utils;
 using System.Drawing;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using static CS2MenuManager.API.Class.ConfigManager;
-using System.Globalization;
 
 namespace CS2MenuManager.API.Class;
 
@@ -36,7 +36,8 @@ internal static partial class Library
     public static VectorData? FindVectorData(this CCSPlayerController player)
     {
         CCSPlayerPawn? playerPawn = GetPlayerPawn(player);
-        if (playerPawn == null) return null;
+        if (playerPawn == null)
+            return null;
 
         ResolutionManager.Resolution resolution = ResolutionManager.GetPlayerResolution(player);
 
@@ -62,12 +63,11 @@ internal static partial class Library
     public static CCSGOViewModel? EnsureCustomView(this CCSPlayerController player)
     {
         CCSPlayerPawn? playerPawn = GetPlayerPawn(player);
-        if (playerPawn == null) return null;
+        if (playerPawn == null)
+            return null;
 
         if (playerPawn.ViewModelServices == null)
-        {
             return null;
-        }
 
         int offset = Schema.GetSchemaOffset("CCSPlayer_ViewModelServices", "m_hViewModel");
         IntPtr viewModelHandleAddress = playerPawn.ViewModelServices.Handle + offset + 4;
@@ -89,9 +89,7 @@ internal static partial class Library
         CPointWorldText entity = Utilities.CreateEntityByName<CPointWorldText>("point_worldtext")!;
 
         if (entity == null || !entity.IsValid)
-        {
             return null;
-        }
 
         entity.MessageText = text;
         entity.Enabled = true;
@@ -117,16 +115,16 @@ internal static partial class Library
     {
         player.PlayerPawn.Value?.ChangeMoveType(MoveType_t.MOVETYPE_OBSOLETE);
     }
+
     public static void Unfreeze(this CCSPlayerController player)
     {
         player.PlayerPawn.Value?.ChangeMoveType(MoveType_t.MOVETYPE_WALK);
     }
+
     public static void ChangeMoveType(this CBasePlayerPawn pawn, MoveType_t movetype)
     {
         if (pawn.Handle == IntPtr.Zero)
-        {
             return;
-        }
 
         pawn.MoveType = movetype;
         Schema.SetSchemaValue(pawn.Handle, "CBaseEntity", "m_nActualMoveType", movetype);
@@ -138,9 +136,7 @@ internal static partial class Library
         CultureInfo cultureInfo = player.GetLanguage();
 
         if (Config.Lang.TryGetValue(cultureInfo.Name, out Dictionary<string, string>? lang) && lang.TryGetValue(key, out string? text))
-        {
             return string.Format(text, args);
-        }
 
         string shortName = cultureInfo.TwoLetterISOLanguageName.ToLower();
         return Config.Lang.TryGetValue(shortName, out lang) && lang.TryGetValue(key, out text)
@@ -193,9 +189,7 @@ internal static partial class Library
         }
 
         while (tagStack.Count > 0)
-        {
             result.Append($"</{tagStack.Pop()}>");
-        }
 
         return result.ToString();
     }

@@ -109,7 +109,6 @@ internal static class ConfigManager
         Config.ScreenMenu.ShowResolutionsOption = bool.Parse(screenTable["ShowResolutionsOption"].ToString()!);
 
         TomlTable resolutionsTable = (TomlTable)model["Resolutions"];
-
         foreach (KeyValuePair<string, object> resolution in resolutionsTable)
         {
             if (resolution.Value is TomlTable innerTable)

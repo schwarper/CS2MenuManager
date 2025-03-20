@@ -81,17 +81,12 @@ public class CenterHtmlMenuInstance : BaseMenuInstance
     /// <summary>
     /// Gets the number of items displayed per page.
     /// </summary>
-    public override int NumPerPage => 5;
+    public override int NumPerPage => CalculateMenuItemsPerPage();
 
     /// <summary>
     /// Gets a value indicating whether the menu has a next button.
     /// </summary>
     protected override bool HasNextButton => Menu.ItemOptions.Count > NumPerPage + 1 && CurrentOffset + NumPerPage < Menu.ItemOptions.Count;
-
-    /// <summary>
-    /// Gets the number of menu items displayed per page.
-    /// </summary>
-    protected override int MenuItemsPerPage => CalculateMenuItemsPerPage();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CenterHtmlMenuInstance"/> class.
@@ -118,7 +113,7 @@ public class CenterHtmlMenuInstance : BaseMenuInstance
         builder.Append($"<b><font color='{centerHtmlMenu.TitleColor}'>{centerHtmlMenu.Title}</font></b><br>");
 
         int keyOffset = 1;
-        int maxIndex = Math.Min(CurrentOffset + MenuItemsPerPage, Menu.ItemOptions.Count);
+        int maxIndex = Math.Min(CurrentOffset + NumPerPage, Menu.ItemOptions.Count);
         for (int i = CurrentOffset; i < maxIndex; i++)
         {
             ItemOption option = centerHtmlMenu.ItemOptions[i];

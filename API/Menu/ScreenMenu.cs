@@ -119,7 +119,7 @@ public class ScreenMenuInstance : BaseMenuInstance
             return;
 
         StringBuilder builder = new();
-        int totalPages = (int)Math.Ceiling((double)Menu.ItemOptions.Count / NumPerPage);
+        int totalPages = (int)Math.Ceiling((double)Menu.ItemOptions.Count / MenuItemsPerPage);
         int currentPage = Page + 1;
 
         builder.AppendLine(" ");
@@ -148,8 +148,8 @@ public class ScreenMenuInstance : BaseMenuInstance
         }
 
         builder.AppendLine(" ");
-        builder.AppendLine(Player.Localizer("Scroll", Config.Buttons.ScrollUp, Config.Buttons.ScrollDown));
-        builder.AppendLine(Player.Localizer("Select", Config.Buttons.Select));
+        builder.AppendLine(Player.Localizer("ScrollKey", Config.Buttons.ScrollUp, Config.Buttons.ScrollDown));
+        builder.AppendLine(Player.Localizer("SelectKey", Config.Buttons.Select));
         builder.AppendLine(" ");
 
         if (WorldText == null || !WorldText.IsValid)
@@ -216,7 +216,7 @@ public class ScreenMenuInstance : BaseMenuInstance
             case -1: NextPage(); return;
             case -2: PrevPage(); return;
             case -3: Close(); return;
-            case -4: Close(); ResolutionMenu(Player, Menu.Plugin).Display(Player, 0); return;
+            case -4: Close(); ResolutionMenu(Player, Menu.Plugin, Menu).Display(Player, 0); return;
             default:
                 ItemOption option = Menu.ItemOptions[globalIndex];
 
@@ -324,7 +324,7 @@ public class ScreenMenuInstance : BaseMenuInstance
             Close();
     }
 
-    private static ScreenMenu ResolutionMenu(CCSPlayerController player, BasePlugin plugin)
+    private static ScreenMenu ResolutionMenu(CCSPlayerController player, BasePlugin plugin, IMenu prevMenu)
     {
         ScreenMenu menu = new(player.Localizer("SelectResolution"), plugin)
         {
@@ -336,6 +336,7 @@ public class ScreenMenuInstance : BaseMenuInstance
             menu.AddItem(resolution.Key, (p, o) =>
             {
                 SetPlayerResolution(p, resolution.Value);
+                prevMenu.Display(p, prevMenu.MenuTime);
             });
         }
 

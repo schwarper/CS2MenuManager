@@ -23,6 +23,7 @@ internal static class ConfigManager
         public string ScrollUp { get; set; } = string.Empty;
         public string ScrollDown { get; set; } = string.Empty;
         public string Select { get; set; } = string.Empty;
+        public string Prev { get; set; } = string.Empty;
         public string Exit { get; set; } = string.Empty;
     }
 
@@ -87,6 +88,7 @@ internal static class ConfigManager
         Config.Buttons.ScrollUp = buttons["ScrollUp"].ToString()!;
         Config.Buttons.ScrollDown = buttons["ScrollDown"].ToString()!;
         Config.Buttons.Select = buttons["Select"].ToString()!;
+        Config.Buttons.Prev = buttons["Prev"].ToString()!;
         Config.Buttons.Exit = buttons["Exit"].ToString()!;
 
         TomlTable soundTable = (TomlTable)model["Sound"];

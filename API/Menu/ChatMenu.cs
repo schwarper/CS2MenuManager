@@ -73,7 +73,7 @@ public class ChatMenuInstance(CCSPlayerController player, ChatMenu menu) : BaseM
         Player.PrintToChat($"---");
 
         int keyOffset = 1;
-        int maxIndex = Math.Min(CurrentOffset + NumPerPage, Menu.ItemOptions.Count);
+        int maxIndex = Math.Min(CurrentOffset + MenuItemsPerPage, Menu.ItemOptions.Count);
         for (int i = CurrentOffset; i < maxIndex; i++)
         {
             ItemOption option = Menu.ItemOptions[i];

@@ -136,12 +136,12 @@ internal static partial class Library
         CultureInfo cultureInfo = player.GetLanguage();
 
         if (Config.Lang.TryGetValue(cultureInfo.Name, out Dictionary<string, string>? lang) && lang.TryGetValue(key, out string? text))
-            return string.Format(text, args);
+            return string.Format(text.ReplaceColorTags(), args);
 
         string shortName = cultureInfo.TwoLetterISOLanguageName.ToLower();
         return Config.Lang.TryGetValue(shortName, out lang) && lang.TryGetValue(key, out text)
-            ? string.Format(text, args)
-            : Config.Lang.TryGetValue("en", out lang) && lang.TryGetValue(key, out text) ? string.Format(text, args) : key;
+            ? string.Format(text.ReplaceColorTags(), args)
+            : Config.Lang.TryGetValue("en", out lang) && lang.TryGetValue(key, out text) ? string.Format(text.ReplaceColorTags(), args) : key;
     }
 
     public static string TruncateHtml(this string html, int maxLength)

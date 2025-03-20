@@ -25,12 +25,22 @@ public class WasdMenu(string title, BasePlugin plugin) : BaseMenu(title, plugin)
     /// <summary>
     /// Gets or sets the color of the scroll up/down buttons.
     /// </summary>
-    public string ScrollUpDownColor { get; set; } = "cyan";
+    public string ScrollUpDownKeyColor { get; set; } = "cyan";
+
+    /// <summary>
+    /// Gets or sets the color of the select button.
+    /// </summary>
+    public string SelectKeyColor { get; set; } = "green";
+
+    /// <summary>
+    /// Gets or sets the color of the prev button.
+    /// </summary>
+    public string PrevKeyColor { get; set; } = "orange";
 
     /// <summary>
     /// Gets or sets the color of the exit button.
     /// </summary>
-    public string ExitColor { get; set; } = "purple";
+    public string ExitKeyColor { get; set; } = "red";
 
     /// <summary>
     /// Gets or sets the color of the selected option.
@@ -46,6 +56,11 @@ public class WasdMenu(string title, BasePlugin plugin) : BaseMenu(title, plugin)
     /// Gets or sets the color of the disabled options.
     /// </summary>
     public string DisabledOptionColor { get; set; } = "grey";
+
+    /// <summary>
+    /// Gets or sets the color of the arrows.
+    /// </summary>
+    public string ArrowColor { get; set; } = "purple";
 
     /// <summary>
     /// Gets or sets a value indicating whether the player is frozen while the menu is open.
@@ -96,13 +111,6 @@ public class WasdMenuInstance : BaseMenuInstance
     /// <param name="menu">The menu associated with this instance.</param>
     public WasdMenuInstance(CCSPlayerController player, IMenu menu) : base(player, menu)
     {
-        var firstEnabledOption = Menu.ItemOptions
-            .Select((option, index) => new { Option = option, Index = index })
-            .FirstOrDefault(x => x.Option.DisableOption == DisableOption.None);
-
-        CurrentChoiceIndex = firstEnabledOption != null ? firstEnabledOption.Index : throw new ArgumentException("No non-disabled menu option found.");
-
-        RemoveOnTickListener();
         Menu.Plugin.RegisterListener<OnTick>(OnTick);
 
         if (((WasdMenu)Menu).FreezePlayer)
@@ -116,18 +124,20 @@ public class WasdMenuInstance : BaseMenuInstance
     {
         PlayerButtons button = Player.Buttons;
 
-        Dictionary<string, Action> Mapping = new()
+        Dictionary<string, Action> mapping = new()
         {
             { Config.Buttons.ScrollUp, ScrollUp },
             { Config.Buttons.ScrollDown, ScrollDown },
-            { Config.Buttons.Select, Choose }
+            { Config.Buttons.Select, Choose },
+            { Config.Buttons.Prev, PrevSubMenu },
+            { Config.Buttons.Exit, () => { if (Menu.ExitButton) Close(); } }
         };
 
-        foreach (KeyValuePair<string, Action> kvp in Mapping)
+        foreach (KeyValuePair<string, Action> kvp in mapping)
         {
-            if (ButtonMapping.TryGetValue(kvp.Key, out PlayerButtons buttonmappingButton))
+            if (ButtonMapping.TryGetValue(kvp.Key, out PlayerButtons mappedBtn))
             {
-                if ((button & buttonmappingButton) == 0 && (OldButton & buttonmappingButton) != 0)
+                if ((button & mappedBtn) == 0 && (OldButton & mappedBtn) != 0)
                 {
                     kvp.Value.Invoke();
                     break;
@@ -135,27 +145,10 @@ public class WasdMenuInstance : BaseMenuInstance
             }
         }
 
-        if ((button & PlayerButtons.Moveleft) == 0 && (OldButton & PlayerButtons.Moveleft) != 0)
-        {
-            if (Menu.PrevMenu == null)
-                Close();
-            else
-                PrevSubMenu();
-        }
-
-        PlayerButtons tab = ButtonMapping["Tab"];
-        if ((button & tab) == tab)
-        {
-            Close();
-            return;
-        }
-
         OldButton = button;
 
-        if (DisplayString != "")
-        {
+        if (!string.IsNullOrEmpty(DisplayString))
             Player.PrintToCenterHtml(DisplayString);
-        }
     }
 
     /// <summary>
@@ -163,59 +156,57 @@ public class WasdMenuInstance : BaseMenuInstance
     /// </summary>
     public override void Display()
     {
-        if (Menu is not WasdMenu wasdMenu)
-            return;
+        if (Menu is not WasdMenu wasdMenu) return;
 
-        const string MenuSelectionLeft = "<img src='https://raw.githubusercontent.com/oqyh/cs2-Kill-Sound-GoldKingZ/main/Resources/left.gif' class=''>";
-        const string MenuSelectionRight = "<img src='https://raw.githubusercontent.com/oqyh/cs2-Kill-Sound-GoldKingZ/main/Resources/right.gif' class=''>";
-        string Prefix = $"<font color='{wasdMenu.TitleColor}'>";
-        const string OptionsBelow = "<img src='https://raw.githubusercontent.com/oqyh/cs2-Kill-Sound-GoldKingZ/main/Resources/arrow.gif' class=''> <img src='https://raw.githubusercontent.com/oqyh/cs2-Kill-Sound-GoldKingZ/main/Resources/arrow.gif' class=''> <img src='https://raw.githubusercontent.com/oqyh/cs2-Kill-Sound-GoldKingZ/main/Resources/arrow.gif' class=''>";
+        string leftArrow = $"<font color='{wasdMenu.ArrowColor}'>▶ [</font>";
+        string rightArrow = $"<font color='{wasdMenu.ArrowColor}'> ] ◀</font>";
 
         StringBuilder builder = new();
-        builder.Append($"           <font color='{wasdMenu.ScrollUpDownColor}'>")
-               .Append(Player.Localizer("Scroll", Config.Buttons.ScrollUp, Config.Buttons.ScrollDown))
-               .Append(" - ")
-               .Append(Player.Localizer("Select", Config.Buttons.Select))
-               .Append($" </font> <br><font color='{wasdMenu.ExitColor}'>[ <img src='https://raw.githubusercontent.com/oqyh/cs2-Kill-Sound-GoldKingZ/main/Resources/tab.gif' class=''> - ")
-               .Append(Player.Localizer("Exit"))
-               .Append(" ]");
-
-        string buttomText = builder.ToString();
-
-        builder.Clear();
-        builder.AppendLine($"{Prefix}{Menu.Title}</u><br>");
+        int totalPages = (int)Math.Ceiling((double)Menu.ItemOptions.Count / MenuItemsPerPage);
+        int currentPage = Page + 1;
+        builder.Append($"<font color='{wasdMenu.TitleColor}'>{Menu.Title}</font> ({currentPage}/{totalPages})<br>");
 
         int keyOffset = 1;
-        int maxIndex = Math.Min(CurrentOffset + NumPerPage, Menu.ItemOptions.Count);
+        int maxIndex = Math.Min(CurrentOffset + MenuItemsPerPage, Menu.ItemOptions.Count);
         for (int i = CurrentOffset; i < maxIndex; i++)
         {
             ItemOption option = Menu.ItemOptions[i];
             if (i == CurrentChoiceIndex)
             {
-                builder.AppendLine($"{MenuSelectionLeft} <font color='{wasdMenu.SelectedOptionColor}'>{keyOffset++}. {option.Text} {MenuSelectionRight}</font> <br>");
+                builder.AppendLine(option.DisableOption switch
+                {
+                    DisableOption.None =>
+                        $"{leftArrow} <font color='{wasdMenu.SelectedOptionColor}'>{option.Text}</font> {rightArrow}<br>",
+                    DisableOption.DisableShowNumber or DisableOption.DisableHideNumber =>
+                        $"{leftArrow} <font color='{wasdMenu.DisabledOptionColor}'>{option.Text}</font> {rightArrow}<br>",
+                    _ => string.Empty
+                });
             }
             else
             {
                 builder.AppendLine(option.DisableOption switch
                 {
-                    DisableOption.None or DisableOption.DisableShowNumber =>
-                        $"<font color='{wasdMenu.OptionColor}'>{keyOffset}. {option.Text}</font> <br>",
-                    DisableOption.DisableHideNumber =>
-                        $"<font color='{wasdMenu.DisabledOptionColor}'>{option.Text}</font> <br>",
+                    DisableOption.None =>
+                        $"<font color='{wasdMenu.OptionColor}'>{option.Text}</font><br>",
+                    DisableOption.DisableShowNumber or DisableOption.DisableHideNumber =>
+                        $"<font color='{wasdMenu.DisabledOptionColor}'>{option.Text}</font><br>",
                     _ => string.Empty
                 });
-
-                keyOffset++;
             }
+            keyOffset++;
         }
 
-        if (Menu.ItemOptions.Count > NumPerPage)
-        {
-            builder.AppendLine(OptionsBelow);
-        }
+        List<string> buttomText = [];
+        buttomText.Add($"<font class='fontSize-s' color='{wasdMenu.ScrollUpDownKeyColor}'>{Player.Localizer("ScrollKey", Config.Buttons.ScrollUp, Config.Buttons.ScrollDown)}</font>");
+        buttomText.Add($"<font class='fontSize-s' color='{wasdMenu.SelectKeyColor}'>{Player.Localizer("SelectKey", Config.Buttons.Select)}</font>");
 
-        builder.AppendLine("<br>" + $"{buttomText}<br>");
-        builder.AppendLine("</div>");
+        if (wasdMenu.PrevMenu != null)
+            buttomText.Add($"<font class='fontSize-s' color='{wasdMenu.PrevKeyColor}'>{Player.Localizer("PrevKey", Config.Buttons.Prev)}</font>");
+
+        if (HasExitButton)
+            buttomText.Add($"<font class='fontSize-s' color='{wasdMenu.ExitKeyColor}'>{Player.Localizer("ExitKey", Config.Buttons.Exit)}</font>");
+
+        builder.AppendLine($"<br>" + string.Join(" | ", buttomText));
 
         DisplayString = builder.ToString();
     }
@@ -226,7 +217,7 @@ public class WasdMenuInstance : BaseMenuInstance
     public override void Close()
     {
         base.Close();
-        RemoveOnTickListener();
+        Menu.Plugin.RemoveListener<OnTick>(OnTick);
         Player.PrintToCenterHtml(" ");
 
         if (((WasdMenu)Menu).FreezePlayer)
@@ -236,36 +227,32 @@ public class WasdMenuInstance : BaseMenuInstance
             Player.ExecuteClientCommand($"play {Config.Sound.Exit}");
     }
 
-    private void RemoveOnTickListener()
-    {
-        Menu.Plugin.RemoveListener<OnTick>(OnTick);
-    }
-
     /// <summary>
     /// Chooses the currently selected option.
     /// </summary>
     public void Choose()
     {
-        if (CurrentChoiceIndex >= 0 && CurrentChoiceIndex < Menu.ItemOptions.Count)
+        if (CurrentChoiceIndex < 0 || CurrentChoiceIndex >= Menu.ItemOptions.Count)
+            return;
+
+        ItemOption option = Menu.ItemOptions[CurrentChoiceIndex];
+
+        if (option.DisableOption != DisableOption.None)
         {
-            ItemOption option = Menu.ItemOptions[CurrentChoiceIndex];
-            option.OnSelect?.Invoke(Player, option);
-
-            if (!string.IsNullOrEmpty(Config.Sound.Select))
-                Player.ExecuteClientCommand($"play {Config.Sound.Select}");
-
-            switch (option.PostSelectAction)
-            {
-                case PostSelectAction.Close:
-                    Close();
-                    break;
-                case PostSelectAction.Reset:
-                    Reset();
-                    break;
-                case PostSelectAction.Nothing:
-                    break;
-            }
+            Player.PrintToChat(Player.Localizer("WarnDisabledItem"));
+            return;
         }
+
+        if (!string.IsNullOrEmpty(Config.Sound.Select))
+            Player.ExecuteClientCommand($"play {Config.Sound.Select}");
+
+        switch (option.PostSelectAction)
+        {
+            case PostSelectAction.Close: Close(); break;
+            case PostSelectAction.Reset: Reset(); break;
+        }
+
+        option.OnSelect?.Invoke(Player, option);
     }
 
     /// <summary>
@@ -273,27 +260,16 @@ public class WasdMenuInstance : BaseMenuInstance
     /// </summary>
     public void ScrollDown()
     {
-        int startIndex = CurrentChoiceIndex;
-        if (startIndex == Menu.ItemOptions.Count - 1) return;
+        int start = CurrentChoiceIndex;
+        if (start == Menu.ItemOptions.Count - 1) return;
 
-        do
-        {
-            CurrentChoiceIndex = (CurrentChoiceIndex + 1) % Menu.ItemOptions.Count;
+        CurrentChoiceIndex = (CurrentChoiceIndex + 1) % Menu.ItemOptions.Count;
+        if (CurrentChoiceIndex == start) return;
 
-            if (CurrentChoiceIndex == startIndex)
-                return;
-
-        } while (Menu.ItemOptions[CurrentChoiceIndex].DisableOption != DisableOption.None);
-
-        int lastVisibleIndex = CurrentOffset + NumPerPage - 1;
-        if (CurrentChoiceIndex > lastVisibleIndex)
-        {
+        if (CurrentChoiceIndex >= CurrentOffset + NumPerPage)
             NextPage();
-        }
         else
-        {
             Display();
-        }
 
         if (!string.IsNullOrEmpty(Config.Sound.ScrollDown))
             Player.ExecuteClientCommand($"play {Config.Sound.ScrollDown}");
@@ -304,26 +280,16 @@ public class WasdMenuInstance : BaseMenuInstance
     /// </summary>
     public void ScrollUp()
     {
-        int startIndex = CurrentChoiceIndex;
-        if (startIndex == 1) return;
+        int start = CurrentChoiceIndex;
+        if (start == 0) return;
 
-        do
-        {
-            CurrentChoiceIndex = (CurrentChoiceIndex - 1 + Menu.ItemOptions.Count) % Menu.ItemOptions.Count;
-
-            if (CurrentChoiceIndex == startIndex)
-                return;
-
-        } while (Menu.ItemOptions[CurrentChoiceIndex].DisableOption != DisableOption.None);
+        CurrentChoiceIndex = (CurrentChoiceIndex - 1 + Menu.ItemOptions.Count) % Menu.ItemOptions.Count;
+        if (CurrentChoiceIndex == start) return;
 
         if (CurrentChoiceIndex < CurrentOffset)
-        {
             PrevPage();
-        }
         else
-        {
             Display();
-        }
 
         if (!string.IsNullOrEmpty(Config.Sound.ScrollUp))
             Player.ExecuteClientCommand($"play {Config.Sound.ScrollUp}");

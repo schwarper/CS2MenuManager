@@ -122,6 +122,11 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     public virtual int NumPerPage => 6;
 
     /// <summary>
+    /// Gets the number of menu items displayed per page.
+    /// </summary>
+    protected virtual int MenuItemsPerPage => NumPerPage;
+
+    /// <summary>
     /// Gets the stack of previous page offsets.
     /// </summary>
     public Stack<int> PrevPageOffsets { get; } = new();
@@ -139,7 +144,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     /// <summary>
     /// Gets a value indicating whether the menu has a next button.
     /// </summary>
-    protected virtual bool HasNextButton => Menu.ItemOptions.Count > NumPerPage && CurrentOffset + NumPerPage < Menu.ItemOptions.Count;
+    protected virtual bool HasNextButton => Menu.ItemOptions.Count > MenuItemsPerPage && CurrentOffset + NumPerPage < Menu.ItemOptions.Count;
 
     /// <summary>
     /// Gets a value indicating whether the menu has an exit button.
@@ -154,7 +159,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     public void NextPage()
     {
         PrevPageOffsets.Push(CurrentOffset);
-        CurrentOffset += NumPerPage;
+        CurrentOffset += MenuItemsPerPage;
         Page++;
         Display();
     }

@@ -50,15 +50,8 @@ WarnDisabledItem = "{Grey}You {Red}can't {Grey}enter this option."
 Prev = "Geri"
 Next = "İleri"
 Exit = "Çıkış"
-Disabled = "Kapalı"
+Disabled = "Devre dışı"
 Scroll = "[{0}/{1}] Kaydır"
 Select = "[{0}] Seç"
-
-[Lang.ro]
-Prev = "Inapoi"
-Next = "Inainte"
-Exit = "Iesire"
-Disabled = "Dezactivata"
-Scroll = "[{0}/{1}] Navigheaza"
-Select = "[{0}] Selecteaza"
-
+SelectResolution = "Çözünürlük Seç"
+WarnDisabledItem = "{Grey}Bu seçeneği {Red}kullanamazsın.{Grey}."

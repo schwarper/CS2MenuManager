@@ -27,6 +27,6 @@
 
 	<Target Name="CopyNuGetAssemblies" AfterTargets="Build">
 		<Copy SourceFiles="Tomlyn.dll" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
-		<Copy SourceFiles="config-example.toml" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="config.toml" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
 	</Target>
 </Project>

@@ -6,10 +6,13 @@ Discord nickname: schwarper
 
 Discord link : [Discord server](https://discord.gg/4zQfUzjk36)
 
+# Nuget
+[![NuGet Badge](https://img.shields.io/nuget/v/CS2MenuManager)](https://www.nuget.org/packages/CS2MenuManager)
+
 # Installation 
 
 1. Download:
-* Download the latest release from [GitHub Releases](https://github.com/schwarper/CS2MenuManager/releases).
+* Download the latest release from [GitHub Releases](https://github.com/schwarper/CS2MenuManager/releases) or [Nuget](https://www.nuget.org/packages/CS2MenuManager).
 2. Install the files:
 * Extract the contents of the downloaded ZIP file to the `addons/counterstrikesharp/shared` folder.
 3. Configure the settings:
@@ -86,8 +89,3 @@ ConsoleMenu menu = new("Console Menu", this)
 * Screen Menu
 
   ![image](https://github.com/user-attachments/assets/54bc171f-c5f1-4d2c-88e2-4951395c9dae)
-
-
-
-
-

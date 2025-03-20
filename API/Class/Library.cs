@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Text;
 using System.Text.RegularExpressions;
 using static CS2MenuManager.API.Class.ConfigManager;
+using System.Globalization;
 
 namespace CS2MenuManager.API.Class;
 
@@ -134,7 +135,7 @@ internal static partial class Library
 
     public static string Localizer(this CCSPlayerController player, string key, params string[] args)
     {
-        System.Globalization.CultureInfo cultureInfo = player.GetLanguage();
+        CultureInfo cultureInfo = player.GetLanguage();
 
         if (Config.Lang.TryGetValue(cultureInfo.Name, out Dictionary<string, string>? lang) && lang.TryGetValue(key, out string? text))
         {

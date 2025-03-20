@@ -84,9 +84,6 @@ jobs:
 
             ### Changes:
             - ${{ github.event.pull_request.title || github.event.head_commit.message }}
-          
-            ### Description:
-            ${{ github.event.pull_request.body }}
 
             ### Feedback:
             - If you encounter any issues, please report them [here](https://github.com/${{ github.repository }}/issues).

@@ -264,9 +264,9 @@ public class ScreenMenuInstance : BaseMenuInstance
         }
 
         if (((ScreenMenu)Menu).ShowResolutionsOption) visible.Add(($"!{displayNumber++}. {Player.Localizer("SelectResolution")}", -4));
-        if (HasPrevButton) visible.Add(($"!{displayNumber++}. {Player.Localizer("Prev")}", -2));
-        if (HasNextButton) visible.Add(($"!{displayNumber++}. {Player.Localizer("Next")}", -1));
-        if (HasExitButton) visible.Add(($"!{displayNumber++}. {Player.Localizer("Exit")}", -3));
+        if (HasPrevButton) visible.Add(($"{displayNumber++}. {Player.Localizer("Prev")}", -2));
+        if (HasNextButton) visible.Add(($"{displayNumber++}. {Player.Localizer("Next")}", -1));
+        if (HasExitButton) visible.Add(($"{displayNumber++}. {Player.Localizer("Exit")}", -3));
 
         return visible;
     }

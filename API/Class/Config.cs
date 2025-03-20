@@ -2,6 +2,7 @@
 using System.Reflection;
 using Tomlyn;
 using Tomlyn.Model;
+using static CS2MenuManager.API.Class.ResolutionManager;
 
 namespace CS2MenuManager.API.Class;
 
@@ -13,7 +14,7 @@ internal static class ConfigManager
         public Sound Sound { get; set; } = new();
         public WasdMenuSettings WasdMenu { get; set; } = new();
         public ScreenMenu ScreenMenu { get; set; } = new();
-        public Dictionary<string, (float, float)> Resolutions { get; set; } = [];
+        public Dictionary<string, Resolution> Resolutions { get; set; } = [];
         public Dictionary<string, Dictionary<string, string>> Lang { get; set; } = [];
     }
 
@@ -113,9 +114,11 @@ internal static class ConfigManager
         {
             if (resolution.Value is TomlTable innerTable)
             {
-                float posX = float.Parse(innerTable["PositionX"].ToString()!);
-                float posY = float.Parse(innerTable["PositionY"].ToString()!);
-                Config.Resolutions[resolution.Key] = (posX, posY);
+                Config.Resolutions[resolution.Key] = new Resolution()
+                {
+                    PositionX = float.Parse(innerTable["PositionX"].ToString()!),
+                    PositionY = float.Parse(innerTable["PositionY"].ToString()!)
+                };
             }
         }
 

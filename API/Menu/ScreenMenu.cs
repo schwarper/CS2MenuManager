@@ -1,12 +1,15 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Core.Translations;
 using CS2MenuManager.API.Class;
 using CS2MenuManager.API.Enum;
 using CS2MenuManager.API.Interface;
 using System.Text;
 using static CounterStrikeSharp.API.Core.Listeners;
+using static CS2MenuManager.API.Class.Buttons;
 using static CS2MenuManager.API.Class.ConfigManager;
 using static CS2MenuManager.API.Class.Library;
+using static CS2MenuManager.API.Class.ResolutionManager;
 
 namespace CS2MenuManager.API.Menu;
 
@@ -77,7 +80,7 @@ public class ScreenMenuInstance : BaseMenuInstance
     /// <summary>
     /// Gets or sets the index of the currently selected option.
     /// </summary>
-    public int CurrentChoiceIndex = 0;
+    public int CurrentChoiceIndex;
 
     /// <summary>
     /// Gets the number of items displayed per page.
@@ -101,18 +104,12 @@ public class ScreenMenuInstance : BaseMenuInstance
     /// <param name="menu">The menu associated with this instance.</param>
     public ScreenMenuInstance(CCSPlayerController player, IMenu menu) : base(player, menu)
     {
-        var firstEnabledOption = menu.ItemOptions
-            .Select((option, index) => new { Option = option, Index = index })
-            .FirstOrDefault(x => x.Option.DisableOption == DisableOption.None);
-
-        CurrentChoiceIndex = firstEnabledOption != null ? firstEnabledOption.Index : throw new ArgumentException("No non-disabled menu option found.");
+        ScreenMenu screenMenu = (ScreenMenu)Menu;
 
         Menu.Plugin.RegisterListener<OnTick>(OnTick);
         Menu.Plugin.RegisterListener<CheckTransmit>(OnCheckTransmit);
         Menu.Plugin.RegisterListener<OnEntityDeleted>(OnEntityDeleted);
-
-        if (((ScreenMenu)Menu).FreezePlayer)
-            Player.Freeze();
+        if (screenMenu.FreezePlayer) Player.Freeze();
     }
 
     /// <summary>
@@ -120,24 +117,38 @@ public class ScreenMenuInstance : BaseMenuInstance
     /// </summary>
     public override void Display()
     {
-        if (Menu is not ScreenMenu screenMenu)
-            return;
+        if (Menu is not ScreenMenu screenMenu) return;
 
         StringBuilder builder = new();
+        int totalPages = (int)Math.Ceiling((double)Menu.ItemOptions.Count / NumPerPage);
+        int currentPage = Page + 1;
+
         builder.AppendLine(" ");
-        builder.AppendLine(Menu.Title);
+        builder.AppendLine($"{Menu.Title} ({currentPage}/{totalPages})");
         builder.AppendLine(" ");
 
-        int keyOffset = 1;
-        int maxIndex = Math.Min(CurrentOffset + MenuItemsPerPage, Menu.ItemOptions.Count);
-        for (int i = CurrentOffset; i < maxIndex; i++)
+        List<(string Text, int GlobalIndex)> visibleOptions = GetVisibleOptions();
+
+        int dynamicStartIndex = -1;
+        for (int i = 0; i < visibleOptions.Count; i++)
         {
-            ItemOption option = Menu.ItemOptions[i];
-            builder.AppendLine(i == CurrentChoiceIndex ? $"> {keyOffset++}. {option.Text}" : $"  {keyOffset++}. {option.Text}");
+            (_, int globalIndex) = visibleOptions[i];
+
+            if (globalIndex < 0 && dynamicStartIndex == -1)
+                dynamicStartIndex = i;
         }
 
-        if (Menu.ItemOptions.Count > MenuItemsPerPage)
-            builder.AppendLine(" ");
+        for (int i = 0; i < visibleOptions.Count; i++)
+        {
+            if (i == dynamicStartIndex)
+            {
+                builder.AppendLine(" ");
+            }
+
+            (string text, int _) = visibleOptions[i];
+            string displayLine = (i == CurrentChoiceIndex) ? $"> {text}" : $"  {text}";
+            builder.AppendLine(displayLine);
+        }
 
         builder.AppendLine(" ");
         builder.AppendLine(Player.Localizer("Scroll", Config.Buttons.ScrollUp, Config.Buttons.ScrollDown));
@@ -147,11 +158,6 @@ public class ScreenMenuInstance : BaseMenuInstance
         if (WorldText == null || !WorldText.IsValid)
         {
             WorldText = CreateWorldText(builder.ToString(), screenMenu.Size, screenMenu.TextColor, screenMenu.Font, screenMenu.Background, screenMenu.BackgroundHeight, screenMenu.BackgroundWidth);
-
-            if (WorldText == null || !WorldText.IsValid)
-            {
-                Close();
-            }
         }
         else
         {
@@ -170,20 +176,105 @@ public class ScreenMenuInstance : BaseMenuInstance
         Menu.Plugin.RemoveListener<CheckTransmit>(OnCheckTransmit);
         Menu.Plugin.RemoveListener<OnEntityDeleted>(OnEntityDeleted);
 
-        if (WorldText != null && WorldText.IsValid)
-            WorldText.Remove();
-
-        if (((ScreenMenu)Menu).FreezePlayer)
-            Player.Freeze();
+        if (WorldText != null && WorldText.IsValid) WorldText.Remove();
+        if (((ScreenMenu)Menu).FreezePlayer) Player.Freeze();
 
         if (!string.IsNullOrEmpty(Config.Sound.Exit))
             Player.ExecuteClientCommand($"play {Config.Sound.Exit}");
     }
 
-    /// <summary>
-    /// Handles the tick event for the menu.
-    /// </summary>
-    public void OnTick()
+    private void ScrollDown()
+    {
+        List<(string Text, int GlobalIndex)> visibleOptions = GetVisibleOptions();
+        if (visibleOptions.Count == 0) return;
+
+        CurrentChoiceIndex = (CurrentChoiceIndex + 1) % visibleOptions.Count;
+        Display();
+
+        if (!string.IsNullOrEmpty(Config.Sound.ScrollDown))
+            Player.ExecuteClientCommand($"play {Config.Sound.ScrollDown}");
+    }
+
+    private void ScrollUp()
+    {
+        List<(string Text, int GlobalIndex)> visibleOptions = GetVisibleOptions();
+        if (visibleOptions.Count == 0) return;
+
+        CurrentChoiceIndex = (CurrentChoiceIndex - 1 + visibleOptions.Count) % visibleOptions.Count;
+        Display();
+
+        if (!string.IsNullOrEmpty(Config.Sound.ScrollUp))
+            Player.ExecuteClientCommand($"play {Config.Sound.ScrollUp}");
+    }
+
+    private void Choose()
+    {
+        List<(string Text, int GlobalIndex)> visibleOptions = GetVisibleOptions();
+        if (CurrentChoiceIndex < 0 || CurrentChoiceIndex >= visibleOptions.Count)
+            return;
+
+        (string _, int globalIndex) = visibleOptions[CurrentChoiceIndex];
+        switch (globalIndex)
+        {
+            case -1: NextPage(); return;
+            case -2: PrevPage(); return;
+            case -3: Close(); return;
+            case -4: Close(); ResolutionMenu(Player, Menu.Plugin).Display(Player, 0); return;
+            default:
+                ItemOption option = Menu.ItemOptions[globalIndex];
+
+                if (option.DisableOption != DisableOption.None)
+                {
+                    Player.PrintToChat(Player.Localizer("WarnDisabledItem").ReplaceColorTags());
+                    return;
+                }
+
+                option.OnSelect?.Invoke(Player, option);
+
+                if (!string.IsNullOrEmpty(Config.Sound.Select))
+                    Player.ExecuteClientCommand($"play {Config.Sound.Select}");
+
+                switch (option.PostSelectAction)
+                {
+                    case PostSelectAction.Close: Close(); break;
+                    case PostSelectAction.Reset: Reset(); break;
+                }
+                break;
+        }
+    }
+
+    private List<(string Text, int GlobalIndex)> GetVisibleOptions()
+    {
+        List<(string Text, int GlobalIndex)> visible = [];
+        int totalItems = Menu.ItemOptions.Count;
+        int start = CurrentOffset;
+        int end = Math.Min(start + NumPerPage, totalItems);
+
+        int displayNumber = 1;
+        for (int i = start; i < end; i++)
+        {
+            ItemOption option = Menu.ItemOptions[i];
+            string text = option.DisableOption switch
+            {
+                DisableOption.None or DisableOption.DisableShowNumber =>
+                    $"{displayNumber}. {option.Text}",
+                DisableOption.DisableHideNumber => $"{option.Text}",
+                _ => string.Empty
+            };
+
+            displayNumber++;
+            visible.Add((text, i));
+        }
+
+        if (((ScreenMenu)Menu).ShowResolutionsOption) visible.Add(($"!{displayNumber++}. {Player.Localizer("SelectResolution")}", -4));
+        if (HasPrevButton) visible.Add(($"!{displayNumber++}. {Player.Localizer("Prev")}", -2));
+        if (HasNextButton) visible.Add(($"!{displayNumber++}. {Player.Localizer("Next")}", -1));
+        if (HasExitButton) visible.Add(($"!{displayNumber++}. {Player.Localizer("Exit")}", -3));
+
+        return visible;
+    }
+
+    private void OnTick()
     {
         PlayerButtons button = Player.Buttons;
         Dictionary<string, Action> mapping = new()
@@ -195,7 +286,7 @@ public class ScreenMenuInstance : BaseMenuInstance
 
         foreach (KeyValuePair<string, Action> kvp in mapping)
         {
-            if (Buttons.ButtonMapping.TryGetValue(kvp.Key, out PlayerButtons buttonMappingButton))
+            if (ButtonMapping.TryGetValue(kvp.Key, out PlayerButtons buttonMappingButton))
             {
                 if ((button & buttonMappingButton) == 0 && (OldButton & buttonMappingButton) != 0)
                 {
@@ -205,13 +296,8 @@ public class ScreenMenuInstance : BaseMenuInstance
             }
         }
 
-        if ((button & PlayerButtons.Moveleft) == 0 && (OldButton & PlayerButtons.Moveleft) != 0)
-        {
-            if (PrevMenu == null) Close();
-            else PrevSubMenu();
-        }
-
-        if (((long)button & 8589934592) == 8589934592)
+        PlayerButtons tab = ButtonMapping["Tab"];
+        if ((button & tab) == tab)
         {
             Close();
             return;
@@ -222,101 +308,17 @@ public class ScreenMenuInstance : BaseMenuInstance
         if (WorldText != null)
         {
             VectorData? vectorData = Player.FindVectorData();
-            if (vectorData == null)
-            {
-                Close();
-                return;
-            }
+            if (vectorData == null) { Close(); return; }
 
             CCSGOViewModel? viewModel = Player.EnsureCustomView();
-            if (viewModel == null)
-            {
-                Close();
-                return;
-            }
+            if (viewModel == null) { Close(); return; }
 
             WorldText.Teleport(vectorData.Value.Position, vectorData.Value.Angle, null);
             WorldText.AcceptInput("SetParent", viewModel, null, "!activator");
         }
     }
 
-    /// <summary>
-    /// Chooses the currently selected option.
-    /// </summary>
-    public void Choose()
-    {
-        if (CurrentChoiceIndex < 0 || CurrentChoiceIndex >= Menu.ItemOptions.Count) return;
-
-        ItemOption option = Menu.ItemOptions[CurrentChoiceIndex];
-        option.OnSelect?.Invoke(Player, option);
-
-        if (!string.IsNullOrEmpty(Config.Sound.Select))
-            Player.ExecuteClientCommand($"play {Config.Sound.Select}");
-
-        switch (option.PostSelectAction)
-        {
-            case PostSelectAction.Close:
-                Close();
-                break;
-            case PostSelectAction.Reset:
-                Reset();
-                break;
-            case PostSelectAction.Nothing:
-                break;
-        }
-    }
-
-    /// <summary>
-    /// Scrolls down to the next option.
-    /// </summary>
-    public void ScrollDown()
-    {
-        int startIndex = CurrentChoiceIndex;
-        if (startIndex == Menu.ItemOptions.Count - 1) return;
-
-        do
-        {
-            CurrentChoiceIndex = (CurrentChoiceIndex + 1) % Menu.ItemOptions.Count;
-            if (CurrentChoiceIndex == startIndex) return;
-        } while (Menu.ItemOptions[CurrentChoiceIndex].DisableOption != DisableOption.None);
-
-        if (CurrentChoiceIndex > CurrentOffset + MenuItemsPerPage - 1)
-            NextPage();
-        else
-            Display();
-
-        if (!string.IsNullOrEmpty(Config.Sound.ScrollDown))
-            Player.ExecuteClientCommand($"play {Config.Sound.ScrollDown}");
-    }
-
-    /// <summary>
-    /// Scrolls up to the previous option.
-    /// </summary>
-    public void ScrollUp()
-    {
-        int startIndex = CurrentChoiceIndex;
-        if (startIndex == 1) return;
-
-        do
-        {
-            CurrentChoiceIndex = (CurrentChoiceIndex - 1 + Menu.ItemOptions.Count) % Menu.ItemOptions.Count;
-            if (CurrentChoiceIndex == startIndex) return;
-        } while (Menu.ItemOptions[CurrentChoiceIndex].DisableOption != DisableOption.None);
-
-        if (CurrentChoiceIndex < CurrentOffset)
-            PrevPage();
-        else
-            Display();
-
-        if (!string.IsNullOrEmpty(Config.Sound.ScrollUp))
-            Player.ExecuteClientCommand($"play {Config.Sound.ScrollUp}");
-    }
-
-    /// <summary>
-    /// Handles the check transmit event for the menu.
-    /// </summary>
-    /// <param name="infoList">The list of check transmit information.</param>
-    public void OnCheckTransmit(CCheckTransmitInfoList infoList)
+    private void OnCheckTransmit(CCheckTransmitInfoList infoList)
     {
         if (WorldText == null) return;
         foreach ((CCheckTransmitInfo info, CCSPlayerController? player) in infoList)
@@ -326,13 +328,26 @@ public class ScreenMenuInstance : BaseMenuInstance
         }
     }
 
-    /// <summary>
-    /// Handles the entity deleted event for the menu.
-    /// </summary>
-    /// <param name="entity">The entity that was deleted.</param>
-    public void OnEntityDeleted(CEntityInstance entity)
+    private void OnEntityDeleted(CEntityInstance entity)
     {
-        if (WorldText != null && WorldText.IsValid && WorldText == entity)
-            Close();
+        if (WorldText != null && WorldText.IsValid && WorldText == entity) Close();
+    }
+
+    private static ScreenMenu ResolutionMenu(CCSPlayerController player, BasePlugin plugin)
+    {
+        ScreenMenu menu = new(player.Localizer("SelectResolution"), plugin)
+        {
+            ShowResolutionsOption = false,
+        };
+
+        foreach (KeyValuePair<string, Resolution> resolution in Config.Resolutions)
+        {
+            menu.AddItem(resolution.Key, (p, o) =>
+            {
+                SetPlayerResolution(p, resolution.Value);
+            });
+        }
+
+        return menu;
     }
 }

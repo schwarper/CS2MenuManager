@@ -143,7 +143,8 @@ public class WasdMenuInstance : BaseMenuInstance
                 PrevSubMenu();
         }
 
-        if (((long)button & 8589934592) == 8589934592)
+        PlayerButtons tab = ButtonMapping["Tab"];
+        if ((button & tab) == tab)
         {
             Close();
             return;

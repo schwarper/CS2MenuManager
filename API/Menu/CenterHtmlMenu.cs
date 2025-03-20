@@ -43,7 +43,7 @@ public class CenterHtmlMenu(string title, BasePlugin plugin) : BaseMenu(title, p
     /// <summary>
     /// Gets or sets the color of the close button.
     /// </summary>
-    public string CloseColor { get; set; } = "red";
+    public string ExitColor { get; set; } = "red";
 
     /// <summary>
     /// Gets or sets a value indicating whether page options are displayed inline.
@@ -93,22 +93,6 @@ public class CenterHtmlMenuInstance : BaseMenuInstance
     /// </summary>
     protected override int MenuItemsPerPage => CalculateMenuItemsPerPage();
 
-    private int CalculateMenuItemsPerPage()
-    {
-        int count = NumPerPage;
-        if (!((CenterHtmlMenu)Menu).InlinePageOptions)
-        {
-            if (!HasPrevButton) count++;
-            if (!HasNextButton) count++;
-        }
-        else
-        {
-            count++;
-            if (!HasExitButton && !HasPrevButton && !HasNextButton) count++;
-        }
-        return count;
-    }
-
     /// <summary>
     /// Initializes a new instance of the <see cref="CenterHtmlMenuInstance"/> class.
     /// </summary>
@@ -154,34 +138,6 @@ public class CenterHtmlMenuInstance : BaseMenuInstance
         Player.PrintToCenterHtml(builder.ToString());
     }
 
-    private void AddPageOptions(CenterHtmlMenu centerHtmlMenu, StringBuilder builder)
-    {
-        string prevText = $"<font color='{centerHtmlMenu.PrevPageColor}'>!7 &#60;</font> Prev";
-        string closeText = $"<font color='{centerHtmlMenu.CloseColor}'>!9 X</font> Close";
-        string nextText = $"<font color='{centerHtmlMenu.NextPageColor}'>!8 ></font> Next";
-
-        if (centerHtmlMenu.InlinePageOptions)
-            AddInlinePageOptions(prevText, closeText, nextText, centerHtmlMenu.ExitButton, builder);
-        else
-            AddMultilinePageOptions(prevText, closeText, nextText, centerHtmlMenu.ExitButton, builder);
-    }
-
-    private void AddInlinePageOptions(string prevText, string closeText, string nextText, bool hasExitButton, StringBuilder builder)
-    {
-        List<string> options = [];
-        if (HasPrevButton) options.Add(prevText);
-        if (hasExitButton) options.Add(closeText);
-        if (HasNextButton) options.Add(nextText);
-        builder.Append(string.Join(" | ", options));
-    }
-
-    private void AddMultilinePageOptions(string prevText, string closeText, string nextText, bool hasExitButton, StringBuilder builder)
-    {
-        if (HasPrevButton) builder.Append($"{prevText}<br>");
-        if (HasNextButton) builder.Append($"{nextText}<br>");
-        if (hasExitButton) builder.Append($"{closeText}<br>");
-    }
-
     /// <summary>
     /// Closes the menu.
     /// </summary>
@@ -190,5 +146,49 @@ public class CenterHtmlMenuInstance : BaseMenuInstance
         base.Close();
         Menu.Plugin.RemoveListener<OnTick>(Display);
         Player.PrintToCenterHtml(" ");
+    }
+
+    private void AddPageOptions(CenterHtmlMenu centerHtmlMenu, StringBuilder builder)
+    {
+        string prevText = $"<font color='{centerHtmlMenu.PrevPageColor}'>!7 &#60;</font> {Player.Localizer("Prev")}";
+        string closeText = $"<font color='{centerHtmlMenu.ExitColor}'>!9 X</font> {Player.Localizer("Exit")}";
+        string nextText = $"<font color='{centerHtmlMenu.NextPageColor}'>!8 ></font> {Player.Localizer("Next")}";
+
+        if (centerHtmlMenu.InlinePageOptions)
+            AddInlinePageOptions(prevText, closeText, nextText, builder);
+        else
+            AddMultilinePageOptions(prevText, closeText, nextText, builder);
+    }
+
+    private void AddInlinePageOptions(string prevText, string closeText, string nextText, StringBuilder builder)
+    {
+        List<string> options = [];
+        if (HasPrevButton) options.Add(prevText);
+        if (HasExitButton) options.Add(closeText);
+        if (HasNextButton) options.Add(nextText);
+        builder.Append(string.Join(" | ", options));
+    }
+
+    private void AddMultilinePageOptions(string prevText, string closeText, string nextText, StringBuilder builder)
+    {
+        if (HasPrevButton) builder.Append($"{prevText}<br>");
+        if (HasNextButton) builder.Append($"{nextText}<br>");
+        if (HasExitButton) builder.Append($"{closeText}<br>");
+    }
+
+    private int CalculateMenuItemsPerPage()
+    {
+        int count = NumPerPage;
+        if (!((CenterHtmlMenu)Menu).InlinePageOptions)
+        {
+            if (!HasPrevButton) count++;
+            if (!HasNextButton) count++;
+        }
+        else
+        {
+            count++;
+            if (!HasExitButton && !HasPrevButton && !HasNextButton) count++;
+        }
+        return count;
     }
 }

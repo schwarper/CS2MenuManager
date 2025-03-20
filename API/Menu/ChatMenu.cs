@@ -40,7 +40,7 @@ public class ChatMenu(string title, BasePlugin plugin) : BaseMenu(title, plugin)
     /// <summary>
     /// Gets or sets the color of the close button.
     /// </summary>
-    public char CloseColor { get; set; } = ChatColors.Red;
+    public char ExitColor { get; set; } = ChatColors.Red;
 
     /// <summary>
     /// Displays the menu to the specified player for a specified duration.
@@ -92,18 +92,12 @@ public class ChatMenuInstance(CCSPlayerController player, ChatMenu menu) : BaseM
         }
 
         if (HasPrevButton)
-        {
             Player.PrintToChat($" {chatMenu.PrevPageColor}!7 {ChatColors.Default}-> {Player.Localizer("Prev")}");
-        }
 
         if (HasNextButton)
-        {
             Player.PrintToChat($" {chatMenu.NextPageColor}!8 {ChatColors.Default}-> {Player.Localizer("Next")}");
-        }
 
         if (Menu.ExitButton)
-        {
-            Player.PrintToChat($" {chatMenu.CloseColor}!9 {ChatColors.Default}->  {Player.Localizer("Exit")}");
-        }
+            Player.PrintToChat($" {chatMenu.ExitColor}!9 {ChatColors.Default}->  {Player.Localizer("Exit")}");
     }
 }

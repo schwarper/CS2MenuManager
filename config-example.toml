@@ -43,6 +43,8 @@ Exit = "Exit"
 Disabled = "Disabled"
 Scroll = "[{0}/{1}] Scroll"
 Select = "[{0}] Select"
+SelectResolution = "Select Resolution"
+WarnDisabledItem = "{Grey}You {Red}can't {Grey}enter this option."
 
 [Lang.tr]
 Prev = "Geri"

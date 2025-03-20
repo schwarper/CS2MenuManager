@@ -57,7 +57,7 @@ public static class MenuManager
         where TMenu : IMenu
     {
         LoadConfig();
-        GetActiveMenu(player)?.Close();
+        CloseActiveMenu(player, CloseMenuAction.Close);
 
         Timer? timer = menu.MenuTime > 0 ?
             menu.Plugin.AddTimer(menu.MenuTime, () => CloseActiveMenu(player, CloseMenuAction.Close)) :
@@ -69,7 +69,7 @@ public static class MenuManager
             baseMenuInstance.RegisterOnKeyPress();
 
         ActiveMenus[player.Handle] = (instance, timer);
-        ActiveMenus[player.Handle].Instance.Display();
+        instance.Display();
     }
 
     /// <summary>

@@ -255,8 +255,6 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
         ItemOption menuOption = Menu.ItemOptions[menuItemIndex];
         if (menuOption.DisableOption != DisableOption.None) return;
 
-        menuOption.OnSelect?.Invoke(Player, menuOption);
-
         switch (menuOption.PostSelectAction)
         {
             case PostSelectAction.Close:
@@ -268,6 +266,8 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
             case PostSelectAction.Nothing:
                 break;
         }
+
+        menuOption.OnSelect?.Invoke(Player, menuOption);
     }
 
     internal void RegisterOnKeyPress()

@@ -37,11 +37,13 @@ internal static partial class Library
         CCSPlayerPawn? playerPawn = GetPlayerPawn(player);
         if (playerPawn == null) return null;
 
+        ResolutionManager.Resolution resolution = ResolutionManager.GetPlayerResolution(player);
+
         QAngle eyeAngles = playerPawn!.EyeAngles;
         Vector forward = new(), right = new(), up = new();
         NativeAPI.AngleVectors(eyeAngles.Handle, forward.Handle, right.Handle, up.Handle);
 
-        Vector offset = forward * 7 + right * Config.ScreenMenu.PositionX + up * Config.ScreenMenu.PositionY;
+        Vector offset = forward * 7 + right * resolution.PositionX + up * resolution.PositionY;
         QAngle angle = new()
         {
             Y = eyeAngles.Y + 270,
@@ -106,6 +108,25 @@ internal static partial class Library
         entity.BackgroundBorderHeight = backgroundheight;
         entity.BackgroundBorderWidth = backgroundwidth;
 
+        entity.DispatchSpawn();
+        return entity;
+    }
+
+    public static CPointWorldText? CreateDecoyWorldText()
+    {
+        CPointWorldText entity = Utilities.CreateEntityByName<CPointWorldText>("point_worldtext")!;
+
+        if (entity == null || !entity.IsValid)
+        {
+            return null;
+        }
+
+        entity.MessageText = "test";
+        entity.Enabled = true;
+        entity.JustifyHorizontal = PointWorldTextJustifyHorizontal_t.POINT_WORLD_TEXT_JUSTIFY_HORIZONTAL_LEFT;
+        entity.JustifyVertical = PointWorldTextJustifyVertical_t.POINT_WORLD_TEXT_JUSTIFY_VERTICAL_CENTER;
+        entity.ReorientMode = PointWorldTextReorientMode_t.POINT_WORLD_TEXT_REORIENT_NONE;
+        entity.RenderMode = RenderMode_t.kRenderNormal;
         entity.DispatchSpawn();
         return entity;
     }

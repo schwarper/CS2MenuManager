@@ -85,7 +85,7 @@ ConsoleMenu menu = new("Console Menu", this)
   ![image](https://github.com/user-attachments/assets/c0c0198a-01b1-46a1-8222-250b8ae1ec80)
 * Wasd Menu
 
-  ![image](https://github.com/user-attachments/assets/070db244-b47b-46d9-8a85-688e1b104a72)
+  ![image](https://github.com/user-attachments/assets/1fa862c9-dbc2-451a-9d32-fb2b6c4cc4df)
 * Screen Menu
 
   ![image](https://github.com/user-attachments/assets/54bc171f-c5f1-4d2c-88e2-4951395c9dae)

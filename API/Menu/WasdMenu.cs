@@ -65,7 +65,7 @@ public class WasdMenu(string title, BasePlugin plugin) : BaseMenu(title, plugin)
     /// <summary>
     /// Gets or sets a value indicating whether the player is frozen while the menu is open.
     /// </summary>
-    public bool FreezePlayer { get; set; } = Config.WasdMenu.FreezePlayer;
+    public bool FreezePlayer => Config.WasdMenu.FreezePlayer;
 
     /// <summary>
     /// Displays the menu to the specified player for a specified duration.

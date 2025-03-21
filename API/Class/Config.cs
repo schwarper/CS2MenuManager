@@ -46,7 +46,7 @@ internal static class ConfigManager
         public string OptionColor { get; set; } = string.Empty;
         public string DisabledOptionColor { get; set; } = string.Empty;
         public string ArrowColor { get; set; } = string.Empty;
-        public bool FreezePlayer { get; set; } = false;
+        public bool FreezePlayer { get; set; }
     }
 
     public class ScreenMenu

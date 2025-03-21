@@ -21,7 +21,7 @@ SelectedOptionColor = "orange"
 OptionColor = "white"
 DisabledOptionColor = "grey"
 ArrowColor = "purple"
-FreezePlayer = false
+FreezePlayer = true
 
 [ScreenMenu]
 TextColor = "orange"

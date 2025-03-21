@@ -20,47 +20,47 @@ public class WasdMenu(string title, BasePlugin plugin) : BaseMenu(title, plugin)
     /// <summary>
     /// Gets or sets the color of the title.
     /// </summary>
-    public string TitleColor { get; set; } = "green";
+    public string TitleColor => Config.WasdMenu.TitleColor;
 
     /// <summary>
     /// Gets or sets the color of the scroll up/down buttons.
     /// </summary>
-    public string ScrollUpDownKeyColor { get; set; } = "cyan";
+    public string ScrollUpDownKeyColor => Config.WasdMenu.ScrollUpDownKeyColor;
 
     /// <summary>
     /// Gets or sets the color of the select button.
     /// </summary>
-    public string SelectKeyColor { get; set; } = "green";
+    public string SelectKeyColor => Config.WasdMenu.SelectKeyColor;
 
     /// <summary>
     /// Gets or sets the color of the prev button.
     /// </summary>
-    public string PrevKeyColor { get; set; } = "orange";
+    public string PrevKeyColor => Config.WasdMenu.PrevKeyColor;
 
     /// <summary>
     /// Gets or sets the color of the exit button.
     /// </summary>
-    public string ExitKeyColor { get; set; } = "red";
+    public string ExitKeyColor => Config.WasdMenu.ExitKeyColor;
 
     /// <summary>
     /// Gets or sets the color of the selected option.
     /// </summary>
-    public string SelectedOptionColor { get; set; } = "orange";
+    public string SelectedOptionColor => Config.WasdMenu.SelectedOptionColor;
 
     /// <summary>
     /// Gets or sets the color of the options.
     /// </summary>
-    public string OptionColor { get; set; } = "white";
+    public string OptionColor => Config.WasdMenu.OptionColor;
 
     /// <summary>
     /// Gets or sets the color of the disabled options.
     /// </summary>
-    public string DisabledOptionColor { get; set; } = "grey";
+    public string DisabledOptionColor => Config.WasdMenu.DisabledOptionColor;
 
     /// <summary>
     /// Gets or sets the color of the arrows.
     /// </summary>
-    public string ArrowColor { get; set; } = "purple";
+    public string ArrowColor => Config.WasdMenu.ArrowColor;
 
     /// <summary>
     /// Gets or sets a value indicating whether the player is frozen while the menu is open.

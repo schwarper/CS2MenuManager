@@ -37,7 +37,16 @@ internal static class ConfigManager
 
     public class WasdMenuSettings
     {
-        public bool FreezePlayer { get; set; }
+        public string TitleColor { get; set; } = string.Empty;
+        public string ScrollUpDownKeyColor { get; set; } = string.Empty;
+        public string SelectKeyColor { get; set; } = string.Empty;
+        public string PrevKeyColor { get; set; } = string.Empty;
+        public string ExitKeyColor { get; set; } = string.Empty;
+        public string SelectedOptionColor { get; set; } = string.Empty;
+        public string OptionColor { get; set; } = string.Empty;
+        public string DisabledOptionColor { get; set; } = string.Empty;
+        public string ArrowColor { get; set; } = string.Empty;
+        public bool FreezePlayer { get; set; } = false;
     }
 
     public class ScreenMenu
@@ -98,6 +107,15 @@ internal static class ConfigManager
         Config.Sound.ScrollDown = soundTable["ScrollDown"].ToString()!;
 
         TomlTable wasdTable = (TomlTable)model["WasdMenu"];
+        Config.WasdMenu.TitleColor = wasdTable["TitleColor"].ToString()!;
+        Config.WasdMenu.ScrollUpDownKeyColor = wasdTable["ScrollUpDownKeyColor"].ToString()!;
+        Config.WasdMenu.SelectKeyColor = wasdTable["SelectKeyColor"].ToString()!;
+        Config.WasdMenu.PrevKeyColor = wasdTable["PrevKeyColor"].ToString()!;
+        Config.WasdMenu.ExitKeyColor = wasdTable["ExitKeyColor"].ToString()!;
+        Config.WasdMenu.SelectedOptionColor = wasdTable["SelectedOptionColor"].ToString()!;
+        Config.WasdMenu.OptionColor = wasdTable["OptionColor"].ToString()!;
+        Config.WasdMenu.DisabledOptionColor = wasdTable["DisabledOptionColor"].ToString()!;
+        Config.WasdMenu.ArrowColor = wasdTable["ArrowColor"].ToString()!;
         Config.WasdMenu.FreezePlayer = bool.Parse(wasdTable["FreezePlayer"]?.ToString() ?? "false");
 
         TomlTable screenTable = (TomlTable)model["ScreenMenu"];

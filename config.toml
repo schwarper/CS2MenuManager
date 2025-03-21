@@ -12,6 +12,15 @@ ScrollUp = ""
 ScrollDown = ""
 
 [WasdMenu]
+TitleColor = "green"
+ScrollUpDownKeyColor = "cyan"
+SelectKeyColor = "green"
+PrevKeyColor = "orange"
+ExitKeyColor = "red"
+SelectedOptionColor = "orange"
+OptionColor = "white"
+DisabledOptionColor = "grey"
+ArrowColor = "purple"
 FreezePlayer = false
 
 [ScreenMenu]

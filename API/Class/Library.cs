@@ -67,16 +67,10 @@ internal static partial class Library
     {
         CCSPlayerPawn? playerPawn = GetPlayerPawn(player);
         if (playerPawn == null)
-        {
-            player.PrintToChat("PLAYERPAWN IS NULL");
             return null;
-        }
 
         if (playerPawn.ViewModelServices == null)
-        {
-            player.PrintToChat("VIEWMODEL SERVICES IS NULL");
             return null;
-        }
 
         int offset = Schema.GetSchemaOffset("CCSPlayer_ViewModelServices", "m_hViewModel");
         IntPtr viewModelHandleAddress = playerPawn.ViewModelServices.Handle + offset + 4;

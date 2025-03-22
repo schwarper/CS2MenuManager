@@ -173,8 +173,6 @@ internal static class ConfigManager
         string configText = File.ReadAllText(ConfigFilePath);
         TomlTable model = Toml.ToModel(configText);
 
-        Console.WriteLine($"LOADİNG CONFİG");
-
         model.SetIfPresent("Buttons.ScrollUp", (string value) => Config.Buttons.ScrollUp = value);
         model.SetIfPresent("Buttons.ScrollDown", (string value) => Config.Buttons.ScrollDown = value);
         model.SetIfPresent("Buttons.Select", (string value) => Config.Buttons.Select = value);

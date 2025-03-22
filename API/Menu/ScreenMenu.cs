@@ -23,42 +23,42 @@ public class ScreenMenu(string title, BasePlugin plugin) : BaseMenu(title, plugi
     /// <summary>
     /// Gets or sets the color of the text.
     /// </summary>
-    public string TextColor { get; set; } = Config.ScreenMenu.TextColor;
+    public string TextColor = Config.ScreenMenu.TextColor;
 
     /// <summary>
     /// Gets or sets a value indicating whether the menu has a background.
     /// </summary>
-    public bool Background { get; set; } = Config.ScreenMenu.Background;
+    public bool Background = Config.ScreenMenu.Background;
 
     /// <summary>
     /// Gets or sets the height of the background.
     /// </summary>
-    public float BackgroundHeight { get; set; } = Config.ScreenMenu.BackgroundHeight;
+    public float BackgroundHeight = Config.ScreenMenu.BackgroundHeight;
 
     /// <summary>
     /// Gets or sets the width of the background.
     /// </summary>
-    public float BackgroundWidth { get; set; } = Config.ScreenMenu.BackgroundWidth;
+    public float BackgroundWidth = Config.ScreenMenu.BackgroundWidth;
 
     /// <summary>
     /// Gets or sets the font used for the text.
     /// </summary>
-    public string Font { get; set; } = Config.ScreenMenu.Font;
+    public string Font = Config.ScreenMenu.Font;
 
     /// <summary>
     /// Gets or sets the size of the text.
     /// </summary>
-    public int Size { get; set; } = Config.ScreenMenu.Size;
+    public int Size = Config.ScreenMenu.Size;
 
     /// <summary>
     /// Gets or sets a value indicating whether the player is frozen while the menu is open.
     /// </summary>
-    public bool FreezePlayer { get; set; } = Config.ScreenMenu.FreezePlayer;
+    public bool FreezePlayer = Config.ScreenMenu.FreezePlayer;
 
     /// <summary>
     /// Gets or sets a value indicating whether the menu shows a resolutions option.
     /// </summary>
-    public bool ShowResolutionsOption { get; set; } = Config.ScreenMenu.ShowResolutionsOption;
+    public bool ShowResolutionsOption = Config.ScreenMenu.ShowResolutionsOption;
 
     /// <summary>
     /// Displays the menu to the specified player for a specified duration.

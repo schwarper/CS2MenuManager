@@ -16,32 +16,32 @@ public class ChatMenu(string title, BasePlugin plugin) : BaseMenu(title, plugin)
     /// <summary>
     /// Gets or sets the color of the title.
     /// </summary>
-    public char TitleColor { get; set; } = Config.ChatMenu.TitleColor;
+    public char TitleColor = Config.ChatMenu.TitleColor;
 
     /// <summary>
     /// Gets or sets the color of enabled items.
     /// </summary>
-    public char EnabledColor { get; set; } = Config.ChatMenu.EnabledColor;
+    public char EnabledColor = Config.ChatMenu.EnabledColor;
 
     /// <summary>
     /// Gets or sets the color of disabled items.
     /// </summary>
-    public char DisabledColor { get; set; } = Config.ChatMenu.DisabledColor;
+    public char DisabledColor = Config.ChatMenu.DisabledColor;
 
     /// <summary>
     /// Gets or sets the color of the previous page button.
     /// </summary>
-    public char PrevPageColor { get; set; } = Config.ChatMenu.PrevPageColor;
+    public char PrevPageColor = Config.ChatMenu.PrevPageColor;
 
     /// <summary>
     /// Gets or sets the color of the next page button.
     /// </summary>
-    public char NextPageColor { get; set; } = Config.ChatMenu.NextPageColor;
+    public char NextPageColor = Config.ChatMenu.NextPageColor;
 
     /// <summary>
     /// Gets or sets the color of the close button.
     /// </summary>
-    public char ExitColor { get; set; } = Config.ChatMenu.ExitColor;
+    public char ExitColor = Config.ChatMenu.ExitColor;
 
     /// <summary>
     /// Displays the menu to the specified player for a specified duration.

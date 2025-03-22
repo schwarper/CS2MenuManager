@@ -145,18 +145,21 @@ public void VoteHandlerCallback(YesNoVoteAction action, int param1, CastVote par
 * `PanoramaVote` => [SLAYER_PanoramaVote](https://github.com/zakriamansoor47/SLAYER_PanoramaVote) by [zakriamansoor47](https://github.com/zakriamansoor47)
 
 # Images
-* Chat Menu
 
-  ![image](https://github.com/user-attachments/assets/c14922aa-26cb-49d7-af50-c2e78f032c16)
-* Console Menu
+## Chat Menu
+![Chat Menu](images/chatmenu.png)
 
-  ![image](https://github.com/user-attachments/assets/86d188a7-c7a3-4b8c-923e-c4fa2e81d9d1)
-* CenterHtmlMenu
+## Console Menu
+![Console Menu](images/consolemenu.png)
 
-  ![image](https://github.com/user-attachments/assets/c0c0198a-01b1-46a1-8222-250b8ae1ec80)
-* Wasd Menu
+## CenterHtmlMenu
+![CenterHtmlMenu](images/centerhtmlmenu.png)
 
-  ![image](https://github.com/user-attachments/assets/1fa862c9-dbc2-451a-9d32-fb2b6c4cc4df)
-* Screen Menu
+## Wasd Menu
+![Wasd Menu](images/wasdmenu.png)
 
-  ![image](https://github.com/user-attachments/assets/54bc171f-c5f1-4d2c-88e2-4951395c9dae)
+## Screen Menu
+![Screen Menu](images/screenmenu.png)
+
+## Panorama Vote
+![Screen Menu](images/panoramavote.png)

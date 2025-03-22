@@ -71,8 +71,6 @@ public class PanoramaVoteInstance : BaseVoteInstance
         VoteController.PotentialVotes = VoterCount;
         VoteController.ActiveIssueIndex = 2;
 
-        CurrentVoteCaller = VoteConstants.VOTE_CALLER_SERVER;
-
         UpdateVoteCounts();
         SendVoteStartUM(CurrentVotefilter);
 
@@ -145,7 +143,7 @@ public class PanoramaVoteInstance : BaseVoteInstance
         UserMessage um = UserMessage.FromPartialName("VoteStart");
 
         um.SetInt("team", -1);
-        um.SetInt("player_slot", CurrentVoteCaller);
+        um.SetInt("player_slot", VoteMenu.VoteCaller?.Slot ?? 99);
         um.SetInt("vote_type", -1);
         um.SetString("disp_str", VoteMenu.Title);
         um.SetString("details_str", VoteMenu.Details);

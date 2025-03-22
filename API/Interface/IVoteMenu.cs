@@ -20,6 +20,11 @@ public interface IVoteMenu
     string Details { get; }
 
     /// <summary>
+    /// Gets the player who initiated the current vote. (Null if the vote was initiated by the server)
+    /// </summary>
+    CCSPlayerController? VoteCaller { get; }
+
+    /// <summary>
     /// Gets the result callback for the vote.
     /// </summary>
     public YesNoVoteResult Result { get; }
@@ -87,11 +92,6 @@ public interface IVoteMenuInstance
     /// Gets an array that stores the slots of players who are eligible to vote.
     /// </summary>
     int[] Voters { get; }
-
-    /// <summary>
-    /// Gets the slot of the player who initiated the current vote.
-    /// </summary>
-    int CurrentVoteCaller { get; }
 
     /// <summary>
     /// Closes the vote menu.

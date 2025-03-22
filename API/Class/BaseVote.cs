@@ -23,6 +23,11 @@ public abstract class BaseVote(string title, string details, YesNoVoteResult res
     public string Details { get; set; } = details;
 
     /// <summary>
+    /// Gets or sets the player who initiated the current vote. (Null if the vote was initiated by the server)
+    /// </summary>
+    public CCSPlayerController? VoteCaller { get; set; }
+
+    /// <summary>
     /// Gets or sets the result callback for the vote.
     /// </summary>
     public YesNoVoteResult Result { get; set; } = resultCallback;
@@ -90,11 +95,6 @@ public abstract class BaseVoteInstance(List<CCSPlayerController> players, IVoteM
     /// Gets or sets an array that stores the slots of players who are eligible to vote.
     /// </summary>
     public int[] Voters { get; set; } = new int[VoteConstants.MAXPLAYERS];
-
-    /// <summary>
-    /// Gets or sets the slot of the player who initiated the current vote.
-    /// </summary>
-    public int CurrentVoteCaller { get; set; }
 
     /// <summary>
     /// Closes the menu.

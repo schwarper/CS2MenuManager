@@ -11,17 +11,36 @@ Exit = ""
 ScrollUp = ""
 ScrollDown = ""
 
+[ChatMenu]
+TitleColor = "Yellow"
+EnabledColor = "Green"
+DisabledColor = "Grey"
+PrevPageColor = "Yellow"
+NextPageColor = "Yellow"
+ExitColor = "Red"
+
+[CenterHtmlMenu]
+TitleColor = "Yellow"
+EnabledColor = "Green"
+DisabledColor = "Grey"
+PrevPageColor = "Yellow"
+NextPageColor = "Yellow"
+ExitColor = "Red"
+InlinePageOptions = true
+MaxTitleLength = 0
+MaxOptionLength = 0
+
 [WasdMenu]
-TitleColor = "green"
-ScrollUpDownKeyColor = "cyan"
-SelectKeyColor = "green"
-PrevKeyColor = "orange"
-ExitKeyColor = "red"
-SelectedOptionColor = "orange"
-OptionColor = "white"
-DisabledOptionColor = "grey"
-ArrowColor = "purple"
-FreezePlayer = true
+TitleColor = "Green"
+ScrollUpDownKeyColor = "Cyan"
+SelectKeyColor = "Green"
+PrevKeyColor = "Orange"
+ExitKeyColor = "Red"
+SelectedOptionColor = "Orange"
+OptionColor = "White"
+DisabledOptionColor = "Grey"
+ArrowColor = "Purple"
+FreezePlayer = false
 
 [ScreenMenu]
 TextColor = "orange"
@@ -82,27 +101,3 @@ PrevKey = "{0} - Előző"
 ExitKey = "{0} - Kilépés"
 SelectResolution = "Felbontás kiválasztása"
 WarnDisabledItem = "{Red}Nem tudod {Grey}ezt az opciót választani."
-
-[Lang.zh-Hans]
-Prev = "上一页"
-Next = "下一页"
-Exit = "退出"
-Disabled = "禁用"
-Scroll = "[{0}/{1}] 滚动"
-Select = "[{0}] 选择"
-PrevKey = "{0} - 上一页"
-ExitKey = "{0} - 退出"
-SelectResolution = "选择分辨率"
-WarnDisabledItem = "{Grey}你 {Red}无法 {Grey}进入此选项."
-
-[Lang.zh-Hant]
-Prev = "上一頁"
-Next = "下一頁"
-Exit = "退出"
-Disabled = "禁用"
-Scroll = "[{0}/{1}] 滾動"
-Select = "[{0}] 選擇"
-PrevKey = "{0} - 上一頁"
-ExitKey = "{0} - 退出"
-SelectResolution = "選擇解析度"
-WarnDisabledItem = "{Grey}你 {Red}無法 {Grey}進入此選項."

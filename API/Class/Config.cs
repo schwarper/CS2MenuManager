@@ -1,4 +1,9 @@
 ﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Core.Translations;
+using CounterStrikeSharp.API.Modules.Utils;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using Tomlyn;
 using Tomlyn.Model;
@@ -10,10 +15,62 @@ internal static class ConfigManager
 {
     public class Cfg
     {
-        public ButtonsKey Buttons { get; set; } = new();
+        public ButtonsKey Buttons { get; set; } = new()
+        {
+            ScrollUp = "W",
+            ScrollDown = "S",
+            Select = "E",
+            Prev = "Shift",
+            Exit = "Tab"
+        };
         public Sound Sound { get; set; } = new();
-        public WasdMenuSettings WasdMenu { get; set; } = new();
-        public ScreenMenu ScreenMenu { get; set; } = new();
+        public ChatMenuSettings ChatMenu { get; set; } = new()
+        {
+            TitleColor = ChatColors.Yellow,
+            EnabledColor = ChatColors.Green,
+            DisabledColor = ChatColors.Grey,
+            PrevPageColor = ChatColors.Yellow,
+            NextPageColor = ChatColors.Yellow,
+            ExitColor = ChatColors.Red
+        };
+        public CenterHtmlMenuSettings CenterHtmlMenu { get; set; } = new()
+        {
+            TitleColor = "yellow",
+            EnabledColor = "green",
+            DisabledColor = "grey",
+            PrevPageColor = "yellow",
+            NextPageColor = "yellow",
+            ExitColor = "red",
+            InlinePageOptions = true,
+            MaxTitleLength = 0,
+            MaxOptionLength = 0
+        };
+        public WasdMenuSettings WasdMenu { get; set; } = new()
+        {
+            TitleColor = "green",
+            ScrollUpDownKeyColor = "cyan",
+            SelectKeyColor = "green",
+            PrevKeyColor = "orange",
+            ExitKeyColor = "red",
+            SelectedOptionColor = "orange",
+            OptionColor = "white",
+            DisabledOptionColor = "grey",
+            ArrowColor = "purple",
+            FreezePlayer = false
+        };
+        public ScreenMenu ScreenMenu { get; set; } = new()
+        {
+            TextColor = "orange",
+            PositionX = -5.5f,
+            PositionY = 0.0f,
+            Background = true,
+            BackgroundHeight = 0,
+            BackgroundWidth = 0.2f,
+            Font = "Arial Bold",
+            Size = 32,
+            FreezePlayer = false,
+            ShowResolutionsOption = true
+        };
         public Dictionary<string, Resolution> Resolutions { get; set; } = [];
         public Dictionary<string, Dictionary<string, string>> Lang { get; set; } = [];
     }
@@ -33,6 +90,29 @@ internal static class ConfigManager
         public string Exit { get; set; } = string.Empty;
         public string ScrollUp { get; set; } = string.Empty;
         public string ScrollDown { get; set; } = string.Empty;
+    }
+
+    public class ChatMenuSettings
+    {
+        public char TitleColor { get; set; }
+        public char EnabledColor { get; set; }
+        public char DisabledColor { get; set; }
+        public char PrevPageColor { get; set; }
+        public char NextPageColor { get; set; }
+        public char ExitColor { get; set; }
+    }
+
+    public class CenterHtmlMenuSettings
+    {
+        public string TitleColor { get; set; } = string.Empty;
+        public string EnabledColor { get; set; } = string.Empty;
+        public string DisabledColor { get; set; } = string.Empty;
+        public string PrevPageColor { get; set; } = string.Empty;
+        public string NextPageColor { get; set; } = string.Empty;
+        public string ExitColor { get; set; } = string.Empty;
+        public bool InlinePageOptions { get; set; }
+        public int MaxTitleLength { get; set; }
+        public int MaxOptionLength { get; set; }
     }
 
     public class WasdMenuSettings
@@ -93,68 +173,87 @@ internal static class ConfigManager
         string configText = File.ReadAllText(ConfigFilePath);
         TomlTable model = Toml.ToModel(configText);
 
-        TomlTable buttons = (TomlTable)model["Buttons"];
-        Config.Buttons.ScrollUp = buttons["ScrollUp"].ToString()!;
-        Config.Buttons.ScrollDown = buttons["ScrollDown"].ToString()!;
-        Config.Buttons.Select = buttons["Select"].ToString()!;
-        Config.Buttons.Prev = buttons["Prev"].ToString()!;
-        Config.Buttons.Exit = buttons["Exit"].ToString()!;
+        Console.WriteLine($"LOADİNG CONFİG");
 
-        TomlTable soundTable = (TomlTable)model["Sound"];
-        Config.Sound.Select = soundTable["Select"].ToString()!;
-        Config.Sound.Exit = soundTable["Exit"].ToString()!;
-        Config.Sound.ScrollUp = soundTable["ScrollUp"].ToString()!;
-        Config.Sound.ScrollDown = soundTable["ScrollDown"].ToString()!;
+        model.SetIfPresent("Buttons.ScrollUp", (string value) => Config.Buttons.ScrollUp = value);
+        model.SetIfPresent("Buttons.ScrollDown", (string value) => Config.Buttons.ScrollDown = value);
+        model.SetIfPresent("Buttons.Select", (string value) => Config.Buttons.Select = value);
+        model.SetIfPresent("Buttons.Prev", (string value) => Config.Buttons.Prev = value);
+        model.SetIfPresent("Buttons.Exit", (string value) => Config.Buttons.Exit = value);
 
-        TomlTable wasdTable = (TomlTable)model["WasdMenu"];
-        Config.WasdMenu.TitleColor = wasdTable["TitleColor"].ToString()!;
-        Config.WasdMenu.ScrollUpDownKeyColor = wasdTable["ScrollUpDownKeyColor"].ToString()!;
-        Config.WasdMenu.SelectKeyColor = wasdTable["SelectKeyColor"].ToString()!;
-        Config.WasdMenu.PrevKeyColor = wasdTable["PrevKeyColor"].ToString()!;
-        Config.WasdMenu.ExitKeyColor = wasdTable["ExitKeyColor"].ToString()!;
-        Config.WasdMenu.SelectedOptionColor = wasdTable["SelectedOptionColor"].ToString()!;
-        Config.WasdMenu.OptionColor = wasdTable["OptionColor"].ToString()!;
-        Config.WasdMenu.DisabledOptionColor = wasdTable["DisabledOptionColor"].ToString()!;
-        Config.WasdMenu.ArrowColor = wasdTable["ArrowColor"].ToString()!;
-        Config.WasdMenu.FreezePlayer = bool.Parse(wasdTable["FreezePlayer"]?.ToString() ?? "false");
+        model.SetIfPresent("Sound.Select", (string value) => Config.Sound.Select = value);
+        model.SetIfPresent("Sound.Exit", (string value) => Config.Sound.Exit = value);
+        model.SetIfPresent("Sound.ScrollUp", (string value) => Config.Sound.ScrollUp = value);
+        model.SetIfPresent("Sound.ScrollDown", (string value) => Config.Sound.ScrollDown = value);
 
-        TomlTable screenTable = (TomlTable)model["ScreenMenu"];
-        Config.ScreenMenu.TextColor = screenTable["TextColor"].ToString()!;
-        Config.ScreenMenu.PositionX = float.Parse(screenTable["PositionX"].ToString()!);
-        Config.ScreenMenu.PositionY = float.Parse(screenTable["PositionY"].ToString()!);
-        Config.ScreenMenu.Background = bool.Parse(screenTable["Background"].ToString()!);
-        Config.ScreenMenu.BackgroundHeight = float.Parse(screenTable["BackgroundHeight"].ToString()!);
-        Config.ScreenMenu.BackgroundWidth = float.Parse(screenTable["BackgroundWidth"].ToString()!);
-        Config.ScreenMenu.Font = screenTable["Font"].ToString()!;
-        Config.ScreenMenu.Size = int.Parse(screenTable["Size"].ToString()!);
-        Config.ScreenMenu.FreezePlayer = bool.Parse(screenTable["FreezePlayer"].ToString()!);
-        Config.ScreenMenu.ShowResolutionsOption = bool.Parse(screenTable["ShowResolutionsOption"].ToString()!);
+        model.SetIfPresent("ChatMenu.TitleColor", (string value) => Config.ChatMenu.TitleColor = value.GetChatColor());
+        model.SetIfPresent("ChatMenu.EnabledColor", (string value) => Config.ChatMenu.EnabledColor = value.GetChatColor());
+        model.SetIfPresent("ChatMenu.DisabledColor", (string value) => Config.ChatMenu.DisabledColor = value.GetChatColor());
+        model.SetIfPresent("ChatMenu.PrevPageColor", (string value) => Config.ChatMenu.PrevPageColor = value.GetChatColor());
+        model.SetIfPresent("ChatMenu.NextPageColor", (string value) => Config.ChatMenu.NextPageColor = value.GetChatColor());
+        model.SetIfPresent("ChatMenu.ExitColor", (string value) => Config.ChatMenu.ExitColor = value.GetChatColor());
 
-        TomlTable resolutionsTable = (TomlTable)model["Resolutions"];
-        foreach (KeyValuePair<string, object> resolution in resolutionsTable)
+        model.SetIfPresent("CenterHtmlMenu.TitleColor", (string value) => Config.CenterHtmlMenu.TitleColor = value);
+        model.SetIfPresent("CenterHtmlMenu.EnabledColor", (string value) => Config.CenterHtmlMenu.EnabledColor = value);
+        model.SetIfPresent("CenterHtmlMenu.DisabledColor", (string value) => Config.CenterHtmlMenu.DisabledColor = value);
+        model.SetIfPresent("CenterHtmlMenu.PrevPageColor", (string value) => Config.CenterHtmlMenu.PrevPageColor = value);
+        model.SetIfPresent("CenterHtmlMenu.NextPageColor", (string value) => Config.CenterHtmlMenu.NextPageColor = value);
+        model.SetIfPresent("CenterHtmlMenu.ExitColor", (string value) => Config.CenterHtmlMenu.ExitColor = value);
+        model.SetIfPresent("CenterHtmlMenu.InlinePageOptions", (bool value) => Config.CenterHtmlMenu.InlinePageOptions = value);
+        model.SetIfPresent("CenterHtmlMenu.MaxTitleLength", (int value) => Config.CenterHtmlMenu.MaxTitleLength = value);
+        model.SetIfPresent("CenterHtmlMenu.MaxOptionLength", (int value) => Config.CenterHtmlMenu.MaxOptionLength = value);
+
+        model.SetIfPresent("WasdMenu.TitleColor", (string value) => Config.WasdMenu.TitleColor = value);
+        model.SetIfPresent("WasdMenu.ScrollUpDownKeyColor", (string value) => Config.WasdMenu.ScrollUpDownKeyColor = value);
+        model.SetIfPresent("WasdMenu.SelectKeyColor", (string value) => Config.WasdMenu.SelectKeyColor = value);
+        model.SetIfPresent("WasdMenu.PrevKeyColor", (string value) => Config.WasdMenu.PrevKeyColor = value);
+        model.SetIfPresent("WasdMenu.ExitKeyColor", (string value) => Config.WasdMenu.ExitKeyColor = value);
+        model.SetIfPresent("WasdMenu.SelectedOptionColor", (string value) => Config.WasdMenu.SelectedOptionColor = value);
+        model.SetIfPresent("WasdMenu.OptionColor", (string value) => Config.WasdMenu.OptionColor = value);
+        model.SetIfPresent("WasdMenu.DisabledOptionColor", (string value) => Config.WasdMenu.DisabledOptionColor = value);
+        model.SetIfPresent("WasdMenu.ArrowColor", (string value) => Config.WasdMenu.ArrowColor = value);
+        model.SetIfPresent("WasdMenu.FreezePlayer", (bool value) => Config.WasdMenu.FreezePlayer = value);
+
+        model.SetIfPresent("ScreenMenu.TextColor", (string value) => Config.ScreenMenu.TextColor = value);
+        model.SetIfPresent("ScreenMenu.PositionX", (float value) => Config.ScreenMenu.PositionX = value);
+        model.SetIfPresent("ScreenMenu.PositionY", (float value) => Config.ScreenMenu.PositionY = value);
+        model.SetIfPresent("ScreenMenu.Background", (bool value) => Config.ScreenMenu.Background = value);
+        model.SetIfPresent("ScreenMenu.BackgroundHeight", (float value) => Config.ScreenMenu.BackgroundHeight = value);
+        model.SetIfPresent("ScreenMenu.BackgroundWidth", (float value) => Config.ScreenMenu.BackgroundWidth = value);
+        model.SetIfPresent("ScreenMenu.Font", (string value) => Config.ScreenMenu.Font = value);
+        model.SetIfPresent("ScreenMenu.Size", (int value) => Config.ScreenMenu.Size = value);
+        model.SetIfPresent("ScreenMenu.FreezePlayer", (bool value) => Config.ScreenMenu.FreezePlayer = value);
+        model.SetIfPresent("ScreenMenu.ShowResolutionsOption", (bool value) => Config.ScreenMenu.ShowResolutionsOption = value);
+
+        model.SetIfExist("Resolutions", (TomlTable table) =>
         {
-            if (resolution.Value is TomlTable innerTable)
+            foreach (var item in table)
             {
-                Config.Resolutions[resolution.Key] = new Resolution()
+                if (item.Value is TomlTable innerTable)
                 {
-                    PositionX = float.Parse(innerTable["PositionX"].ToString()!),
-                    PositionY = float.Parse(innerTable["PositionY"].ToString()!)
-                };
-            }
-        }
-
-        TomlTable langTable = (TomlTable)model["Lang"];
-        foreach (KeyValuePair<string, object> lang in langTable)
-        {
-            if (lang.Value is TomlTable innerTable)
-            {
-                Dictionary<string, string> innerDict = Config.Lang.GetValueOrDefault(lang.Key) ?? (Config.Lang[lang.Key] = []);
-
-                foreach (KeyValuePair<string, object> item in innerTable)
-                {
-                    innerDict[item.Key] = item.Value?.ToString() ?? string.Empty;
+                    Config.Resolutions[item.Key] = new Resolution
+                    {
+                        PositionX = innerTable.GetValue<float>("PositionX"),
+                        PositionY = innerTable.GetValue<float>("PositionY")
+                    };
                 }
             }
-        }
+        });
+
+        model.SetIfExist("Lang", (TomlTable table) =>
+        {
+            foreach (var item in table)
+            {
+                if (item.Value is TomlTable innerTable)
+                {
+                    var innerDict = new Dictionary<string, string>();
+                    foreach (var innerItem in innerTable)
+                    {
+                        innerDict[innerItem.Key] = innerItem.Value?.ToString() ?? string.Empty;
+                    }
+                    Config.Lang[item.Key] = innerDict;
+                }
+            }
+        });
     }
 }

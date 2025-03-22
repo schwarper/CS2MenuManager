@@ -1,9 +1,5 @@
 ﻿using CounterStrikeSharp.API;
-using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Utils;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using Tomlyn;
 using Tomlyn.Model;
@@ -225,7 +221,7 @@ internal static class ConfigManager
 
         model.SetIfExist("Resolutions", (TomlTable table) =>
         {
-            foreach (var item in table)
+            foreach (KeyValuePair<string, object> item in table)
             {
                 if (item.Value is TomlTable innerTable)
                 {
@@ -240,12 +236,12 @@ internal static class ConfigManager
 
         model.SetIfExist("Lang", (TomlTable table) =>
         {
-            foreach (var item in table)
+            foreach (KeyValuePair<string, object> item in table)
             {
                 if (item.Value is TomlTable innerTable)
                 {
-                    var innerDict = new Dictionary<string, string>();
-                    foreach (var innerItem in innerTable)
+                    Dictionary<string, string> innerDict = [];
+                    foreach (KeyValuePair<string, object> innerItem in innerTable)
                     {
                         innerDict[innerItem.Key] = innerItem.Value?.ToString() ?? string.Empty;
                     }

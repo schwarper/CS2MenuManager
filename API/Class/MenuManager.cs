@@ -1,6 +1,7 @@
 ﻿using CounterStrikeSharp.API.Core;
 using CS2MenuManager.API.Enum;
 using CS2MenuManager.API.Interface;
+using CS2MenuManager.API.Menu;
 using static CS2MenuManager.API.Class.ConfigManager;
 using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
 
@@ -58,17 +59,20 @@ public static class MenuManager
         LoadConfig();
         CloseActiveMenu(player, CloseMenuAction.Close);
 
-        Timer? timer = menu.MenuTime > 0 ?
-            menu.Plugin.AddTimer(menu.MenuTime, () => CloseActiveMenu(player, CloseMenuAction.Close)) :
-            null;
-
         IMenuInstance instance = createInstance.Invoke(player, menu);
+
+        if (instance is ScreenMenuInstance screenMenuInstance)
+            player.CreateFakeWorldText(screenMenuInstance);
 
         if (instance is BaseMenuInstance baseMenuInstance)
         {
             baseMenuInstance.RegisterOnKeyPress();
             baseMenuInstance.RegisterPlayerDisconnectEvent();
         }
+
+        Timer? timer = menu.MenuTime > 0 ?
+        menu.Plugin.AddTimer(menu.MenuTime, () => CloseActiveMenu(player, CloseMenuAction.Close)) :
+        null;
 
         ActiveMenus[player.Handle] = (instance, timer);
         instance.Display();

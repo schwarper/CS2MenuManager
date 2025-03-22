@@ -4,8 +4,8 @@ using CS2MenuManager.API.Enum;
 using CS2MenuManager.API.Interface;
 using System.Text;
 using static CounterStrikeSharp.API.Core.Listeners;
-using static CS2MenuManager.API.Class.Library;
 using static CS2MenuManager.API.Class.ConfigManager;
+using static CS2MenuManager.API.Class.Library;
 
 namespace CS2MenuManager.API.Menu;
 

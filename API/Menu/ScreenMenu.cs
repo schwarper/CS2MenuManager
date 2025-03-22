@@ -97,6 +97,8 @@ public class ScreenMenuInstance : BaseMenuInstance
     /// </summary>
     public CPointWorldText? WorldText;
 
+    internal CCSGOViewModel? OldViewModel;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ScreenMenuInstance"/> class.
     /// </summary>
@@ -297,12 +299,14 @@ public class ScreenMenuInstance : BaseMenuInstance
 
         if (WorldText != null)
         {
+            CCSGOViewModel? viewModel = Player.EnsureCustomView();
+            if (viewModel == null) { Close(); return; }
+            if (OldViewModel == viewModel) return;
+
             VectorData? vectorData = Player.FindVectorData();
             if (vectorData == null) { Close(); return; }
 
-            CCSGOViewModel? viewModel = Player.EnsureCustomView();
-            if (viewModel == null) { Close(); return; }
-
+            OldViewModel = viewModel;
             WorldText.Teleport(vectorData.Value.Position, vectorData.Value.Angle, null);
             WorldText.AcceptInput("SetParent", viewModel, null, "!activator");
         }

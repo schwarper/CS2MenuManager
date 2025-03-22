@@ -3,6 +3,7 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Utils;
+using CS2MenuManager.API.Menu;
 using System.Drawing;
 using System.Globalization;
 using System.Text;
@@ -17,21 +18,22 @@ internal static partial class Library
     [GeneratedRegex("<[^>]+>", RegexOptions.Compiled)] private static partial Regex TagRegex();
 
     public readonly record struct VectorData(Vector Position, QAngle Angle);
+    private static bool _isFakeCreated;
 
     public static CCSPlayerPawn? GetPlayerPawn(this CCSPlayerController player)
     {
-        if (player.Pawn.Value is not { } playerPawn)
+        if (player.Pawn.Value is not CBasePlayerPawn pawn)
             return null;
 
-        if (playerPawn.LifeState == (byte)LifeState_t.LIFE_DEAD)
+        if (pawn.LifeState == (byte)LifeState_t.LIFE_DEAD)
         {
-            if (playerPawn.ObserverServices?.ObserverTarget.Value is not CCSPlayerPawn observerTarget)
+            if (pawn.ObserverServices?.ObserverTarget.Value?.As<CBasePlayerPawn>() is not CBasePlayerPawn observer)
                 return null;
 
-            playerPawn = observerTarget;
+            pawn = observer;
         }
 
-        return playerPawn.As<CCSPlayerPawn>();
+        return pawn.As<CCSPlayerPawn>();
     }
 
     public static VectorData? FindVectorData(this CCSPlayerController player)
@@ -110,6 +112,27 @@ internal static partial class Library
 
         entity.DispatchSpawn();
         return entity;
+    }
+
+    public static void CreateFakeWorldText(this CCSPlayerController player, ScreenMenuInstance instance)
+    {
+        if (_isFakeCreated)
+            return;
+
+        CPointWorldText? entity = CreateWorldText("       ", 35, "orange", "Arial", false, 0, 0);
+        if (entity == null) { instance.Close(); return; }
+
+        CCSGOViewModel? viewModel = player.EnsureCustomView();
+        if (viewModel == null) { instance.Close(); return; }
+
+        VectorData? vectorData = player.FindVectorData();
+        if (vectorData == null) { instance.Close(); return; }
+
+        entity.Teleport(vectorData.Value.Position, vectorData.Value.Angle, null);
+        entity.AcceptInput("SetParent", viewModel, null, "!activator");
+
+        entity.Remove();
+        _isFakeCreated = true;
     }
 
     public static void Freeze(this CCSPlayerController player)
@@ -197,11 +220,11 @@ internal static partial class Library
 
     public static void SetIfPresent<T>(this TomlTable table, string key, Action<T> setter)
     {
-        var split = key.Split('.', StringSplitOptions.TrimEntries);
+        string[] split = key.Split('.', StringSplitOptions.TrimEntries);
 
-        if (table.TryGetValue(split[0], out var innerValue) && innerValue is TomlTable innerTable)
+        if (table.TryGetValue(split[0], out object? innerValue) && innerValue is TomlTable innerTable)
         {
-            if (innerTable.TryGetValue(split[1], out var value))
+            if (innerTable.TryGetValue(split[1], out object? value))
             {
                 T typedValue = (T)Convert.ChangeType(value, typeof(T));
                 setter(typedValue);
@@ -211,7 +234,7 @@ internal static partial class Library
 
     public static void SetIfExist(this TomlTable table, string key, Action<TomlTable> setter)
     {
-        if (table.TryGetValue(key, out var value) && value is TomlTable innerTable)
+        if (table.TryGetValue(key, out object? value) && value is TomlTable innerTable)
         {
             setter(innerTable);
         }
@@ -219,11 +242,7 @@ internal static partial class Library
 
     public static T? GetValue<T>(this TomlTable table, string key)
     {
-        if (table.TryGetValue(key, out var value))
-        {
-            return (T)Convert.ChangeType(value, typeof(T));
-        }
-        return default;
+        return table.TryGetValue(key, out object? value) ? (T)Convert.ChangeType(value, typeof(T)) : default;
     }
 
     public static char GetChatColor(this string colorName)

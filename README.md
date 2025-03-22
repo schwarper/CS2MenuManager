@@ -21,8 +21,11 @@ Discord link : [Discord server](https://discord.gg/4zQfUzjk36)
 * Restart your server for the changes to take effect. You will need to use this API in your plugins.
 
 # Usage
-1. You can create any type of menu. All menu types have a similar structure. Here's an example of how to create a Chat Menu:
-Supported menus: `ChatMenu`, `ConsoleMenu`, `CenterHtmlMenu`, `WasdMenu`, `ScreenMenu`
+
+## Creating Menus
+You can create any type of menu. All menu types have a similar structure. Here's an example of how to create a Chat Menu:
+
+Supported menus: `ChatMenu`, `ConsoleMenu`, `CenterHtmlMenu`, `WasdMenu`, `ScreenMenu`, `PanoramaVote`
 ```csharp
 ChatMenu menu = new("Title", this);
 
@@ -37,7 +40,8 @@ menu.AddItem("Option 3X", DisableOption.DisableHideNumber);
 menu.Display(player);
 ```
 
-2. You can add submenus to any menu. Here's how to link a submenu:
+## Adding Submenus
+You can add submenus to any menu. Here's how to link a submenu:
 ```csharp
 menu.PrevMenu = AnySubMenu();
 
@@ -49,7 +53,8 @@ private static CenterHtmlMenu AnySubMenu()
 }
 ```
 
-4. You can set the behaviour after selecting an option using PostSelectAction. The default is to close the menu after selection.
+## Post-Select Actions
+You can set the behavior after selecting an option using PostSelectAction. The default is to close the menu after selection.
 ```csharp
 menu.AddItem("Option After Reset", (p, o) =>
 {
@@ -57,7 +62,8 @@ menu.AddItem("Option After Reset", (p, o) =>
 });
 ```
 
-3. You can set the time for the menu. When the time is up, the menu is automatically closed.
+## Setting Menu Time
+You can set the time for the menu. When the time is up, the menu is automatically closed.
 ```csharp
 menu.Display(menu, 10);
 // OR
@@ -65,6 +71,70 @@ ConsoleMenu menu = new("Console Menu", this)
 {
     MenuTime = 20
 };
+```
+
+## Panorama Vote Menu
+The PanoramaVote menu allows you to create interactive vote menus using the Panorama UI. Here's an example:
+```csharp
+var menu = new PanoramaVote("#SFUI_vote_panorama_vote_default", "Hold on, Let me Cook", VoteResultCallback, VoteHandlerCallback, this)
+{
+    VoteCaller = player // null is the server.
+};
+
+menu.DisplayVoteToAll(20);
+```
+### And callbacks
+```csharp
+public bool VoteResultCallback(YesNoVoteInfo info)
+{
+    /*
+    public int TotalVotes;
+    public int YesVotes;
+    public int NoVotes;
+    public int TotalClients;
+    public Dictionary<int, (int, int)> ClientInfo = [];
+    */
+
+    if (info.YesVotes > info.NoVotes)
+    {
+        Server.PrintToChatAll("Vote passed!");
+        return true;
+    }
+    
+    Server.PrintToChatAll("Vote failed!");
+    return false;
+}
+
+public void VoteHandlerCallback(YesNoVoteAction action, int param1, CastVote param2)
+{
+    switch (action)
+    {
+        case YesNoVoteAction.VoteAction_Start:
+            Server.PrintToChatAll("Vote started!");
+            break;
+
+        case YesNoVoteAction.VoteAction_Vote:
+            var player = Utilities.GetPlayerFromSlot(param1);
+            if (player == null) return;
+            player.PrintToChat("You voted: " + (param2 == CastVote.VOTE_OPTION1 ? "Yes" : "No"));
+            break;
+
+        case YesNoVoteAction.VoteAction_End:
+            switch ((YesNoVoteEndReason)param1)
+            {
+                case YesNoVoteEndReason.VoteEnd_Cancelled:
+                    Server.PrintToChatAll("Vote Ended! Cancelled");
+                    break;
+                case YesNoVoteEndReason.VoteEnd_AllVotes:
+                    Server.PrintToChatAll("Vote Ended! Thank you for participating.");
+                    break;
+                case YesNoVoteEndReason.VoteEnd_TimeUp:
+                    Server.PrintToChatAll("Vote Ended! Time is up.");
+                    break;
+            }
+            break;
+    }
+}
 ```
 
 # References

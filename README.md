@@ -72,6 +72,7 @@ ConsoleMenu menu = new("Console Menu", this)
 * `ChatMenu`,`ConsoleMenu`,`CenterHtmlMenu` => [CounterStrikeSharp](https://github.com/roflmuffin/CounterStrikeSharp) by [roflmuffin](https://github.com/roflmuffin)
 * `WasdMenu` => [WasdMenuAPI](https://github.com/Interesting-exe/WASDMenuAPI) by [Interesting-exe](https://github.com/Interesting-exe)
 * `ScreenMenu` => [CS2ScreenMenuAPI](https://github.com/T3Marius/CS2ScreenMenuAPI) by [T3Marius](https://github.com/T3Marius)
+* `PanoramaVote` => [SLAYER_PanoramaVote](https://github.com/zakriamansoor47/SLAYER_PanoramaVote) by [zakriamansoor47](https://github.com/zakriamansoor47)
 
 # Images
 * Chat Menu

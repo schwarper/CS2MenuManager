@@ -1,6 +1,7 @@
 ﻿using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using static CS2MenuManager.API.Class.BaseVoteInstance;
+using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
 
 namespace CS2MenuManager.API.Interface;
 
@@ -45,13 +46,6 @@ public interface IVoteMenu
     int VoteTime { get; }
 
     /// <summary>
-    /// Displays the vote to a single player.
-    /// </summary>
-    /// <param name="player">The player to display the vote to.</param>
-    /// <param name="time">The duration of the vote in seconds.</param>
-    void DisplayVote(CCSPlayerController player, int time);
-
-    /// <summary>
     /// Displays the vote to all players.
     /// </summary>
     /// <param name="time">The duration of the vote in seconds.</param>
@@ -61,7 +55,7 @@ public interface IVoteMenu
 /// <summary>
 /// Represents an instance of a vote menu with the vote data.
 /// </summary>
-public interface IVoteMenuInstance
+public interface IVoteMenuInstance : IDisposable
 {
     /// <summary>
     /// Gets the vote menu associated with this instance.
@@ -77,6 +71,10 @@ public interface IVoteMenuInstance
     /// Gets the filter for the current vote, which determines which players are eligible to vote.
     /// </summary>
     RecipientFilter CurrentVotefilter { get; }
+
+    /// <summary>
+    /// </summary>
+    Timer? Timer { get; }
 
     /// <summary>
     /// Gets the count of votes that have been cast in the current vote.

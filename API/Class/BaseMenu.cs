@@ -309,12 +309,9 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
 
     private HookResult OnPlayerDisconnect(EventPlayerDisconnect @event, GameEventInfo info)
     {
-        Console.WriteLine("Disconnected");
-
         if (@event.Userid != Player)
             return HookResult.Continue;
 
-        Console.WriteLine("Close menu");
         Close();
         return HookResult.Continue;
     }

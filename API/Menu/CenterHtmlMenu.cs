@@ -5,6 +5,7 @@ using CS2MenuManager.API.Interface;
 using System.Text;
 using static CounterStrikeSharp.API.Core.Listeners;
 using static CS2MenuManager.API.Class.Library;
+using static CS2MenuManager.API.Class.ConfigManager;
 
 namespace CS2MenuManager.API.Menu;
 
@@ -18,47 +19,47 @@ public class CenterHtmlMenu(string title, BasePlugin plugin) : BaseMenu(title, p
     /// <summary>
     /// Gets or sets the color of the title.
     /// </summary>
-    public string TitleColor { get; set; } = "yellow";
+    public string TitleColor = Config.CenterHtmlMenu.TitleColor;
 
     /// <summary>
     /// Gets or sets the color of enabled items.
     /// </summary>
-    public string EnabledColor { get; set; } = "green";
+    public string EnabledColor = Config.CenterHtmlMenu.EnabledColor;
 
     /// <summary>
     /// Gets or sets the color of disabled items.
     /// </summary>
-    public string DisabledColor { get; set; } = "grey";
+    public string DisabledColor = Config.CenterHtmlMenu.DisabledColor;
 
     /// <summary>
     /// Gets or sets the color of the previous page button.
     /// </summary>
-    public string PrevPageColor { get; set; } = "yellow";
+    public string PrevPageColor = Config.CenterHtmlMenu.PrevPageColor;
 
     /// <summary>
     /// Gets or sets the color of the next page button.
     /// </summary>
-    public string NextPageColor { get; set; } = "yellow";
+    public string NextPageColor = Config.CenterHtmlMenu.NextPageColor;
 
     /// <summary>
     /// Gets or sets the color of the close button.
     /// </summary>
-    public string ExitColor { get; set; } = "red";
+    public string ExitColor = Config.CenterHtmlMenu.ExitColor;
 
     /// <summary>
     /// Gets or sets a value indicating whether page options are displayed inline.
     /// </summary>
-    public bool InlinePageOptions { get; set; } = true;
+    public bool InlinePageOptions = Config.CenterHtmlMenu.InlinePageOptions;
 
     /// <summary>
     /// Gets or sets the maximum length of the title.
     /// </summary>
-    public int MaxTitleLength { get; set; } = 0;
+    public int MaxTitleLength = Config.CenterHtmlMenu.MaxTitleLength;
 
     /// <summary>
     /// Gets or sets the maximum length of each option.
     /// </summary>
-    public int MaxOptionLength { get; set; } = 0;
+    public int MaxOptionLength = Config.CenterHtmlMenu.MaxOptionLength;
 
     /// <summary>
     /// Displays the menu to the specified player for a specified duration.

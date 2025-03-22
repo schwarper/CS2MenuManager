@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
+using Tomlyn.Model;
 using static CS2MenuManager.API.Class.ConfigManager;
 
 namespace CS2MenuManager.API.Class;
@@ -192,5 +193,41 @@ internal static partial class Library
             result.Append($"</{tagStack.Pop()}>");
 
         return result.ToString();
+    }
+
+    public static void SetIfPresent<T>(this TomlTable table, string key, Action<T> setter)
+    {
+        var split = key.Split('.', StringSplitOptions.TrimEntries);
+
+        if (table.TryGetValue(split[0], out var innerValue) && innerValue is TomlTable innerTable)
+        {
+            if (innerTable.TryGetValue(split[1], out var value))
+            {
+                T typedValue = (T)Convert.ChangeType(value, typeof(T));
+                setter(typedValue);
+            }
+        }
+    }
+
+    public static void SetIfExist(this TomlTable table, string key, Action<TomlTable> setter)
+    {
+        if (table.TryGetValue(key, out var value) && value is TomlTable innerTable)
+        {
+            setter(innerTable);
+        }
+    }
+
+    public static T? GetValue<T>(this TomlTable table, string key)
+    {
+        if (table.TryGetValue(key, out var value))
+        {
+            return (T)Convert.ChangeType(value, typeof(T));
+        }
+        return default;
+    }
+
+    public static char GetChatColor(this string colorName)
+    {
+        return (char)typeof(ChatColors).GetField(colorName)?.GetValue(null)!;
     }
 }

@@ -78,6 +78,18 @@ ExitKey = "{0} - Exit"
 SelectResolution = "Select Resolution"
 WarnDisabledItem = "{Grey}You {Red}can't {Grey}enter this option."
 
+[Lang.pt-BR]
+Prev = "Voltar"
+Next = "Próximo"
+Exit = "Sair"
+Disabled = "Desabilitado"
+ScrollKey = "{0}/{1} - Scroll"
+SelectKey = "{0} - Selecionar"
+PrevKey = "{0} - Voltar"
+ExitKey = "{0} - Sair"
+SelectResolution = "Selecionar Resolução"
+WarnDisabledItem = "{Grey}Você {Red}não pode {Grey}inserir esta opção."
+
 [Lang.tr]
 Prev = "Geri"
 Next = "İleri"

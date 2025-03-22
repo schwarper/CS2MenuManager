@@ -35,7 +35,6 @@ public static class MenuManager
             switch (action)
             {
                 case CloseMenuAction.Close:
-                    ((BaseMenuInstance)value.Instance).DeregisterOnKeyPress();
                     value.Instance.Close(); break;
                 case CloseMenuAction.Reset:
                     value.Instance.Reset(); break;
@@ -66,7 +65,10 @@ public static class MenuManager
         IMenuInstance instance = createInstance.Invoke(player, menu);
 
         if (instance is BaseMenuInstance baseMenuInstance)
+        {
             baseMenuInstance.RegisterOnKeyPress();
+            baseMenuInstance.RegisterPlayerDisconnectEvent();
+        }
 
         ActiveMenus[player.Handle] = (instance, timer);
         instance.Display();

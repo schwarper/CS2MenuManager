@@ -72,7 +72,7 @@ public interface IMenu
 /// <summary>
 /// Represents an instance of a menu with player-specific data.
 /// </summary>
-public interface IMenuInstance
+public interface IMenuInstance : IDisposable
 {
     /// <summary>
     /// Gets the player associated with this menu instance.

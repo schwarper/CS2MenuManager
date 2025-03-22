@@ -101,6 +101,8 @@ public abstract class BaseMenu(string title, BasePlugin plugin) : IMenu
 /// <param name="menu">The menu associated with this instance.</param>
 public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) : IMenuInstance
 {
+    private bool _disposed = false;
+
     /// <summary>
     /// Gets or sets the player associated with this menu instance.
     /// </summary>
@@ -189,7 +191,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     /// </summary>
     public virtual void Close()
     {
-        DeregisterOnKeyPress();
+        ((IDisposable)this).Dispose();
         MenuManager.CloseActiveMenu(Player, CloseMenuAction.Reset);
     }
 
@@ -205,7 +207,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     /// <param name="key">The key that was pressed.</param>
     public void OnKeyPress(CCSPlayerController player, int key)
     {
-        if (player.Handle != Player.Handle || Menu is WasdMenu or ScreenMenu)
+        if (player.Handle != Player.Handle)
             return;
 
         switch (key)
@@ -228,8 +230,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
 
     internal void PrevSubMenu()
     {
-        if (menu.PrevMenu is IMenu prevMenu)
-            prevMenu.Display(Player, prevMenu.MenuTime);
+        menu.PrevMenu?.Display(Player, menu.PrevMenu.MenuTime);
     }
 
     private void HandleMenuItemSelection(int key)
@@ -257,6 +258,11 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
 
     internal void RegisterOnKeyPress()
     {
+        if (Menu is WasdMenu or ScreenMenu)
+        {
+            return;
+        }
+
         for (int i = 1; i <= 9; ++i)
         {
             int key = i;
@@ -273,10 +279,23 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
 
     internal void DeregisterOnKeyPress()
     {
+        if (Menu is WasdMenu or ScreenMenu)
+            return;
+
         foreach (KeyValuePair<string, CommandInfo.CommandListenerCallback> kvp in _listeners)
             Menu.Plugin.RemoveCommandListener(kvp.Key, kvp.Value, HookMode.Pre);
 
         _listeners.Clear();
+    }
+
+    internal void RegisterPlayerDisconnectEvent()
+    {
+        Menu.Plugin.RegisterEventHandler<EventPlayerDisconnect>(OnPlayerDisconnect);
+    }
+
+    internal void DeregisterPlayerDisconnectEvent()
+    {
+        Menu.Plugin.DeregisterEventHandler<EventPlayerDisconnect>(OnPlayerDisconnect);
     }
 
     private HookResult OnCommandListener(CCSPlayerController? player, int key)
@@ -286,5 +305,40 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
 
         MenuManager.OnKeyPress(player, key);
         return HookResult.Continue;
+    }
+
+    private HookResult OnPlayerDisconnect(EventPlayerDisconnect @event, GameEventInfo info)
+    {
+        Console.WriteLine("Disconnected");
+
+        if (@event.Userid != Player)
+            return HookResult.Continue;
+
+        Console.WriteLine("Close menu");
+        Close();
+        return HookResult.Continue;
+    }
+
+    void IDisposable.Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Disposes the menu instance.
+    /// </summary>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                DeregisterOnKeyPress();
+                DeregisterPlayerDisconnectEvent();
+            }
+
+            _disposed = true;
+        }
     }
 }

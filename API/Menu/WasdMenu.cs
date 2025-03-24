@@ -138,18 +138,21 @@ public class WasdMenuInstance : BaseMenuInstance
     /// <param name="menu">The menu associated with this instance.</param>
     public WasdMenuInstance(CCSPlayerController player, IMenu menu) : base(player, menu)
     {
+        if (Menu is not WasdMenu wasdMenu)
+            return;
+
         Menu.Plugin.RegisterListener<OnTick>(OnTick);
 
-        if (((WasdMenu)Menu).FreezePlayer)
+        if (wasdMenu.FreezePlayer)
             Player.Freeze();
 
         Buttons = new Dictionary<string, Action>()
         {
-            { ((WasdMenu)Menu).ScrollUpKey, ScrollUp },
-            { ((WasdMenu)Menu).ScrollDownKey, ScrollDown },
-            { ((WasdMenu)Menu).SelectKey, Choose },
-            { ((WasdMenu)Menu).PrevKey, PrevSubMenu },
-            { ((WasdMenu)Menu).ExitKey, () => { if (Menu.ExitButton) Close(); } }
+            { wasdMenu.ScrollUpKey, ScrollUp },
+            { wasdMenu.ScrollDownKey, ScrollDown },
+            { wasdMenu.SelectKey, Choose },
+            { wasdMenu.PrevKey, PrevSubMenu },
+            { wasdMenu.ExitKey, () => { if (Menu.ExitButton) Close(); } }
         };
     }
 

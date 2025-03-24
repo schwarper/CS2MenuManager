@@ -61,6 +61,21 @@ public class ScreenMenu(string title, BasePlugin plugin) : BaseMenu(title, plugi
     public bool ShowResolutionsOption = Config.ScreenMenu.ShowResolutionsOption;
 
     /// <summary>
+    /// The key binding used to scroll up in the menu.
+    /// </summary>
+    public string ScrollUpKey = Config.Buttons.ScrollUp;
+
+    /// <summary>
+    /// The key binding used to scroll down in the menu.
+    /// </summary>
+    public string ScrollDownKey = Config.Buttons.ScrollDown;
+
+    /// <summary>
+    /// The key binding used to select the currently highlighted menu option.
+    /// </summary>
+    public string SelectKey = Config.Buttons.Select;
+
+    /// <summary>
     /// Displays the menu to the specified player for a specified duration.
     /// </summary>
     /// <param name="player">The player to whom the menu is displayed.</param>
@@ -77,6 +92,8 @@ public class ScreenMenu(string title, BasePlugin plugin) : BaseMenu(title, plugi
 /// </summary>
 public class ScreenMenuInstance : BaseMenuInstance
 {
+    private readonly Dictionary<string, Action> Buttons = [];
+
     /// <summary>
     /// Gets or sets the index of the currently selected option.
     /// </summary>
@@ -110,6 +127,13 @@ public class ScreenMenuInstance : BaseMenuInstance
         Menu.Plugin.RegisterListener<CheckTransmit>(OnCheckTransmit);
         Menu.Plugin.RegisterListener<OnEntityDeleted>(OnEntityDeleted);
         if (((ScreenMenu)Menu).FreezePlayer) Player.Freeze();
+
+        Buttons = new Dictionary<string, Action>()
+        {
+            { ((WasdMenu)Menu).ScrollUpKey, ScrollUp },
+            { ((WasdMenu)Menu).ScrollDownKey, ScrollDown },
+            { ((WasdMenu)Menu).SelectKey, Choose },
+        };
     }
 
     /// <summary>
@@ -150,8 +174,8 @@ public class ScreenMenuInstance : BaseMenuInstance
         }
 
         builder.AppendLine(" ");
-        builder.AppendLine(Player.Localizer("ScrollKey", Config.Buttons.ScrollUp, Config.Buttons.ScrollDown));
-        builder.AppendLine(Player.Localizer("SelectKey", Config.Buttons.Select));
+        builder.AppendLine(Player.Localizer("ScrollKey", screenMenu.ScrollUpKey, screenMenu.ScrollDownKey));
+        builder.AppendLine(Player.Localizer("SelectKey", screenMenu.SelectKey));
         builder.AppendLine(" ");
 
         if (WorldText == null || !WorldText.IsValid)
@@ -178,6 +202,39 @@ public class ScreenMenuInstance : BaseMenuInstance
 
         if (!string.IsNullOrEmpty(Config.Sound.Exit))
             Player.ExecuteClientCommand($"play {Config.Sound.Exit}");
+    }
+
+    private void OnTick()
+    {
+        PlayerButtons button = Player.Buttons;
+
+        foreach (KeyValuePair<string, Action> kvp in Buttons)
+        {
+            if (ButtonMapping.TryGetValue(kvp.Key, out PlayerButtons buttonMappingButton))
+            {
+                if ((button & buttonMappingButton) == 0 && (OldButton & buttonMappingButton) != 0)
+                {
+                    kvp.Value.Invoke();
+                    break;
+                }
+            }
+        }
+
+        OldButton = button;
+
+        if (WorldText != null)
+        {
+            CCSGOViewModel? viewModel = Player.EnsureCustomView();
+            if (viewModel == null) { Close(); return; }
+            if (OldViewModel == viewModel) return;
+
+            VectorData? vectorData = Player.FindVectorData();
+            if (vectorData == null) { Close(); return; }
+
+            OldViewModel = viewModel;
+            WorldText.Teleport(vectorData.Value.Position, vectorData.Value.Angle, null);
+            WorldText.AcceptInput("SetParent", viewModel, null, "!activator");
+        }
     }
 
     private void ScrollDown()
@@ -271,45 +328,6 @@ public class ScreenMenuInstance : BaseMenuInstance
         if (HasExitButton) visible.Add(($"{displayNumber++}. {Player.Localizer("Exit")}", -3));
 
         return visible;
-    }
-
-    private void OnTick()
-    {
-        PlayerButtons button = Player.Buttons;
-        Dictionary<string, Action> mapping = new()
-        {
-            { Config.Buttons.ScrollUp, ScrollUp },
-            { Config.Buttons.ScrollDown, ScrollDown },
-            { Config.Buttons.Select, Choose }
-        };
-
-        foreach (KeyValuePair<string, Action> kvp in mapping)
-        {
-            if (ButtonMapping.TryGetValue(kvp.Key, out PlayerButtons buttonMappingButton))
-            {
-                if ((button & buttonMappingButton) == 0 && (OldButton & buttonMappingButton) != 0)
-                {
-                    kvp.Value.Invoke();
-                    break;
-                }
-            }
-        }
-
-        OldButton = button;
-
-        if (WorldText != null)
-        {
-            CCSGOViewModel? viewModel = Player.EnsureCustomView();
-            if (viewModel == null) { Close(); return; }
-            if (OldViewModel == viewModel) return;
-
-            VectorData? vectorData = Player.FindVectorData();
-            if (vectorData == null) { Close(); return; }
-
-            OldViewModel = viewModel;
-            WorldText.Teleport(vectorData.Value.Position, vectorData.Value.Angle, null);
-            WorldText.AcceptInput("SetParent", viewModel, null, "!activator");
-        }
     }
 
     private void OnCheckTransmit(CCheckTransmitInfoList infoList)

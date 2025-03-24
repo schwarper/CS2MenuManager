@@ -77,6 +77,8 @@ PrevKey = "{0} - Prev"
 ExitKey = "{0} - Exit"
 SelectResolution = "Select Resolution"
 WarnDisabledItem = "{Grey}You {Red}can't {Grey}enter this option."
+CancelledVote = "{darkred}{0} {Grey}cancelled vote."
+Console = "Console"
 
 [Lang.es]
 Prev = "Atras"
@@ -89,6 +91,8 @@ PrevKey = "{0} - Previo"
 ExitKey = "{0} - Salir"
 SelectResolution = "Seleccionar Resolucion"
 WarnDisabledItem = "{Grey}No puedes {Red}usar {Grey}esta opción."
+CancelledVote = "{darkred}{0} {Grey}detuvo la votación."
+Console = "Consola"
 
 [Lang.pt-BR]
 Prev = "Voltar"
@@ -101,6 +105,8 @@ PrevKey = "{0} - Voltar"
 ExitKey = "{0} - Sair"
 SelectResolution = "Selecionar Resolução"
 WarnDisabledItem = "{Grey}Você {Red}não pode {Grey}inserir esta opção."
+CancelledVote = "{darkred}{0} {Grey}parou a votação."
+Console = "Console"
 
 [Lang.tr]
 Prev = "Geri"
@@ -113,6 +119,8 @@ PrevKey = "{0} - Geri"
 ExitKey = "{0} - Çık"
 SelectResolution = "Çözünürlük seç"
 WarnDisabledItem = "{Grey}Bu seçeneği {Red}kullanamazsın {Grey}."
+CancelledVote = "{darkred}{0} {Grey}oylamayı durdurdu."
+Console = "Konsol"
 
 [Lang.hu]
 Prev = "Előző"
@@ -125,6 +133,8 @@ PrevKey = "{0} - Előző"
 ExitKey = "{0} - Kilépés"
 SelectResolution = "Felbontás kiválasztása"
 WarnDisabledItem = "{Red}Nem tudod {Grey}ezt az opciót választani."
+CancelledVote = "{darkred}{0} {Grey}megállította a szavazást."
+Console = "Konzol"
 
 [Lang.zh-Hans]
 Prev = "上一页"
@@ -137,6 +147,8 @@ PrevKey = "{0} - 上一页"
 ExitKey = "{0} - 退出"
 SelectResolution = "选择分辨率"
 WarnDisabledItem = "{Grey}你 {Red}无法 {Grey}进入此选项."
+CancelledVote = "{darkred}{0} {Grey}已停止投票。"
+Console = "控制台"
 
 [Lang.zh-Hant]
 Prev = "上一頁"
@@ -149,3 +161,5 @@ PrevKey = "{0} - 上一頁"
 ExitKey = "{0} - 退出"
 SelectResolution = "選擇解析度"
 WarnDisabledItem = "{Grey}你 {Red}無法 {Grey}進入此選項."
+CancelledVote = "{darkred}{0} {Grey}已停止投票。"
+Console = "控制台"

@@ -237,8 +237,6 @@ public class ScreenMenuInstance : BaseMenuInstance
             OldViewModel = viewModel;
             WorldText.Teleport(vectorData.Value.Position, vectorData.Value.Angle, null);
             WorldText.AcceptInput("SetParent", viewModel, null, "!activator");
-
-            Player.PrintToChat($"Changed view model");
         }
     }
 

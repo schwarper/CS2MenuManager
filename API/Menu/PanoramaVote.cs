@@ -1,6 +1,7 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.UserMessages;
+using CounterStrikeSharp.API.Modules.Utils;
 using CS2MenuManager.API.Class;
 using CS2MenuManager.API.Enum;
 using static CS2MenuManager.API.Class.BaseVoteInstance;
@@ -70,7 +71,7 @@ public class PanoramaVoteInstance : BaseVoteInstance
         VoteController.ActiveIssueIndex = 2;
 
         UpdateVoteCounts();
-        SendVoteStartUM();
+        SendVoteStartUM(CurrentVotefilter);
 
         VoteMenu.Handler?.Invoke(YesNoVoteAction.VoteAction_Start, 0, 0);
 
@@ -120,6 +121,23 @@ public class PanoramaVoteInstance : BaseVoteInstance
         }.FireEvent(false);
     }
 
+    internal void Revote(CCSPlayerController? player)
+    {
+        if (player == null || !CurrentVotefilter.Contains(player))
+            return;
+
+        int vote = VoteController.VotesCast[player.Slot];
+
+        if (vote != (int)CastVote.VOTE_UNCAST)
+        {
+            VoteController.VoteOptionCount[vote]--;
+            VoteController.VotesCast[player.Slot] = (int)CastVote.VOTE_UNCAST;
+            UpdateVoteCounts();
+        }
+
+        SendVoteStartUM(new RecipientFilter(player));
+    }
+
     internal void EndVote(YesNoVoteEndReason reason)
     {
         if (ActiveVoteEnded)
@@ -166,7 +184,7 @@ public class PanoramaVoteInstance : BaseVoteInstance
             Server.NextFrame(() => EndVote(YesNoVoteEndReason.VoteEnd_AllVotes));
     }
 
-    private void SendVoteStartUM()
+    private void SendVoteStartUM(RecipientFilter recipientFilter)
     {
         UserMessage um = UserMessage.FromPartialName("VoteStart");
 
@@ -177,7 +195,7 @@ public class PanoramaVoteInstance : BaseVoteInstance
         um.SetString("details_str", VoteMenu.Details);
         um.SetBool("is_yes_no_vote", true);
 
-        um.Send(CurrentVotefilter);
+        um.Send(recipientFilter);
     }
 
     private void SendVoteFailed(YesNoVoteEndReason reason)

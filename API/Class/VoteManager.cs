@@ -40,6 +40,9 @@ public static class VoteManager
     public static void OpenVoteMenu<TMenu>(List<CCSPlayerController> players, TMenu menu, Func<List<CCSPlayerController>, TMenu, IVoteMenuInstance> createInstance)
         where TMenu : IVoteMenu
     {
-        createInstance.Invoke(players, menu).Display();
+        IVoteMenuInstance instance = createInstance.Invoke(players, menu);
+        instance.Display();
+
+        (instance as PanoramaVoteInstance)?.RegisterCommands();
     }
 }

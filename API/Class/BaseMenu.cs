@@ -104,9 +104,9 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     private bool _disposed = false;
 
     /// <summary>
-    /// Gets or sets the player associated with this menu instance.
+    /// Gets or the player associated with this menu instance.
     /// </summary>
-    public CCSPlayerController Player { get; set; } = player;
+    public CCSPlayerController Player { get; } = player;
 
     /// <summary>
     /// Gets or sets the current page number of the menu.

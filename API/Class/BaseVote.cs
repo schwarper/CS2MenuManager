@@ -1,8 +1,11 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Admin;
+using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Utils;
 using CS2MenuManager.API.Enum;
 using CS2MenuManager.API.Interface;
+using CS2MenuManager.API.Menu;
 using static CS2MenuManager.API.Class.BaseVoteInstance;
 using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
 
@@ -137,6 +140,38 @@ public abstract class BaseVoteInstance(List<CCSPlayerController> players, IVoteM
         return Utilities.FindAllEntitiesByDesignerName<CVoteController>("vote_controller").Last();
     }
 
+    internal void RegisterCommands()
+    {
+        VoteMenu.Plugin.AddCommand("css_cancelvote", "Cancels the active vote.", Command_CancelVote);
+        VoteMenu.Plugin.AddCommand("css_revote", "Allows you to revote.", Command_Revote);
+    }
+
+    internal void DeregisterCommands()
+    {
+        VoteMenu.Plugin.RemoveCommand("css_cancelvote", Command_CancelVote);
+        VoteMenu.Plugin.RemoveCommand("css_revote", Command_Revote);
+    }
+
+    [RequiresPermissions("@css/root")]
+    private void Command_CancelVote(CCSPlayerController? player, CommandInfo info)
+    {
+        List<CCSPlayerController> players = Utilities.GetPlayers();
+        foreach (CCSPlayerController target in players)
+        {
+            if (target.IsBot)
+                continue;
+
+            target.PrintToChat(target.Localizer("CancelledVote", player?.PlayerName ?? target.Localizer("Console")));
+        }
+
+        VoteManager.ActiveVoteInstance?.Close();
+    }
+
+    private void Command_Revote(CCSPlayerController? player, CommandInfo info)
+    {
+        ((PanoramaVoteInstance?)VoteManager.ActiveVoteInstance)?.Revote(player);
+    }
+
     void IDisposable.Dispose()
     {
         Dispose(true);
@@ -154,6 +189,7 @@ public abstract class BaseVoteInstance(List<CCSPlayerController> players, IVoteM
             {
                 Timer?.Kill();
                 Timer = null;
+                DeregisterCommands();
             }
 
             _disposed = true;

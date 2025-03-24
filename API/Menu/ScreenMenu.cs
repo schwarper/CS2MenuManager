@@ -123,16 +123,19 @@ public class ScreenMenuInstance : BaseMenuInstance
     /// <param name="menu">The menu associated with this instance.</param>
     public ScreenMenuInstance(CCSPlayerController player, IMenu menu) : base(player, menu)
     {
+        if (Menu is not ScreenMenu screenMenu)
+            return;
+
         Menu.Plugin.RegisterListener<OnTick>(OnTick);
         Menu.Plugin.RegisterListener<CheckTransmit>(OnCheckTransmit);
         Menu.Plugin.RegisterListener<OnEntityDeleted>(OnEntityDeleted);
-        if (((ScreenMenu)Menu).FreezePlayer) Player.Freeze();
+        if (screenMenu.FreezePlayer) Player.Freeze();
 
         Buttons = new Dictionary<string, Action>()
         {
-            { ((WasdMenu)Menu).ScrollUpKey, ScrollUp },
-            { ((WasdMenu)Menu).ScrollDownKey, ScrollDown },
-            { ((WasdMenu)Menu).SelectKey, Choose },
+            { screenMenu.ScrollUpKey, ScrollUp },
+            { screenMenu.ScrollDownKey, ScrollDown },
+            { screenMenu.SelectKey, Choose },
         };
     }
 
@@ -333,10 +336,13 @@ public class ScreenMenuInstance : BaseMenuInstance
     private void OnCheckTransmit(CCheckTransmitInfoList infoList)
     {
         if (WorldText == null) return;
+
         foreach ((CCheckTransmitInfo info, CCSPlayerController? player) in infoList)
         {
-            if (player == null || Player == player) continue;
-            info.TransmitAlways.Remove(WorldText);
+            if (player == null || player == Player)
+                continue;
+
+            info.TransmitEntities.Remove(WorldText);
         }
     }
 

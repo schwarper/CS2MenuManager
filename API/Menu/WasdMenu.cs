@@ -68,6 +68,31 @@ public class WasdMenu(string title, BasePlugin plugin) : BaseMenu(title, plugin)
     public bool FreezePlayer = Config.WasdMenu.FreezePlayer;
 
     /// <summary>
+    /// The key binding used to scroll up in the menu.
+    /// </summary>
+    public string ScrollUpKey = Config.Buttons.ScrollUp;
+
+    /// <summary>
+    /// The key binding used to scroll down in the menu.
+    /// </summary>
+    public string ScrollDownKey = Config.Buttons.ScrollDown;
+
+    /// <summary>
+    /// The key binding used to select the currently highlighted menu option.
+    /// </summary>
+    public string SelectKey = Config.Buttons.Select;
+
+    /// <summary>
+    /// The key binding used to navigate to the previous page or option in the menu.
+    /// </summary>
+    public string PrevKey = Config.Buttons.Prev;
+
+    /// <summary>
+    /// The key binding used to close the menu.
+    /// </summary>
+    public string ExitKey = Config.Buttons.Exit;
+
+    /// <summary>
     /// Displays the menu to the specified player for a specified duration.
     /// </summary>
     /// <param name="player">The player to whom the menu is displayed.</param>
@@ -84,6 +109,8 @@ public class WasdMenu(string title, BasePlugin plugin) : BaseMenu(title, plugin)
 /// </summary>
 public class WasdMenuInstance : BaseMenuInstance
 {
+    private readonly Dictionary<string, Action> Buttons = [];
+
     /// <summary>
     /// Gets or sets the index of the currently selected option.
     /// </summary>
@@ -115,40 +142,15 @@ public class WasdMenuInstance : BaseMenuInstance
 
         if (((WasdMenu)Menu).FreezePlayer)
             Player.Freeze();
-    }
 
-    /// <summary>
-    /// Handles the tick event for the menu.
-    /// </summary>
-    public void OnTick()
-    {
-        PlayerButtons button = Player.Buttons;
-
-        Dictionary<string, Action> mapping = new()
+        Buttons = new Dictionary<string, Action>()
         {
-            { Config.Buttons.ScrollUp, ScrollUp },
-            { Config.Buttons.ScrollDown, ScrollDown },
-            { Config.Buttons.Select, Choose },
-            { Config.Buttons.Prev, PrevSubMenu },
-            { Config.Buttons.Exit, () => { if (Menu.ExitButton) Close(); } }
+            { ((WasdMenu)Menu).ScrollUpKey, ScrollUp },
+            { ((WasdMenu)Menu).ScrollDownKey, ScrollDown },
+            { ((WasdMenu)Menu).SelectKey, Choose },
+            { ((WasdMenu)Menu).PrevKey, PrevSubMenu },
+            { ((WasdMenu)Menu).ExitKey, () => { if (Menu.ExitButton) Close(); } }
         };
-
-        foreach (KeyValuePair<string, Action> kvp in mapping)
-        {
-            if (ButtonMapping.TryGetValue(kvp.Key, out PlayerButtons mappedBtn))
-            {
-                if ((button & mappedBtn) == 0 && (OldButton & mappedBtn) != 0)
-                {
-                    kvp.Value.Invoke();
-                    break;
-                }
-            }
-        }
-
-        OldButton = button;
-
-        if (!string.IsNullOrEmpty(DisplayString))
-            Player.PrintToCenterHtml(DisplayString);
     }
 
     /// <summary>
@@ -197,16 +199,16 @@ public class WasdMenuInstance : BaseMenuInstance
         }
 
         List<string> buttomText = [];
-        buttomText.Add($"<font class='fontSize-s' color='{wasdMenu.ScrollUpDownKeyColor}'>{Player.Localizer("ScrollKey", Config.Buttons.ScrollUp, Config.Buttons.ScrollDown)}</font>");
-        buttomText.Add($"<font class='fontSize-s' color='{wasdMenu.SelectKeyColor}'>{Player.Localizer("SelectKey", Config.Buttons.Select)}</font>");
+        buttomText.Add($"<font class='fontSize-s' color='{wasdMenu.ScrollUpDownKeyColor}'>{Player.Localizer("ScrollKey", wasdMenu.ScrollUpKey, wasdMenu.ScrollDownKey)}</font>");
+        buttomText.Add($"<font class='fontSize-s' color='{wasdMenu.SelectKeyColor}'>{Player.Localizer("SelectKey", wasdMenu.SelectKey)}</font>");
 
         if (wasdMenu.PrevMenu != null)
-            buttomText.Add($"<font class='fontSize-s' color='{wasdMenu.PrevKeyColor}'>{Player.Localizer("PrevKey", Config.Buttons.Prev)}</font>");
+            buttomText.Add($"<font class='fontSize-s' color='{wasdMenu.PrevKeyColor}'>{Player.Localizer("PrevKey", wasdMenu.PrevKey)}</font>");
 
         if (HasExitButton)
-            buttomText.Add($"<font class='fontSize-s' color='{wasdMenu.ExitKeyColor}'>{Player.Localizer("ExitKey", Config.Buttons.Exit)}</font>");
+            buttomText.Add($"<font class='fontSize-s' color='{wasdMenu.ExitKeyColor}'>{Player.Localizer("ExitKey", wasdMenu.ExitKey)}</font>");
 
-        builder.AppendLine($"<br>" + string.Join(" | ", buttomText));
+        builder.AppendLine(string.Join(" | ", buttomText));
 
         DisplayString = builder.ToString();
     }
@@ -225,6 +227,31 @@ public class WasdMenuInstance : BaseMenuInstance
 
         if (!string.IsNullOrEmpty(Config.Sound.Exit))
             Player.ExecuteClientCommand($"play {Config.Sound.Exit}");
+    }
+
+    /// <summary>
+    /// Handles the tick event for the menu.
+    /// </summary>
+    public void OnTick()
+    {
+        PlayerButtons button = Player.Buttons;
+
+        foreach (KeyValuePair<string, Action> kvp in Buttons)
+        {
+            if (ButtonMapping.TryGetValue(kvp.Key, out PlayerButtons mappedBtn))
+            {
+                if ((button & mappedBtn) == 0 && (OldButton & mappedBtn) != 0)
+                {
+                    kvp.Value.Invoke();
+                    break;
+                }
+            }
+        }
+
+        OldButton = button;
+
+        if (!string.IsNullOrEmpty(DisplayString))
+            Player.PrintToCenterHtml(DisplayString);
     }
 
     /// <summary>

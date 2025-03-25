@@ -198,7 +198,6 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     public virtual void Close()
     {
         ((IDisposable)this).Dispose();
-        MenuManager.CloseActiveMenu(Player, CloseMenuAction.Reset);
     }
 
     /// <summary>
@@ -242,18 +241,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
         ItemOption menuOption = Menu.ItemOptions[menuItemIndex];
         if (menuOption.DisableOption != DisableOption.None) return;
 
-        switch (menuOption.PostSelectAction)
-        {
-            case PostSelectAction.Close:
-                Close();
-                break;
-            case PostSelectAction.Reset:
-                Reset();
-                break;
-            case PostSelectAction.Nothing:
-                break;
-        }
-
+        Close();
         menuOption.OnSelect?.Invoke(Player, menuOption);
     }
 
@@ -328,6 +316,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
             {
                 DeregisterOnKeyPress();
                 DeregisterPlayerDisconnectEvent();
+                MenuManager.DisposeActiveMenu(Player);
             }
 
             _disposed = true;

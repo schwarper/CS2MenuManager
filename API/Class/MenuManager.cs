@@ -1,5 +1,4 @@
 ﻿using CounterStrikeSharp.API.Core;
-using CS2MenuManager.API.Enum;
 using CS2MenuManager.API.Interface;
 using CS2MenuManager.API.Menu;
 using static CS2MenuManager.API.Class.ConfigManager;
@@ -28,20 +27,23 @@ public static class MenuManager
     /// Closes the active menu for the specified player.
     /// </summary>
     /// <param name="player">The player controller.</param>
-    /// <param name="action">The action to take when closing the menu.</param>
-    public static void CloseActiveMenu(CCSPlayerController player, CloseMenuAction action)
+    public static void CloseActiveMenu(CCSPlayerController player)
     {
         if (ActiveMenus.TryGetValue(player.Handle, out (IMenuInstance Instance, Timer? Timer) value))
         {
-            switch (action)
-            {
-                case CloseMenuAction.Close:
-                    value.Instance.Close(); break;
-                case CloseMenuAction.Reset:
-                    value.Instance.Reset(); break;
-            }
-
+            value.Instance.Close();
             value.Timer?.Kill();
+            value.Timer = null;
+            ActiveMenus.Remove(player.Handle);
+        }
+    }
+
+    internal static void DisposeActiveMenu(CCSPlayerController player)
+    {
+        if (ActiveMenus.TryGetValue(player.Handle, out (IMenuInstance Instance, Timer? Timer) value))
+        {
+            value.Timer?.Kill();
+            value.Timer = null;
             ActiveMenus.Remove(player.Handle);
         }
     }
@@ -57,7 +59,7 @@ public static class MenuManager
         where TMenu : IMenu
     {
         LoadConfig();
-        CloseActiveMenu(player, CloseMenuAction.Close);
+        CloseActiveMenu(player);
 
         IMenuInstance instance = createInstance.Invoke(player, menu);
 
@@ -71,8 +73,8 @@ public static class MenuManager
         }
 
         Timer? timer = menu.MenuTime > 0 ?
-        menu.Plugin.AddTimer(menu.MenuTime, () => CloseActiveMenu(player, CloseMenuAction.Close)) :
-        null;
+            menu.Plugin.AddTimer(menu.MenuTime, () => CloseActiveMenu(player)) :
+            null;
 
         ActiveMenus[player.Handle] = (instance, timer);
         instance.Display();

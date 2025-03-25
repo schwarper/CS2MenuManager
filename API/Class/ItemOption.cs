@@ -25,9 +25,4 @@ public class ItemOption(string display, DisableOption option, Action<CCSPlayerCo
     /// Gets or sets the action to perform when the item is selected.
     /// </summary>
     public Action<CCSPlayerController, ItemOption>? OnSelect { get; set; } = onSelect;
-
-    /// <summary>
-    /// Gets or sets the action to take after the item is selected.
-    /// </summary>
-    public PostSelectAction PostSelectAction { get; set; } = PostSelectAction.Close;
 }

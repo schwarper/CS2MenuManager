@@ -276,12 +276,7 @@ public class WasdMenuInstance : BaseMenuInstance
         if (!string.IsNullOrEmpty(Config.Sound.Select))
             Player.ExecuteClientCommand($"play {Config.Sound.Select}");
 
-        switch (option.PostSelectAction)
-        {
-            case PostSelectAction.Close: Close(); break;
-            case PostSelectAction.Reset: Reset(); break;
-        }
-
+        Close();
         option.OnSelect?.Invoke(Player, option);
     }
 

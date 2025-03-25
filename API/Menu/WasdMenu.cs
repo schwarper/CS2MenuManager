@@ -20,77 +20,77 @@ public class WasdMenu(string title, BasePlugin plugin) : BaseMenu(title, plugin)
     /// <summary>
     /// Gets or sets the color of the title.
     /// </summary>
-    public string TitleColor = Config.WasdMenu.TitleColor;
+    public string TitleColor { get; set; } = Config.WasdMenu.TitleColor;
 
     /// <summary>
     /// Gets or sets the color of the scroll up/down buttons.
     /// </summary>
-    public string ScrollUpDownKeyColor = Config.WasdMenu.ScrollUpDownKeyColor;
+    public string ScrollUpDownKeyColor { get; set; } = Config.WasdMenu.ScrollUpDownKeyColor;
 
     /// <summary>
     /// Gets or sets the color of the select button.
     /// </summary>
-    public string SelectKeyColor = Config.WasdMenu.SelectKeyColor;
+    public string SelectKeyColor { get; set; } = Config.WasdMenu.SelectKeyColor;
 
     /// <summary>
     /// Gets or sets the color of the prev button.
     /// </summary>
-    public string PrevKeyColor = Config.WasdMenu.PrevKeyColor;
+    public string PrevKeyColor { get; set; } = Config.WasdMenu.PrevKeyColor;
 
     /// <summary>
     /// Gets or sets the color of the exit button.
     /// </summary>
-    public string ExitKeyColor = Config.WasdMenu.ExitKeyColor;
+    public string ExitKeyColor { get; set; } = Config.WasdMenu.ExitKeyColor;
 
     /// <summary>
     /// Gets or sets the color of the selected option.
     /// </summary>
-    public string SelectedOptionColor = Config.WasdMenu.SelectedOptionColor;
+    public string SelectedOptionColor { get; set; } = Config.WasdMenu.SelectedOptionColor;
 
     /// <summary>
     /// Gets or sets the color of the options.
     /// </summary>
-    public string OptionColor = Config.WasdMenu.OptionColor;
+    public string OptionColor { get; set; } = Config.WasdMenu.OptionColor;
 
     /// <summary>
     /// Gets or sets the color of the disabled options.
     /// </summary>
-    public string DisabledOptionColor = Config.WasdMenu.DisabledOptionColor;
+    public string DisabledOptionColor { get; set; } = Config.WasdMenu.DisabledOptionColor;
 
     /// <summary>
     /// Gets or sets the color of the arrows.
     /// </summary>
-    public string ArrowColor = Config.WasdMenu.ArrowColor;
+    public string ArrowColor { get; set; } = Config.WasdMenu.ArrowColor;
 
     /// <summary>
     /// Gets or sets a value indicating whether the player is frozen while the menu is open.
     /// </summary>
-    public bool FreezePlayer = Config.WasdMenu.FreezePlayer;
+    public bool FreezePlayer { get; set; } = Config.WasdMenu.FreezePlayer;
 
     /// <summary>
     /// The key binding used to scroll up in the menu.
     /// </summary>
-    public string ScrollUpKey = Config.Buttons.ScrollUp;
+    public string ScrollUpKey { get; set; } = Config.Buttons.ScrollUp;
 
     /// <summary>
     /// The key binding used to scroll down in the menu.
     /// </summary>
-    public string ScrollDownKey = Config.Buttons.ScrollDown;
+    public string ScrollDownKey { get; set; } = Config.Buttons.ScrollDown;
 
     /// <summary>
     /// The key binding used to select the currently highlighted menu option.
     /// </summary>
-    public string SelectKey = Config.Buttons.Select;
+    public string SelectKey { get; set; } = Config.Buttons.Select;
 
     /// <summary>
     /// The key binding used to navigate to the previous page or option in the menu.
     /// </summary>
-    public string PrevKey = Config.Buttons.Prev;
+    public string PrevKey { get; set; } = Config.Buttons.Prev;
 
     /// <summary>
     /// The key binding used to close the menu.
     /// </summary>
-    public string ExitKey = Config.Buttons.Exit;
+    public string ExitKey { get; set; } = Config.Buttons.Exit;
 
     /// <summary>
     /// Displays the menu to the specified player for a specified duration.

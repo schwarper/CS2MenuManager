@@ -79,6 +79,17 @@ public static class MenuManager
     }
 
     /// <summary>
+    /// Represent an instance of a menu of type <typeparamref name="T"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of the menu to create, which must implement <see cref="IMenu"/>.</typeparam>
+    /// <param name="title">The title of the menu.</param>
+    /// <param name="plugin">The plugin associated with the menu.</param>
+    public static T CreateMenu<T>(string title, BasePlugin plugin) where T : IMenu
+    {
+        return (T)Activator.CreateInstance(typeof(T), title, plugin)!;
+    }
+
+    /// <summary>
     /// Handles key press events for the active menu of the specified player.
     /// </summary>
     /// <param name="player">The player controller.</param>

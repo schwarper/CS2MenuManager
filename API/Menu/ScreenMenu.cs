@@ -23,57 +23,57 @@ public class ScreenMenu(string title, BasePlugin plugin) : BaseMenu(title, plugi
     /// <summary>
     /// Gets or sets the color of the text.
     /// </summary>
-    public string TextColor = Config.ScreenMenu.TextColor;
+    public string TextColor { get; set; } = Config.ScreenMenu.TextColor;
 
     /// <summary>
     /// Gets or sets a value indicating whether the menu has a background.
     /// </summary>
-    public bool Background = Config.ScreenMenu.Background;
+    public bool Background { get; set; } = Config.ScreenMenu.Background;
 
     /// <summary>
     /// Gets or sets the height of the background.
     /// </summary>
-    public float BackgroundHeight = Config.ScreenMenu.BackgroundHeight;
+    public float BackgroundHeight { get; set; } = Config.ScreenMenu.BackgroundHeight;
 
     /// <summary>
     /// Gets or sets the width of the background.
     /// </summary>
-    public float BackgroundWidth = Config.ScreenMenu.BackgroundWidth;
+    public float BackgroundWidth { get; set; } = Config.ScreenMenu.BackgroundWidth;
 
     /// <summary>
     /// Gets or sets the font used for the text.
     /// </summary>
-    public string Font = Config.ScreenMenu.Font;
+    public string Font { get; set; } = Config.ScreenMenu.Font;
 
     /// <summary>
     /// Gets or sets the size of the text.
     /// </summary>
-    public int Size = Config.ScreenMenu.Size;
+    public int Size { get; set; } = Config.ScreenMenu.Size;
 
     /// <summary>
     /// Gets or sets a value indicating whether the player is frozen while the menu is open.
     /// </summary>
-    public bool FreezePlayer = Config.ScreenMenu.FreezePlayer;
+    public bool FreezePlayer { get; set; } = Config.ScreenMenu.FreezePlayer;
 
     /// <summary>
     /// Gets or sets a value indicating whether the menu shows a resolutions option.
     /// </summary>
-    public bool ShowResolutionsOption = Config.ScreenMenu.ShowResolutionsOption;
+    public bool ShowResolutionsOption { get; set; } = Config.ScreenMenu.ShowResolutionsOption;
 
     /// <summary>
     /// The key binding used to scroll up in the menu.
     /// </summary>
-    public string ScrollUpKey = Config.Buttons.ScrollUp;
+    public string ScrollUpKey { get; set; } = Config.Buttons.ScrollUp;
 
     /// <summary>
     /// The key binding used to scroll down in the menu.
     /// </summary>
-    public string ScrollDownKey = Config.Buttons.ScrollDown;
+    public string ScrollDownKey { get; set; } = Config.Buttons.ScrollDown;
 
     /// <summary>
     /// The key binding used to select the currently highlighted menu option.
     /// </summary>
-    public string SelectKey = Config.Buttons.Select;
+    public string SelectKey { get; set; } = Config.Buttons.Select;
 
     /// <summary>
     /// Displays the menu to the specified player for a specified duration.
@@ -102,7 +102,7 @@ public class ScreenMenuInstance : BaseMenuInstance
     /// <summary>
     /// Gets the number of items displayed per page.
     /// </summary>
-    public override int NumPerPage => 5;
+    public override int NumPerPage => ((ScreenMenu)Menu).ShowResolutionsOption ? 6 : 7;
 
     /// <summary>
     /// Gets or sets the previous button state.
@@ -276,7 +276,10 @@ public class ScreenMenuInstance : BaseMenuInstance
         switch (globalIndex)
         {
             case -1: NextPage(); return;
-            case -2: PrevPage(); return;
+            case -2:
+                if (Page > 0) PrevPage();
+                else PrevSubMenu();
+                return;
             case -3: Close(); return;
             case -4: Close(); ResolutionMenu(Player, Menu.Plugin, Menu).Display(Player, 0); return;
             default:
@@ -325,10 +328,10 @@ public class ScreenMenuInstance : BaseMenuInstance
             visible.Add((text, i));
         }
 
-        if (((ScreenMenu)Menu).ShowResolutionsOption) visible.Add(($"!{displayNumber++}. {Player.Localizer("SelectResolution")}", -4));
-        if (HasPrevButton) visible.Add(($"{displayNumber++}. {Player.Localizer("Prev")}", -2));
-        if (HasNextButton) visible.Add(($"{displayNumber++}. {Player.Localizer("Next")}", -1));
-        if (HasExitButton) visible.Add(($"{displayNumber++}. {Player.Localizer("Exit")}", -3));
+        if (((ScreenMenu)Menu).ShowResolutionsOption) visible.Add(($"!{displayNumber++}. {Player.Localizer("SelectResolution")}\n", -4));
+        if (HasPrevButton) visible.Add(($"8. {Player.Localizer("Prev")}", -2));
+        if (HasNextButton) visible.Add(($"9. {Player.Localizer("Next")}", -1));
+        if (HasExitButton) visible.Add(($"0. {Player.Localizer("Exit")}", -3));
 
         return visible;
     }

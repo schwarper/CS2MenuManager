@@ -19,47 +19,47 @@ public class CenterHtmlMenu(string title, BasePlugin plugin) : BaseMenu(title, p
     /// <summary>
     /// Gets or sets the color of the title.
     /// </summary>
-    public string TitleColor = Config.CenterHtmlMenu.TitleColor;
+    public string TitleColor { get; set; } = Config.CenterHtmlMenu.TitleColor;
 
     /// <summary>
     /// Gets or sets the color of enabled items.
     /// </summary>
-    public string EnabledColor = Config.CenterHtmlMenu.EnabledColor;
+    public string EnabledColor { get; set; } = Config.CenterHtmlMenu.EnabledColor;
 
     /// <summary>
     /// Gets or sets the color of disabled items.
     /// </summary>
-    public string DisabledColor = Config.CenterHtmlMenu.DisabledColor;
+    public string DisabledColor { get; set; } = Config.CenterHtmlMenu.DisabledColor;
 
     /// <summary>
     /// Gets or sets the color of the previous page button.
     /// </summary>
-    public string PrevPageColor = Config.CenterHtmlMenu.PrevPageColor;
+    public string PrevPageColor { get; set; } = Config.CenterHtmlMenu.PrevPageColor;
 
     /// <summary>
     /// Gets or sets the color of the next page button.
     /// </summary>
-    public string NextPageColor = Config.CenterHtmlMenu.NextPageColor;
+    public string NextPageColor { get; set; } = Config.CenterHtmlMenu.NextPageColor;
 
     /// <summary>
     /// Gets or sets the color of the close button.
     /// </summary>
-    public string ExitColor = Config.CenterHtmlMenu.ExitColor;
+    public string ExitColor { get; set; } = Config.CenterHtmlMenu.ExitColor;
 
     /// <summary>
     /// Gets or sets a value indicating whether page options are displayed inline.
     /// </summary>
-    public bool InlinePageOptions = Config.CenterHtmlMenu.InlinePageOptions;
+    public bool InlinePageOptions { get; set; } = Config.CenterHtmlMenu.InlinePageOptions;
 
     /// <summary>
     /// Gets or sets the maximum length of the title.
     /// </summary>
-    public int MaxTitleLength = Config.CenterHtmlMenu.MaxTitleLength;
+    public int MaxTitleLength { get; set; } = Config.CenterHtmlMenu.MaxTitleLength;
 
     /// <summary>
     /// Gets or sets the maximum length of each option.
     /// </summary>
-    public int MaxOptionLength = Config.CenterHtmlMenu.MaxOptionLength;
+    public int MaxOptionLength { get; set; } = Config.CenterHtmlMenu.MaxOptionLength;
 
     /// <summary>
     /// Displays the menu to the specified player for a specified duration.
@@ -151,9 +151,9 @@ public class CenterHtmlMenuInstance : BaseMenuInstance
 
     private void AddPageOptions(CenterHtmlMenu centerHtmlMenu, StringBuilder builder)
     {
-        string prevText = $"<font color='{centerHtmlMenu.PrevPageColor}'>!7 &#60;</font> {Player.Localizer("Prev")}";
-        string closeText = $"<font color='{centerHtmlMenu.ExitColor}'>!9 X</font> {Player.Localizer("Exit")}";
-        string nextText = $"<font color='{centerHtmlMenu.NextPageColor}'>!8 ></font> {Player.Localizer("Next")}";
+        string prevText = $"<font color='{centerHtmlMenu.PrevPageColor}'>!8 &#60;</font> {Player.Localizer("Prev")}";
+        string closeText = $"<font color='{centerHtmlMenu.ExitColor}'>!0 X</font> {Player.Localizer("Exit")}";
+        string nextText = $"<font color='{centerHtmlMenu.NextPageColor}'>!9 ></font> {Player.Localizer("Next")}";
 
         if (centerHtmlMenu.InlinePageOptions)
             AddInlinePageOptions(prevText, closeText, nextText, builder);

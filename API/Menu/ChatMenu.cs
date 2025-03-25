@@ -16,32 +16,32 @@ public class ChatMenu(string title, BasePlugin plugin) : BaseMenu(title, plugin)
     /// <summary>
     /// Gets or sets the color of the title.
     /// </summary>
-    public char TitleColor = Config.ChatMenu.TitleColor;
+    public char TitleColor { get; set; } = Config.ChatMenu.TitleColor;
 
     /// <summary>
     /// Gets or sets the color of enabled items.
     /// </summary>
-    public char EnabledColor = Config.ChatMenu.EnabledColor;
+    public char EnabledColor { get; set; } = Config.ChatMenu.EnabledColor;
 
     /// <summary>
     /// Gets or sets the color of disabled items.
     /// </summary>
-    public char DisabledColor = Config.ChatMenu.DisabledColor;
+    public char DisabledColor { get; set; } = Config.ChatMenu.DisabledColor;
 
     /// <summary>
     /// Gets or sets the color of the previous page button.
     /// </summary>
-    public char PrevPageColor = Config.ChatMenu.PrevPageColor;
+    public char PrevPageColor { get; set; } = Config.ChatMenu.PrevPageColor;
 
     /// <summary>
     /// Gets or sets the color of the next page button.
     /// </summary>
-    public char NextPageColor = Config.ChatMenu.NextPageColor;
+    public char NextPageColor { get; set; } = Config.ChatMenu.NextPageColor;
 
     /// <summary>
     /// Gets or sets the color of the close button.
     /// </summary>
-    public char ExitColor = Config.ChatMenu.ExitColor;
+    public char ExitColor { get; set; } = Config.ChatMenu.ExitColor;
 
     /// <summary>
     /// Displays the menu to the specified player for a specified duration.
@@ -93,12 +93,12 @@ public class ChatMenuInstance(CCSPlayerController player, ChatMenu menu) : BaseM
         }
 
         if (HasPrevButton)
-            Player.PrintToChat($" {chatMenu.PrevPageColor}!7 {ChatColors.Default}-> {Player.Localizer("Prev")}");
+            Player.PrintToChat($" {chatMenu.PrevPageColor}!8 {ChatColors.Default}-> {Player.Localizer("Prev")}");
 
         if (HasNextButton)
-            Player.PrintToChat($" {chatMenu.NextPageColor}!8 {ChatColors.Default}-> {Player.Localizer("Next")}");
+            Player.PrintToChat($" {chatMenu.NextPageColor}!9 {ChatColors.Default}-> {Player.Localizer("Next")}");
 
         if (Menu.ExitButton)
-            Player.PrintToChat($" {chatMenu.ExitColor}!9 {ChatColors.Default}->  {Player.Localizer("Exit")}");
+            Player.PrintToChat($" {chatMenu.ExitColor}!0 {ChatColors.Default}->  {Player.Localizer("Exit")}");
     }
 }

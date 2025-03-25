@@ -121,7 +121,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     /// <summary>
     /// Gets the number of items displayed per page.
     /// </summary>
-    public virtual int NumPerPage => 6;
+    public virtual int NumPerPage => 7;
 
     /// <summary>
     /// Gets the number of menu items displayed per page.
@@ -154,6 +154,11 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     protected bool HasExitButton => Menu.ExitButton;
 
     private readonly Dictionary<string, CommandInfo.CommandListenerCallback> _listeners = [];
+
+    internal void PrevSubMenu()
+    {
+        menu.PrevMenu?.Display(Player, menu.PrevMenu.MenuTime);
+    }
 
     /// <summary>
     /// Navigates to the next page of the menu.
@@ -212,25 +217,20 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
 
         switch (key)
         {
-            case 8 when HasNextButton:
-                NextPage();
-                break;
-            case 9 when HasExitButton:
-                Close();
-                break;
-            case 7 when HasPrevButton:
+            case 8 when HasPrevButton:
                 if (Page > 0) PrevPage();
                 else PrevSubMenu();
+                break;
+            case 9 when HasNextButton:
+                NextPage();
+                break;
+            case 0 when HasExitButton:
+                Close();
                 break;
             default:
                 HandleMenuItemSelection(key);
                 break;
         }
-    }
-
-    internal void PrevSubMenu()
-    {
-        menu.PrevMenu?.Display(Player, menu.PrevMenu.MenuTime);
     }
 
     private void HandleMenuItemSelection(int key)
@@ -263,7 +263,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
             return;
         }
 
-        for (int i = 1; i <= 9; ++i)
+        for (int i = 0; i <= 9; ++i)
         {
             int key = i;
 

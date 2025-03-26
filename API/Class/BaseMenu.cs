@@ -210,7 +210,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     /// </summary>
     /// <param name="player">The player who pressed the key.</param>
     /// <param name="key">The key that was pressed.</param>
-    public void OnKeyPress(CCSPlayerController player, int key)
+    public virtual void OnKeyPress(CCSPlayerController player, int key)
     {
         if (player.Handle != Player.Handle)
             return;
@@ -233,7 +233,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
         }
     }
 
-    private void HandleMenuItemSelection(int key)
+    internal void HandleMenuItemSelection(int key)
     {
         int menuItemIndex = CurrentOffset + key - 1;
         if (menuItemIndex < 0 || menuItemIndex >= Menu.ItemOptions.Count) return;
@@ -247,10 +247,8 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
 
     internal void RegisterOnKeyPress()
     {
-        if (Menu is WasdMenu or ScreenMenu)
-        {
+        if (Menu is WasdMenu || (Menu is ScreenMenu screenMenu && screenMenu.MenuType == MenuType.Scrollable))
             return;
-        }
 
         for (int i = 0; i <= 9; i++)
         {
@@ -271,7 +269,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
 
     internal void DeregisterOnKeyPress()
     {
-        if (Menu is WasdMenu or ScreenMenu)
+        if (Menu is WasdMenu || (Menu is ScreenMenu screenMenu && screenMenu.MenuType == MenuType.Scrollable))
             return;
 
         foreach (KeyValuePair<string, CommandCallback> kvp in _keyCommands)

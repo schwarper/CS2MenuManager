@@ -76,6 +76,11 @@ public class ScreenMenu(string title, BasePlugin plugin) : BaseMenu(title, plugi
     public string SelectKey { get; set; } = Config.Buttons.Select;
 
     /// <summary>
+    /// Defines the types of menus.
+    /// </summary>
+    public MenuType MenuType { get; set; } = MenuType.Scrollable;
+
+    /// <summary>
     /// Displays the menu to the specified player for a specified duration.
     /// </summary>
     /// <param name="player">The player to whom the menu is displayed.</param>
@@ -126,17 +131,20 @@ public class ScreenMenuInstance : BaseMenuInstance
         if (Menu is not ScreenMenu screenMenu)
             return;
 
+        if (screenMenu.MenuType != MenuType.KeyPress)
+        {
+            Buttons = new Dictionary<string, Action>()
+            {
+                { screenMenu.ScrollUpKey, ScrollUp },
+                { screenMenu.ScrollDownKey, ScrollDown },
+                { screenMenu.SelectKey, Choose },
+            };
+        }
+
         Menu.Plugin.RegisterListener<OnTick>(OnTick);
         Menu.Plugin.RegisterListener<CheckTransmit>(OnCheckTransmit);
         Menu.Plugin.RegisterListener<OnEntityDeleted>(OnEntityDeleted);
         if (screenMenu.FreezePlayer) Player.Freeze();
-
-        Buttons = new Dictionary<string, Action>()
-        {
-            { screenMenu.ScrollUpKey, ScrollUp },
-            { screenMenu.ScrollDownKey, ScrollDown },
-            { screenMenu.SelectKey, Choose },
-        };
     }
 
     /// <summary>
@@ -209,21 +217,24 @@ public class ScreenMenuInstance : BaseMenuInstance
 
     private void OnTick()
     {
-        PlayerButtons button = Player.Buttons;
-
-        foreach (KeyValuePair<string, Action> kvp in Buttons)
+        if (((ScreenMenu)Menu).MenuType != MenuType.KeyPress)
         {
-            if (ButtonMapping.TryGetValue(kvp.Key, out PlayerButtons buttonMappingButton))
+            PlayerButtons button = Player.Buttons;
+
+            foreach (KeyValuePair<string, Action> kvp in Buttons)
             {
-                if ((button & buttonMappingButton) == 0 && (OldButton & buttonMappingButton) != 0)
+                if (ButtonMapping.TryGetValue(kvp.Key, out PlayerButtons buttonMappingButton))
                 {
-                    kvp.Value.Invoke();
-                    break;
+                    if ((button & buttonMappingButton) == 0 && (OldButton & buttonMappingButton) != 0)
+                    {
+                        kvp.Value.Invoke();
+                        break;
+                    }
                 }
             }
-        }
 
-        OldButton = button;
+            OldButton = button;
+        }
 
         if (WorldText != null)
         {
@@ -266,6 +277,35 @@ public class ScreenMenuInstance : BaseMenuInstance
             Player.ExecuteClientCommand($"play {Config.Sound.ScrollUp}");
     }
 
+    /// <summary>
+    /// Handles key press events for the menu.
+    /// </summary>
+    /// <param name="player">The player who pressed the key.</param>
+    /// <param name="key">The key that was pressed.</param>
+    public override void OnKeyPress(CCSPlayerController player, int key)
+    {
+        switch (key)
+        {
+            case 7 when ((ScreenMenu)Menu).ShowResolutionsOption:
+                Close();
+                ResolutionMenu(Player, Menu.Plugin, Menu).Display(Player, 0);
+                break;
+            case 8 when HasPrevButton:
+                if (Page > 0) PrevPage();
+                else PrevSubMenu();
+                break;
+            case 9 when HasNextButton:
+                NextPage();
+                break;
+            case 0 when HasExitButton:
+                Close();
+                break;
+            default:
+                HandleMenuItemSelection(key);
+                break;
+        }
+    }
+
     private void Choose()
     {
         List<(string Text, int GlobalIndex)> visibleOptions = GetVisibleOptions();
@@ -283,22 +323,27 @@ public class ScreenMenuInstance : BaseMenuInstance
             case -3: Close(); return;
             case -4: Close(); ResolutionMenu(Player, Menu.Plugin, Menu).Display(Player, 0); return;
             default:
-                ItemOption option = Menu.ItemOptions[globalIndex];
-
-                if (option.DisableOption != DisableOption.None)
-                {
-                    Player.PrintToChat(Player.Localizer("WarnDisabledItem").ReplaceColorTags());
-                    return;
-                }
-
-                option.OnSelect?.Invoke(Player, option);
-
-                if (!string.IsNullOrEmpty(Config.Sound.Select))
-                    Player.ExecuteClientCommand($"play {Config.Sound.Select}");
-
-                Close();
+                HandleOption(globalIndex);
                 break;
         }
+    }
+
+    private void HandleOption(int globalIndex)
+    {
+        ItemOption option = Menu.ItemOptions[globalIndex];
+
+        if (option.DisableOption != DisableOption.None)
+        {
+            Player.PrintToChat(Player.Localizer("WarnDisabledItem").ReplaceColorTags());
+            return;
+        }
+
+        option.OnSelect?.Invoke(Player, option);
+
+        if (!string.IsNullOrEmpty(Config.Sound.Select))
+            Player.ExecuteClientCommand($"play {Config.Sound.Select}");
+
+        Close();
     }
 
     private List<(string Text, int GlobalIndex)> GetVisibleOptions()
@@ -351,11 +396,12 @@ public class ScreenMenuInstance : BaseMenuInstance
             Close();
     }
 
-    private static ScreenMenu ResolutionMenu(CCSPlayerController player, BasePlugin plugin, IMenu prevMenu)
+    private ScreenMenu ResolutionMenu(CCSPlayerController player, BasePlugin plugin, IMenu prevMenu)
     {
         ScreenMenu menu = new(player.Localizer("SelectResolution"), plugin)
         {
             ShowResolutionsOption = false,
+            MenuType = ((ScreenMenu)Menu).MenuType
         };
 
         foreach (KeyValuePair<string, Resolution> resolution in Config.Resolutions)

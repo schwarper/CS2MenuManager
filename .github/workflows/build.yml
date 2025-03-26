@@ -81,7 +81,7 @@ jobs:
             ## Release Notes for v1.0.${{ env.BUILD_NUMBER }}
 
             ### Changes:
-            - ${{ github.event.pull_request.title || github.event.head_commit.message }}
+            - ${{ github.event.head_commit.message }}
 
             ### Feedback:
             - If you encounter any issues, please report them [here](https://github.com/${{ github.repository }}/issues).

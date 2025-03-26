@@ -273,10 +273,16 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
             return;
 
         foreach (KeyValuePair<string, CommandCallback> kvp in _keyCommands)
-            Menu.Plugin.RemoveCommand(kvp.Key, kvp.Value);
+        {
+            if (_keyCommands.ContainsKey(kvp.Key))
+            {
+                Menu.Plugin.RemoveCommand(kvp.Key, kvp.Value);
+            }
+        }
 
         _keyCommands.Clear();
     }
+
 
     internal void RegisterPlayerDisconnectEvent()
     {

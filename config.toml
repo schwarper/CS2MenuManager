@@ -53,6 +53,7 @@ Font = "Arial Bold"
 Size = 32
 FreezePlayer = false
 ShowResolutionsOption = true
+MenuType = "Both" // Supported Scrollable, KeyPress, Both
 
 [Resolutions]
 "1920x1080" = { PositionX = -9.0, PositionY = 0.0 }

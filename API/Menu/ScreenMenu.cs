@@ -78,7 +78,12 @@ public class ScreenMenu(string title, BasePlugin plugin) : BaseMenu(title, plugi
     /// <summary>
     /// Defines the types of menus.
     /// </summary>
-    public MenuType MenuType { get; set; } = MenuType.Scrollable;
+    public MenuType MenuType { get; set; } = Config.ScreenMenu.MenuType switch
+    {
+        string text when text.Length > 0 && char.ToLower(text[0]) == 's' => MenuType.Scrollable,
+        string text when text.Length > 0 && char.ToLower(text[0]) == 'k' => MenuType.KeyPress,
+        _ => MenuType.Both
+    };
 
     /// <summary>
     /// Displays the menu to the specified player for a specified duration.

@@ -180,14 +180,24 @@ public class ScreenMenuInstance : BaseMenuInstance
                 builder.AppendLine(" ");
 
             (string text, int _) = visibleOptions[i];
-            string displayLine = (i == CurrentChoiceIndex) ? $"> {text}" : $"  {text}";
+
+            string displayLine = screenMenu.MenuType switch
+            {
+                MenuType.KeyPress => text,
+                MenuType.Scrollable or MenuType.Both => (i == CurrentChoiceIndex) ? $"> {text}" : $"  {text}",
+                _ => string.Empty
+            };
+
             builder.AppendLine(displayLine);
         }
 
-        builder.AppendLine(" ");
-        builder.AppendLine(Player.Localizer("ScrollKey", screenMenu.ScrollUpKey, screenMenu.ScrollDownKey));
-        builder.AppendLine(Player.Localizer("SelectKey", screenMenu.SelectKey));
-        builder.AppendLine(" ");
+        if (screenMenu.MenuType != MenuType.KeyPress)
+        {
+            builder.AppendLine(" ");
+            builder.AppendLine(Player.Localizer("ScrollKey", screenMenu.ScrollUpKey, screenMenu.ScrollDownKey));
+            builder.AppendLine(Player.Localizer("SelectKey", screenMenu.SelectKey));
+            builder.AppendLine(" ");
+        }
 
         if (WorldText == null || !WorldText.IsValid)
             WorldText = CreateWorldText(builder.ToString(), screenMenu.Size, screenMenu.TextColor, screenMenu.Font, screenMenu.Background, screenMenu.BackgroundHeight, screenMenu.BackgroundWidth);
@@ -369,7 +379,7 @@ public class ScreenMenuInstance : BaseMenuInstance
             visible.Add((text, i));
         }
 
-        if (((ScreenMenu)Menu).ShowResolutionsOption) visible.Add(($"!{displayNumber++}. {Player.Localizer("SelectResolution")}\n", -4));
+        if (((ScreenMenu)Menu).ShowResolutionsOption) visible.Add(($"{displayNumber++}. {Player.Localizer("SelectResolution")}\n", -4));
         if (HasPrevButton) visible.Add(($"8. {Player.Localizer("Prev")}", -2));
         if (HasNextButton) visible.Add(($"9. {Player.Localizer("Next")}", -1));
         if (HasExitButton) visible.Add(($"0. {Player.Localizer("Exit")}", -3));

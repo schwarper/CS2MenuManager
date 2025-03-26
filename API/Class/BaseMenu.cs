@@ -4,7 +4,7 @@ using CounterStrikeSharp.API.Modules.Commands;
 using CS2MenuManager.API.Enum;
 using CS2MenuManager.API.Interface;
 using CS2MenuManager.API.Menu;
-using static CounterStrikeSharp.API.Modules.Commands.CommandInfo;
+using static CounterStrikeSharp.API.Modules.Commands.CommandInfo; 
 
 namespace CS2MenuManager.API.Class;
 

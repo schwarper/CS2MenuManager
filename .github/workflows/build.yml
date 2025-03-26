@@ -65,7 +65,7 @@ jobs:
             mkdir -p release
             cd BuildOutput
             # Create zip, excluding .nupkg and .xml files
-            zip -r ../CS2MenuManager-v${{ env.BUILD_NUMBER }}-${{ env.GITHUB_SHA_SHORT }}.zip * --exclude '*.nupkg' '*.xml'
+            zip -r ../CS2MenuManager-v${{ env.BUILD_NUMBER }}.zip * --exclude '*.nupkg' '*.xml'
 
       - name: Create GitHub Release
         id: create_release

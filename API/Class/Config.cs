@@ -65,7 +65,8 @@ internal static class ConfigManager
             Font = "Arial Bold",
             Size = 32,
             FreezePlayer = false,
-            ShowResolutionsOption = true
+            ShowResolutionsOption = true,
+            MenuType = "Both"
         };
         public Dictionary<string, Resolution> Resolutions { get; set; } = [];
         public Dictionary<string, Dictionary<string, string>> Lang { get; set; } = [];
@@ -137,6 +138,7 @@ internal static class ConfigManager
         public int Size { get; set; }
         public bool FreezePlayer { get; set; }
         public bool ShowResolutionsOption { get; set; }
+        public string MenuType { get; set; } = string.Empty;
     }
 
     public static Cfg Config { get; set; } = new();

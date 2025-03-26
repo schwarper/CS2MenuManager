@@ -224,7 +224,7 @@ public class ScreenMenuInstance : BaseMenuInstance
         Menu.Plugin.RemoveListener<OnEntityDeleted>(OnEntityDeleted);
 
         if (WorldText != null && WorldText.IsValid) WorldText.Remove();
-        if (((ScreenMenu)Menu).FreezePlayer) Player.Freeze();
+        if (((ScreenMenu)Menu).FreezePlayer) Player.Unfreeze();
 
         if (!string.IsNullOrEmpty(Config.Sound.Exit))
             Player.ExecuteClientCommand($"play {Config.Sound.Exit}");

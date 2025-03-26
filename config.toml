@@ -53,7 +53,7 @@ Font = "Arial Bold"
 Size = 32
 FreezePlayer = false
 ShowResolutionsOption = true
-MenuType = "Both" // Supported Scrollable, KeyPress, Both
+MenuType = "Both" # Supported Scrollable, KeyPress, Both
 
 [Resolutions]
 "1920x1080" = { PositionX = -9.0, PositionY = 0.0 }
@@ -95,7 +95,6 @@ WarnDisabledItem = "{Grey}No puedes {Red}usar {Grey}esta opción."
 CancelledVote = "{darkred}{0} {Grey}detuvo la votación."
 Console = "Consola"
 
-[Lang]
 [Lang.fr]
 Prev = "Précédent"
 Next = "Suivant"

@@ -58,7 +58,6 @@ public static class MenuManager
     public static void OpenMenu<TMenu>(CCSPlayerController player, TMenu menu, Func<CCSPlayerController, TMenu, IMenuInstance> createInstance)
         where TMenu : IMenu
     {
-        LoadConfig();
         CloseActiveMenu(player);
 
         IMenuInstance instance = createInstance.Invoke(player, menu);

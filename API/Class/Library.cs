@@ -224,9 +224,8 @@ internal static partial class Library
 
         if (table.TryGetValue(split[0], out object? innerValue) && innerValue is TomlTable innerTable)
         {
-            if (innerTable.TryGetValue(split[1], out object? value))
+            if (innerTable.TryGetValue(split[1], out object? value) && value is T typedValue)
             {
-                T typedValue = (T)Convert.ChangeType(value, typeof(T));
                 setter(typedValue);
             }
         }

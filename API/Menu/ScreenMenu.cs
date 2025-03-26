@@ -20,6 +20,11 @@ namespace CS2MenuManager.API.Menu;
 /// <param name="plugin">The plugin associated with the menu.</param>
 public class ScreenMenu(string title, BasePlugin plugin) : BaseMenu(title, plugin)
 {
+    static ScreenMenu()
+    {
+        LoadConfig();
+    }
+
     /// <summary>
     /// Gets or sets the color of the text.
     /// </summary>

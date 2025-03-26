@@ -95,6 +95,21 @@ WarnDisabledItem = "{Grey}No puedes {Red}usar {Grey}esta opción."
 CancelledVote = "{darkred}{0} {Grey}detuvo la votación."
 Console = "Consola"
 
+[Lang]
+[Lang.fr]
+Prev = "Précédent"
+Next = "Suivant"
+Exit = "Quitter"
+Disabled = "Désactivé"
+ScrollKey = "{0}/{1} - Défilement"
+SelectKey = "{0} - Sélectionner"
+PrevKey = "{0} - Précédent"
+ExitKey = "{0} - Quitter"
+SelectResolution = "Sélectionner une résolution"
+WarnDisabledItem = "{Grey}Vous {Red}ne pouvez pas {Grey}saisir cette option."
+CancelledVote = "{darkred}{0} {Grey}vote annulé."
+Console = "Console"
+
 [Lang.pt-BR]
 Prev = "Voltar"
 Next = "Próximo"

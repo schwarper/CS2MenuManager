@@ -220,6 +220,7 @@ internal static class ConfigManager
         model.SetIfPresent("ScreenMenu.Size", (int value) => Config.ScreenMenu.Size = value);
         model.SetIfPresent("ScreenMenu.FreezePlayer", (bool value) => Config.ScreenMenu.FreezePlayer = value);
         model.SetIfPresent("ScreenMenu.ShowResolutionsOption", (bool value) => Config.ScreenMenu.ShowResolutionsOption = value);
+        model.SetIfPresent("ScreenMenu.MenuType", (string value) => Config.ScreenMenu.MenuType = value);
 
         model.SetIfExist("Resolutions", (TomlTable table) =>
         {

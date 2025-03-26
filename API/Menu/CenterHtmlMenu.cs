@@ -16,6 +16,11 @@ namespace CS2MenuManager.API.Menu;
 /// <param name="plugin">The plugin associated with the menu.</param>
 public class CenterHtmlMenu(string title, BasePlugin plugin) : BaseMenu(title, plugin)
 {
+    static CenterHtmlMenu()
+    {
+        LoadConfig();
+    }
+
     /// <summary>
     /// Gets or sets the color of the title.
     /// </summary>

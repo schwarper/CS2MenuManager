@@ -17,6 +17,11 @@ namespace CS2MenuManager.API.Menu;
 /// <param name="plugin">The plugin associated with the menu.</param>
 public class WasdMenu(string title, BasePlugin plugin) : BaseMenu(title, plugin)
 {
+    static WasdMenu()
+    {
+        LoadConfig();
+    }
+
     /// <summary>
     /// Gets or sets the color of the title.
     /// </summary>

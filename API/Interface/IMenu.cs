@@ -44,8 +44,9 @@ public interface IMenu
     /// </summary>
     /// <param name="display">The text to display for the item.</param>
     /// <param name="onSelect">The action to perform when the item is selected.</param>
+    /// <param name="disableOption">The disable option for the item.</param>
     /// <returns>The created item option.</returns>
-    ItemOption AddItem(string display, Action<CCSPlayerController, ItemOption> onSelect);
+    ItemOption AddItem(string display, Action<CCSPlayerController, ItemOption> onSelect, DisableOption disableOption = DisableOption.None);
 
     /// <summary>
     /// Adds an item to the menu with a specified display text and disable option.

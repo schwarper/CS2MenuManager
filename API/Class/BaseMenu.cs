@@ -50,10 +50,11 @@ public abstract class BaseMenu(string title, BasePlugin plugin) : IMenu
     /// </summary>
     /// <param name="display">The text to display for the item.</param>
     /// <param name="onSelect">The action to perform when the item is selected.</param>
+    /// <param name="disableOption">The disable option for the item.</param>
     /// <returns>The created item option.</returns>
-    public virtual ItemOption AddItem(string display, Action<CCSPlayerController, ItemOption> onSelect)
+    public virtual ItemOption AddItem(string display, Action<CCSPlayerController, ItemOption> onSelect, DisableOption disableOption = DisableOption.None)
     {
-        ItemOption option = new(display, DisableOption.None, onSelect);
+        ItemOption option = new(display, disableOption, onSelect);
         ItemOptions.Add(option);
         return option;
     }
@@ -272,17 +273,11 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
         if (Menu is WasdMenu || (Menu is ScreenMenu screenMenu && screenMenu.MenuType == MenuType.Scrollable))
             return;
 
-        foreach (KeyValuePair<string, CommandCallback> kvp in _keyCommands)
-        {
-            if (_keyCommands.ContainsKey(kvp.Key))
-            {
-                Menu.Plugin.RemoveCommand(kvp.Key, kvp.Value);
-            }
-        }
+        foreach (var kvp in _keyCommands)
+            Menu.Plugin.RemoveCommand(kvp.Key, kvp.Value);
 
         _keyCommands.Clear();
     }
-
 
     internal void RegisterPlayerDisconnectEvent()
     {

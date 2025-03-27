@@ -97,7 +97,7 @@ public class CenterHtmlMenuInstance : BaseMenuInstance
     /// <summary>
     /// Gets a value indicating whether the menu has a next button.
     /// </summary>
-    protected override bool HasNextButton => Menu.ItemOptions.Count > MenuItemsPerPage + 1 && CurrentOffset + NumPerPage < Menu.ItemOptions.Count;
+    protected override bool HasNextButton => Menu.ItemOptions.Count > NumPerPage + 1 && CurrentOffset + NumPerPage < Menu.ItemOptions.Count;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CenterHtmlMenuInstance"/> class.

@@ -266,13 +266,17 @@ public class ScreenMenuInstance : BaseMenuInstance
         if (viewModel == null) { Close(); return; }
         if (OldViewModel == viewModel) return;
 
-        VectorData? vectorData = Player.FindVectorData();
+        VectorData? vectorData = Player.FindVectorData(((ScreenMenu)Menu).Size);
         if (vectorData == null) { Close(); return; }
 
         OldViewModel = viewModel;
 
         if (WorldText != null)
         {
+            if (vectorData.Value.Size.HasValue)
+            {
+                WorldText.FontSize = vectorData.Value.Size.Value;
+            }
             WorldText.Teleport(vectorData.Value.Position, vectorData.Value.Angle, null);
             WorldText.AcceptInput("SetParent", viewModel, null, "!activator");
         }

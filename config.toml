@@ -43,13 +43,14 @@ ArrowColor = "Purple"
 FreezePlayer = false
 
 [ScreenMenu]
-TextColor = "orange"
+TextColor = "#E89B1B"
+DisabledTextColor = "#E7D2B1"
 PositionX = -5.5
 PositionY = 0.0
 Background = true
 BackgroundHeight = 0
 BackgroundWidth = 0.2
-Font = "Arial Bold"
+Font = "Tahoma Bold"
 Size = 32
 FreezePlayer = false
 ShowResolutionsOption = true

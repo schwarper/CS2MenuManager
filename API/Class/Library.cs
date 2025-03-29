@@ -87,7 +87,7 @@ internal static partial class Library
         return handle.Value;
     }
 
-    public static CPointWorldText? CreateWorldText(string text, int size, string textColor, string font, bool background, float backgroundheight, float backgroundwidth)
+    public static CPointWorldText? CreateWorldText(string text, int size, Color color, string font, bool background, float backgroundheight, float backgroundwidth)
     {
         CPointWorldText entity = Utilities.CreateEntityByName<CPointWorldText>("point_worldtext")!;
 
@@ -98,7 +98,7 @@ internal static partial class Library
         entity.Enabled = true;
         entity.FontSize = size;
         entity.Fullbright = true;
-        entity.Color = Color.FromName(textColor);
+        entity.Color = color;
         entity.WorldUnitsPerPx = 0.25f / 1050 * size;
         entity.FontName = font;
         entity.JustifyHorizontal = PointWorldTextJustifyHorizontal_t.POINT_WORLD_TEXT_JUSTIFY_HORIZONTAL_LEFT;
@@ -119,7 +119,7 @@ internal static partial class Library
         if (_isFakeCreated)
             return;
 
-        CPointWorldText? entity = CreateWorldText("       ", 35, "orange", "Arial", false, 0, 0);
+        CPointWorldText? entity = CreateWorldText("       ", 35, Color.Orange, "Arial", false, 0, 0);
         if (entity == null) { instance.Close(); return; }
 
         CCSGOViewModel? viewModel = player.EnsureCustomView();
@@ -247,5 +247,16 @@ internal static partial class Library
     public static char GetChatColor(this string colorName)
     {
         return (char)typeof(ChatColors).GetField(colorName)?.GetValue(null)!;
+    }
+
+    public static Color HexToColor(this string hex)
+    {
+        hex = hex.TrimStart('#');
+
+        return Color.FromArgb(
+            red: Convert.ToByte(hex[..2], 16),
+            green: Convert.ToByte(hex.Substring(2, 2), 16),
+            blue: Convert.ToByte(hex.Substring(4, 2), 16)
+        );
     }
 }

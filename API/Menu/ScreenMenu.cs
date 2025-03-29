@@ -4,6 +4,7 @@ using CounterStrikeSharp.API.Core.Translations;
 using CS2MenuManager.API.Class;
 using CS2MenuManager.API.Enum;
 using CS2MenuManager.API.Interface;
+using System.Drawing;
 using System.Text;
 using static CounterStrikeSharp.API.Core.Listeners;
 using static CS2MenuManager.API.Class.Buttons;
@@ -28,7 +29,12 @@ public class ScreenMenu(string title, BasePlugin plugin) : BaseMenu(title, plugi
     /// <summary>
     /// Gets or sets the color of the text.
     /// </summary>
-    public string TextColor { get; set; } = Config.ScreenMenu.TextColor;
+    public Color TextColor { get; set; } = Config.ScreenMenu.TextColor;
+
+    /// <summary>
+    /// Gets or sets the color of the disabled text.
+    /// </summary>
+    public Color DisabledTextColor { get; set; } = Config.ScreenMenu.DisabledTextColor;
 
     /// <summary>
     /// Gets or sets a value indicating whether the menu has a background.
@@ -119,17 +125,10 @@ public class ScreenMenuInstance : BaseMenuInstance
     /// </summary>
     public override int NumPerPage => ((ScreenMenu)Menu).ShowResolutionsOption ? 6 : 7;
 
-    /// <summary>
-    /// Gets or sets the previous button state.
-    /// </summary>
-    public PlayerButtons OldButton;
-
-    /// <summary>
-    /// Gets or sets the world text entity used to display the menu.
-    /// </summary>
-    public CPointWorldText? WorldText;
-
-    internal CCSGOViewModel? OldViewModel;
+    private PlayerButtons OldButton;
+    private CPointWorldText? WorldText;
+    private CPointWorldText? WorldTextDisabled;
+    private CCSGOViewModel? OldViewModel;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ScreenMenuInstance"/> class.
@@ -165,31 +164,17 @@ public class ScreenMenuInstance : BaseMenuInstance
         if (Menu is not ScreenMenu screenMenu)
             return;
 
-        StringBuilder builder = new();
-        int totalPages = (int)Math.Ceiling((double)Menu.ItemOptions.Count / MenuItemsPerPage);
-        int currentPage = Page + 1;
+        StringBuilder noneOptions = new();
+        StringBuilder disabledOptions = new();
 
-        builder.AppendLine(" ");
-        builder.AppendLine($"{Menu.Title} ({currentPage}/{totalPages})");
-        builder.AppendLine(" ");
+        disabledOptions.AppendLine(Menu.Title);
+        noneOptions.AppendLine();
 
-        List<(string Text, int GlobalIndex)> visibleOptions = GetVisibleOptions();
-
-        int dynamicStartIndex = -1;
-        for (int i = 0; i < visibleOptions.Count; i++)
-        {
-            (_, int globalIndex) = visibleOptions[i];
-
-            if (globalIndex < 0 && dynamicStartIndex == -1)
-                dynamicStartIndex = i;
-        }
+        List<(string Text, int GlobalIndex, bool disabled)> visibleOptions = GetVisibleOptions();
 
         for (int i = 0; i < visibleOptions.Count; i++)
         {
-            if (i == dynamicStartIndex)
-                builder.AppendLine(" ");
-
-            (string text, int _) = visibleOptions[i];
+            (string text, int _, bool disabled) = visibleOptions[i];
 
             string displayLine = screenMenu.MenuType switch
             {
@@ -198,23 +183,43 @@ public class ScreenMenuInstance : BaseMenuInstance
                 _ => string.Empty
             };
 
-            builder.AppendLine(displayLine);
+            if (disabled)
+            {
+                noneOptions.AppendLine();
+                disabledOptions.AppendLine(displayLine);
+            }
+            else
+            {
+                noneOptions.AppendLine(displayLine);
+                disabledOptions.AppendLine();
+            }
         }
+
+        noneOptions.AppendLine();
+        disabledOptions.AppendLine();
 
         if (screenMenu.MenuType != MenuType.KeyPress)
         {
-            builder.AppendLine(" ");
-            builder.AppendLine(Player.Localizer("ScrollKey", screenMenu.ScrollUpKey, screenMenu.ScrollDownKey));
-            builder.AppendLine(Player.Localizer("SelectKey", screenMenu.SelectKey));
-            builder.AppendLine(" ");
+            disabledOptions.AppendLine();
+            disabledOptions.AppendLine();
+            noneOptions.AppendLine(Player.Localizer("ScrollKey", screenMenu.ScrollUpKey, screenMenu.ScrollDownKey));
+            noneOptions.AppendLine(Player.Localizer("SelectKey", screenMenu.SelectKey));
         }
 
-        if (WorldText == null || !WorldText.IsValid)
-            WorldText = CreateWorldText(builder.ToString(), screenMenu.Size, screenMenu.TextColor, screenMenu.Font, screenMenu.Background, screenMenu.BackgroundHeight, screenMenu.BackgroundWidth);
+        UpdateWorldText(ref WorldText, noneOptions.ToString(), screenMenu, screenMenu.TextColor);
+        UpdateWorldText(ref WorldTextDisabled, disabledOptions.ToString(), screenMenu, screenMenu.DisabledTextColor);
+    }
+
+    private static void UpdateWorldText(ref CPointWorldText? worldText, string message, ScreenMenu screenMenu, Color color)
+    {
+        if (worldText == null || !worldText.IsValid)
+        {
+            worldText = CreateWorldText(message, screenMenu.Size, color, screenMenu.Font, false, screenMenu.BackgroundHeight, screenMenu.BackgroundWidth);
+        }
         else
         {
-            WorldText.MessageText = builder.ToString();
-            Utilities.SetStateChanged(WorldText, "CPointWorldText", "m_messageText");
+            worldText.MessageText = message;
+            Utilities.SetStateChanged(worldText, "CPointWorldText", "m_messageText");
         }
     }
 
@@ -229,6 +234,7 @@ public class ScreenMenuInstance : BaseMenuInstance
         Menu.Plugin.RemoveListener<OnEntityDeleted>(OnEntityDeleted);
 
         if (WorldText != null && WorldText.IsValid) WorldText.Remove();
+        if (WorldTextDisabled != null && WorldTextDisabled.IsValid) WorldTextDisabled.Remove();
         if (((ScreenMenu)Menu).FreezePlayer) Player.Unfreeze();
 
         if (!string.IsNullOrEmpty(Config.Sound.Exit))
@@ -256,24 +262,31 @@ public class ScreenMenuInstance : BaseMenuInstance
             OldButton = button;
         }
 
+        CCSGOViewModel? viewModel = Player.EnsureCustomView();
+        if (viewModel == null) { Close(); return; }
+        if (OldViewModel == viewModel) return;
+
+        VectorData? vectorData = Player.FindVectorData();
+        if (vectorData == null) { Close(); return; }
+
+        OldViewModel = viewModel;
+
         if (WorldText != null)
         {
-            CCSGOViewModel? viewModel = Player.EnsureCustomView();
-            if (viewModel == null) { Close(); return; }
-            if (OldViewModel == viewModel) return;
-
-            VectorData? vectorData = Player.FindVectorData();
-            if (vectorData == null) { Close(); return; }
-
-            OldViewModel = viewModel;
             WorldText.Teleport(vectorData.Value.Position, vectorData.Value.Angle, null);
             WorldText.AcceptInput("SetParent", viewModel, null, "!activator");
+        }
+
+        if (WorldTextDisabled != null)
+        {
+            WorldTextDisabled.Teleport(vectorData.Value.Position, vectorData.Value.Angle, null);
+            WorldTextDisabled.AcceptInput("SetParent", viewModel, null, "!activator");
         }
     }
 
     private void ScrollDown()
     {
-        List<(string Text, int GlobalIndex)> visibleOptions = GetVisibleOptions();
+        List<(string Text, int GlobalIndex, bool disabled)> visibleOptions = GetVisibleOptions();
         if (visibleOptions.Count == 0)
             return;
 
@@ -286,7 +299,7 @@ public class ScreenMenuInstance : BaseMenuInstance
 
     private void ScrollUp()
     {
-        List<(string Text, int GlobalIndex)> visibleOptions = GetVisibleOptions();
+        List<(string Text, int GlobalIndex, bool disabled)> visibleOptions = GetVisibleOptions();
         if (visibleOptions.Count == 0)
             return;
 
@@ -328,11 +341,11 @@ public class ScreenMenuInstance : BaseMenuInstance
 
     private void Choose()
     {
-        List<(string Text, int GlobalIndex)> visibleOptions = GetVisibleOptions();
+        List<(string Text, int GlobalIndex, bool disabled)> visibleOptions = GetVisibleOptions();
         if (CurrentChoiceIndex < 0 || CurrentChoiceIndex >= visibleOptions.Count)
             return;
 
-        (string _, int globalIndex) = visibleOptions[CurrentChoiceIndex];
+        (string _, int globalIndex, _) = visibleOptions[CurrentChoiceIndex];
         switch (globalIndex)
         {
             case -1: NextPage(); return;
@@ -366,9 +379,9 @@ public class ScreenMenuInstance : BaseMenuInstance
         Close();
     }
 
-    private List<(string Text, int GlobalIndex)> GetVisibleOptions()
+    private List<(string Text, int GlobalIndex, bool disabled)> GetVisibleOptions()
     {
-        List<(string Text, int GlobalIndex)> visible = [];
+        List<(string Text, int GlobalIndex, bool disabled)> visible = [];
         int totalItems = Menu.ItemOptions.Count;
         int start = CurrentOffset;
         int end = Math.Min(start + NumPerPage, totalItems);
@@ -377,29 +390,39 @@ public class ScreenMenuInstance : BaseMenuInstance
         for (int i = start; i < end; i++)
         {
             ItemOption option = Menu.ItemOptions[i];
+
             string text = option.DisableOption switch
             {
                 DisableOption.None or DisableOption.DisableShowNumber =>
                     $"{displayNumber}. {option.Text}",
-                DisableOption.DisableHideNumber => $"{option.Text}",
+                DisableOption.DisableHideNumber => option.Text,
                 _ => string.Empty
             };
 
+            visible.Add((text, i, option.DisableOption != DisableOption.None));
             displayNumber++;
-            visible.Add((text, i));
         }
 
-        if (((ScreenMenu)Menu).ShowResolutionsOption) visible.Add(($"{displayNumber++}. {Player.Localizer("SelectResolution")}\n", -4));
-        if (HasPrevButton) visible.Add(($"8. {Player.Localizer("Prev")}", -2));
-        if (HasNextButton) visible.Add(($"9. {Player.Localizer("Next")}", -1));
-        if (HasExitButton) visible.Add(($"0. {Player.Localizer("Exit")}", -3));
+        if (visible.Count > 0)
+        {
+            visible.Add(("", -99, true));
+        }
+
+        if (((ScreenMenu)Menu).ShowResolutionsOption)
+            visible.Add(($"7. {Player.Localizer("SelectResolution")}", -4, false));
+        if (HasPrevButton)
+            visible.Add(($"8. {Player.Localizer("Prev")}", -2, false));
+        if (HasNextButton)
+            visible.Add(($"9. {Player.Localizer("Next")}", -1, false));
+        if (HasExitButton)
+            visible.Add(($"0. {Player.Localizer("Exit")}", -3, false));
 
         return visible;
     }
 
     private void OnCheckTransmit(CCheckTransmitInfoList infoList)
     {
-        if (WorldText == null) return;
+        if (WorldText == null || WorldTextDisabled == null) return;
 
         foreach ((CCheckTransmitInfo info, CCSPlayerController? player) in infoList)
         {
@@ -407,6 +430,7 @@ public class ScreenMenuInstance : BaseMenuInstance
                 continue;
 
             info.TransmitEntities.Remove(WorldText);
+            info.TransmitEntities.Remove(WorldTextDisabled);
         }
     }
 

@@ -1,5 +1,6 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Modules.Utils;
+using System.Drawing;
 using System.Reflection;
 using Tomlyn;
 using Tomlyn.Model;
@@ -56,13 +57,14 @@ internal static class ConfigManager
         };
         public ScreenMenu ScreenMenu { get; set; } = new()
         {
-            TextColor = "orange",
+            TextColor = Color.FromArgb(232, 155, 27),
+            DisabledTextColor = Color.FromArgb(231, 210, 177),
             PositionX = -5.5f,
             PositionY = 0.0f,
             Background = true,
             BackgroundHeight = 0,
             BackgroundWidth = 0.2f,
-            Font = "Arial Bold",
+            Font = "Tahoma Bold",
             Size = 32,
             FreezePlayer = false,
             ShowResolutionsOption = true,
@@ -128,7 +130,8 @@ internal static class ConfigManager
 
     public class ScreenMenu
     {
-        public string TextColor { get; set; } = string.Empty;
+        public Color TextColor { get; set; }
+        public Color DisabledTextColor { get; set; }
         public float PositionX { get; set; }
         public float PositionY { get; set; }
         public bool Background { get; set; }
@@ -210,7 +213,6 @@ internal static class ConfigManager
         model.SetIfPresent("WasdMenu.ArrowColor", (string value) => Config.WasdMenu.ArrowColor = value);
         model.SetIfPresent("WasdMenu.FreezePlayer", (bool value) => Config.WasdMenu.FreezePlayer = value);
 
-        model.SetIfPresent("ScreenMenu.TextColor", (string value) => Config.ScreenMenu.TextColor = value);
         model.SetIfPresent("ScreenMenu.PositionX", (float value) => Config.ScreenMenu.PositionX = value);
         model.SetIfPresent("ScreenMenu.PositionY", (float value) => Config.ScreenMenu.PositionY = value);
         model.SetIfPresent("ScreenMenu.Background", (bool value) => Config.ScreenMenu.Background = value);
@@ -221,6 +223,20 @@ internal static class ConfigManager
         model.SetIfPresent("ScreenMenu.FreezePlayer", (bool value) => Config.ScreenMenu.FreezePlayer = value);
         model.SetIfPresent("ScreenMenu.ShowResolutionsOption", (bool value) => Config.ScreenMenu.ShowResolutionsOption = value);
         model.SetIfPresent("ScreenMenu.MenuType", (string value) => Config.ScreenMenu.MenuType = value);
+
+        model.SetIfPresent("ScreenMenu.TextColor", (string hexOrName) =>
+        {
+            Config.ScreenMenu.TextColor = hexOrName.StartsWith('#') ?
+                hexOrName.HexToColor() :
+                Color.FromName(hexOrName);
+        });
+
+        model.SetIfPresent("ScreenMenu.DisabledTextColor", (string hexOrName) =>
+        {
+            Config.ScreenMenu.DisabledTextColor = hexOrName.StartsWith('#') ?
+                hexOrName.HexToColor() :
+                Color.FromName(hexOrName);
+        });
 
         model.SetIfExist("Resolutions", (TomlTable table) =>
         {

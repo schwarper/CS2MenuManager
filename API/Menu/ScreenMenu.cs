@@ -179,7 +179,7 @@ public class ScreenMenuInstance : BaseMenuInstance
             string displayLine = screenMenu.MenuType switch
             {
                 MenuType.KeyPress => text,
-                MenuType.Scrollable or MenuType.Both => (i == CurrentChoiceIndex) ? $"> {text}" : $"  {text}",
+                MenuType.Scrollable or MenuType.Both => (i == CurrentChoiceIndex) ? $"> {text}" : text,
                 _ => string.Empty
             };
 
@@ -200,10 +200,10 @@ public class ScreenMenuInstance : BaseMenuInstance
 
         if (screenMenu.MenuType != MenuType.KeyPress)
         {
-            disabledOptions.AppendLine();
-            disabledOptions.AppendLine();
-            noneOptions.AppendLine(Player.Localizer("ScrollKey", screenMenu.ScrollUpKey, screenMenu.ScrollDownKey));
-            noneOptions.AppendLine(Player.Localizer("SelectKey", screenMenu.SelectKey));
+            noneOptions.AppendLine();
+            noneOptions.AppendLine();
+            disabledOptions.AppendLine(Player.Localizer("ScrollKey", screenMenu.ScrollUpKey, screenMenu.ScrollDownKey));
+            disabledOptions.AppendLine(Player.Localizer("SelectKey", screenMenu.SelectKey));
         }
 
         UpdateWorldText(ref WorldText, noneOptions.ToString(), screenMenu, screenMenu.TextColor);
@@ -290,7 +290,11 @@ public class ScreenMenuInstance : BaseMenuInstance
         if (visibleOptions.Count == 0)
             return;
 
-        CurrentChoiceIndex = (CurrentChoiceIndex + 1) % visibleOptions.Count;
+        do
+        {
+            CurrentChoiceIndex = (CurrentChoiceIndex + 1) % visibleOptions.Count;
+        } while (visibleOptions[CurrentChoiceIndex].GlobalIndex == -99);
+
         Display();
 
         if (!string.IsNullOrEmpty(Config.Sound.ScrollDown))
@@ -303,7 +307,11 @@ public class ScreenMenuInstance : BaseMenuInstance
         if (visibleOptions.Count == 0)
             return;
 
-        CurrentChoiceIndex = (CurrentChoiceIndex - 1 + visibleOptions.Count) % visibleOptions.Count;
+        do
+        {
+            CurrentChoiceIndex = (CurrentChoiceIndex - 1 + visibleOptions.Count) % visibleOptions.Count;
+        } while (visibleOptions[CurrentChoiceIndex].GlobalIndex == -99);
+
         Display();
 
         if (!string.IsNullOrEmpty(Config.Sound.ScrollUp))

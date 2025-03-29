@@ -17,7 +17,7 @@ internal static partial class Library
 {
     [GeneratedRegex("<[^>]+>", RegexOptions.Compiled)] private static partial Regex TagRegex();
 
-    public readonly record struct VectorData(Vector Position, QAngle Angle);
+    public readonly record struct VectorData(Vector Position, QAngle Angle, float? Size);
     private static bool _isFakeCreated;
 
     public static CCSPlayerPawn? GetPlayerPawn(this CCSPlayerController player)
@@ -36,7 +36,7 @@ internal static partial class Library
         return pawn.As<CCSPlayerPawn>();
     }
 
-    public static VectorData? FindVectorData(this CCSPlayerController player)
+    public static VectorData? FindVectorData(this CCSPlayerController player, float? size = null)
     {
         CCSPlayerPawn? playerPawn = GetPlayerPawn(player);
         if (playerPawn == null)
@@ -47,6 +47,15 @@ internal static partial class Library
         QAngle eyeAngles = playerPawn!.EyeAngles;
         Vector forward = new(), right = new(), up = new();
         NativeAPI.AngleVectors(eyeAngles.Handle, forward.Handle, right.Handle, up.Handle);
+
+        if (size.HasValue)
+        {
+            (var newX, var newY, var newSize) = GetWorldTextPosition(player, resolution.PositionX, resolution.PositionY, size.Value);
+
+            resolution.PositionX = newX;
+            resolution.PositionY = newY;
+            size = newSize;
+        }
 
         Vector offset = forward * 7 + right * resolution.PositionX + up * resolution.PositionY;
         QAngle angle = new()
@@ -60,7 +69,24 @@ internal static partial class Library
         {
             Position = playerPawn.AbsOrigin! + offset + new Vector(0, 0, playerPawn.ViewOffset.Z),
             Angle = angle,
+            Size = size
         };
+    }
+
+    private static (float x, float y, float size) GetWorldTextPosition(CCSPlayerController controller, float x, float y, float size)
+    {
+        float fov = controller.DesiredFOV == 0 ? 90 : controller.DesiredFOV;
+
+        if (fov == 90)
+            return (x, y, size);
+
+        float scaleFactor = (float)Math.Tan((fov / 2) * Math.PI / 180) / (float)Math.Tan(45 * Math.PI / 180);
+
+        float newX = x * scaleFactor;
+        float newY = y * scaleFactor;
+        float newSize = size * scaleFactor;
+
+        return (newX, newY, newSize);
     }
 
     public static CCSGOViewModel? EnsureCustomView(this CCSPlayerController player)

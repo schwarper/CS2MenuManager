@@ -283,6 +283,10 @@ public class ScreenMenuInstance : BaseMenuInstance
 
         if (WorldTextDisabled != null)
         {
+            if (vectorData.Value.Size.HasValue)
+            {
+                WorldTextDisabled.FontSize = vectorData.Value.Size.Value;
+            }
             WorldTextDisabled.Teleport(vectorData.Value.Position, vectorData.Value.Angle, null);
             WorldTextDisabled.AcceptInput("SetParent", viewModel, null, "!activator");
         }

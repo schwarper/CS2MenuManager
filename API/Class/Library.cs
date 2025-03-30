@@ -113,7 +113,7 @@ internal static partial class Library
         return handle.Value;
     }
 
-    public static CPointWorldText? CreateWorldText(string text, int size, Color color, string font, bool background, float backgroundheight, float backgroundwidth)
+    public static CPointWorldText? CreateWorldText(string text, int size, Color color, string font, bool background, float offset)
     {
         CPointWorldText entity = Utilities.CreateEntityByName<CPointWorldText>("point_worldtext")!;
 
@@ -133,8 +133,9 @@ internal static partial class Library
         entity.RenderMode = RenderMode_t.kRenderNormal;
 
         entity.DrawBackground = background;
-        entity.BackgroundBorderHeight = backgroundheight;
-        entity.BackgroundBorderWidth = backgroundwidth;
+        entity.BackgroundBorderHeight = 0.1f;
+        entity.BackgroundBorderWidth = 0.1f;
+        entity.DepthOffset = offset;
 
         entity.DispatchSpawn();
         return entity;
@@ -145,7 +146,7 @@ internal static partial class Library
         if (_isFakeCreated)
             return;
 
-        CPointWorldText? entity = CreateWorldText("       ", 35, Color.Orange, "Arial", false, 0, 0);
+        CPointWorldText? entity = CreateWorldText("       ", 35, Color.Orange, "Arial", false, 0f);
         if (entity == null) { instance.Close(); return; }
 
         CCSGOViewModel? viewModel = player.EnsureCustomView();

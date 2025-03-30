@@ -61,9 +61,6 @@ internal static class ConfigManager
             DisabledTextColor = Color.FromArgb(231, 210, 177),
             PositionX = -5.5f,
             PositionY = 0.0f,
-            Background = true,
-            BackgroundHeight = 0,
-            BackgroundWidth = 0.2f,
             Font = "Tahoma Bold",
             Size = 32,
             FreezePlayer = false,
@@ -134,9 +131,6 @@ internal static class ConfigManager
         public Color DisabledTextColor { get; set; }
         public float PositionX { get; set; }
         public float PositionY { get; set; }
-        public bool Background { get; set; }
-        public float BackgroundHeight { get; set; }
-        public float BackgroundWidth { get; set; }
         public string Font { get; set; } = string.Empty;
         public int Size { get; set; }
         public bool FreezePlayer { get; set; }
@@ -215,9 +209,6 @@ internal static class ConfigManager
 
         model.SetIfPresent("ScreenMenu.PositionX", (float value) => Config.ScreenMenu.PositionX = value);
         model.SetIfPresent("ScreenMenu.PositionY", (float value) => Config.ScreenMenu.PositionY = value);
-        model.SetIfPresent("ScreenMenu.Background", (bool value) => Config.ScreenMenu.Background = value);
-        model.SetIfPresent("ScreenMenu.BackgroundHeight", (float value) => Config.ScreenMenu.BackgroundHeight = value);
-        model.SetIfPresent("ScreenMenu.BackgroundWidth", (float value) => Config.ScreenMenu.BackgroundWidth = value);
         model.SetIfPresent("ScreenMenu.Font", (string value) => Config.ScreenMenu.Font = value);
         model.SetIfPresent("ScreenMenu.Size", (int value) => Config.ScreenMenu.Size = value);
         model.SetIfPresent("ScreenMenu.FreezePlayer", (bool value) => Config.ScreenMenu.FreezePlayer = value);

@@ -37,21 +37,6 @@ public class ScreenMenu(string title, BasePlugin plugin) : BaseMenu(title, plugi
     public Color DisabledTextColor { get; set; } = Config.ScreenMenu.DisabledTextColor;
 
     /// <summary>
-    /// Gets or sets a value indicating whether the menu has a background.
-    /// </summary>
-    public bool Background { get; set; } = Config.ScreenMenu.Background;
-
-    /// <summary>
-    /// Gets or sets the height of the background.
-    /// </summary>
-    public float BackgroundHeight { get; set; } = Config.ScreenMenu.BackgroundHeight;
-
-    /// <summary>
-    /// Gets or sets the width of the background.
-    /// </summary>
-    public float BackgroundWidth { get; set; } = Config.ScreenMenu.BackgroundWidth;
-
-    /// <summary>
     /// Gets or sets the font used for the text.
     /// </summary>
     public string Font { get; set; } = Config.ScreenMenu.Font;
@@ -179,6 +164,7 @@ public class ScreenMenuInstance : BaseMenuInstance
 
         List<(string Text, int GlobalIndex, bool disabled)> visibleOptions = GetVisibleOptions();
 
+        int maxLength = 0;
         for (int i = 0; i < visibleOptions.Count; i++)
         {
             (string text, int _, bool disabled) = visibleOptions[i];
@@ -200,6 +186,9 @@ public class ScreenMenuInstance : BaseMenuInstance
                 noneOptions.AppendLine(displayLine);
                 disabledOptions.AppendLine();
             }
+
+            if (maxLength < displayLine.Length)
+                maxLength = displayLine.Length;
         }
 
         noneOptions.AppendLine();
@@ -213,15 +202,25 @@ public class ScreenMenuInstance : BaseMenuInstance
             disabledOptions.AppendLine(Player.Localizer("SelectKey", screenMenu.SelectKey));
         }
 
-        UpdateWorldText(ref WorldText, noneOptions.ToString(), screenMenu, screenMenu.TextColor);
-        UpdateWorldText(ref WorldTextDisabled, disabledOptions.ToString(), screenMenu, screenMenu.DisabledTextColor);
+        for (int i = 0; i < maxLength - 5; i++)
+            disabledOptions.Append('ᅠ');
+
+        UpdateWorldText(ref WorldText, noneOptions.ToString(), false, screenMenu, screenMenu.TextColor);
+        UpdateWorldText(ref WorldTextDisabled, disabledOptions.ToString(), true, screenMenu, screenMenu.DisabledTextColor);
     }
 
-    private static void UpdateWorldText(ref CPointWorldText? worldText, string message, ScreenMenu screenMenu, Color color)
+    private static void UpdateWorldText(ref CPointWorldText? worldText, string message, bool background, ScreenMenu screenMenu, Color color)
     {
         if (worldText == null || !worldText.IsValid)
         {
-            worldText = CreateWorldText(message, screenMenu.Size, color, screenMenu.Font, false, screenMenu.BackgroundHeight, screenMenu.BackgroundWidth);
+            worldText = CreateWorldText(
+                message,
+                screenMenu.Size,
+                color,
+                screenMenu.Font,
+                background,
+                background ? -0.001f : 0f
+            );
         }
         else
         {
@@ -410,6 +409,7 @@ public class ScreenMenuInstance : BaseMenuInstance
         int end = Math.Min(start + NumPerPage, totalItems);
 
         int displayNumber = 1;
+        int maxLength = 0;
         for (int i = start; i < end; i++)
         {
             ItemOption option = Menu.ItemOptions[i];
@@ -424,6 +424,9 @@ public class ScreenMenuInstance : BaseMenuInstance
 
             visible.Add((text, i, option.DisableOption != DisableOption.None));
             displayNumber++;
+
+            if (text.Length > maxLength)
+                maxLength = text.Length;
         }
 
         if (visible.Count > 0)

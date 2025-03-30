@@ -71,11 +71,24 @@ public class CenterHtmlMenu(string title, BasePlugin plugin) : BaseMenu(title, p
     /// </summary>
     /// <param name="player">The player to whom the menu is displayed.</param>
     /// <param name="time">The duration for which the menu is displayed.</param>
-    public override void Display(CCSPlayerController player, int time = 0)
+    public override void Display(CCSPlayerController player, int time)
     {
         Title = Title.TruncateHtml(MaxTitleLength);
         MenuTime = time;
-        MenuManager.OpenMenu(player, this, (p, m) => new CenterHtmlMenuInstance(p, m));
+        MenuManager.OpenMenu(player, this, null, (p, m) => new CenterHtmlMenuInstance(p, m));
+    }
+
+    /// <summary>
+    /// Displays the menu to the specified player for a specified duration, starting from the given item.
+    /// </summary>
+    /// <param name="player">The player to whom the menu is displayed.</param>
+    /// <param name="firstItem">The index of the first item to display.</param>
+    /// <param name="time">The duration for which the menu is displayed.</param>
+    public override void DisplayAt(CCSPlayerController player, int firstItem, int time)
+    {
+        Title = Title.TruncateHtml(MaxTitleLength);
+        MenuTime = time;
+        MenuManager.OpenMenu(player, this, firstItem, (p, m) => new CenterHtmlMenuInstance(p, m));
     }
 }
 

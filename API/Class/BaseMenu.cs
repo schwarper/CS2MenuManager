@@ -80,6 +80,14 @@ public abstract class BaseMenu(string title, BasePlugin plugin) : IMenu
     public abstract void Display(CCSPlayerController player, int time);
 
     /// <summary>
+    /// Displays the menu to a specific player for a specified duration, starting from the given item.
+    /// </summary>
+    /// <param name="player">The player to whom the menu is displayed.</param>
+    /// <param name="firstItem">First item to begin drawing from.</param>
+    /// <param name="time">The duration for which the menu is displayed.</param>
+    public abstract void DisplayAt(CCSPlayerController player, int firstItem, int time);
+
+    /// <summary>
     /// Displays the menu to all players for a specified duration.
     /// </summary>
     /// <param name="time">The duration for which the menu is displayed.</param>
@@ -92,6 +100,23 @@ public abstract class BaseMenu(string title, BasePlugin plugin) : IMenu
                 continue;
 
             Display(player, time);
+        }
+    }
+
+    /// <summary>
+    /// Displays the menu to all players for a specified duration, starting from the given item.
+    /// <param name="firstItem">First item to begin drawing from.</param>
+    /// </summary>
+    /// <param name="time">The duration for which the menu is displayed.</param>
+    public void DisplayAtToAll(int firstItem, int time)
+    {
+        List<CCSPlayerController> players = Utilities.GetPlayers();
+        foreach (CCSPlayerController player in players)
+        {
+            if (player.IsBot)
+                continue;
+
+            DisplayAt(player, firstItem, time);
         }
     }
 }
@@ -155,6 +180,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     /// </summary>
     protected bool HasExitButton => Menu.ExitButton;
 
+    internal int CurrentChoiceIndex;
     private readonly Dictionary<string, CommandCallback> _keyCommands = [];
 
     internal void PrevSubMenu()
@@ -273,7 +299,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
         if (Menu is WasdMenu || (Menu is ScreenMenu screenMenu && screenMenu.MenuType == MenuType.Scrollable))
             return;
 
-        foreach (var kvp in _keyCommands)
+        foreach (KeyValuePair<string, CommandCallback> kvp in _keyCommands)
             Menu.Plugin.RemoveCommand(kvp.Key, kvp.Value);
 
         _keyCommands.Clear();

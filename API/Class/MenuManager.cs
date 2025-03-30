@@ -1,7 +1,6 @@
 ﻿using CounterStrikeSharp.API.Core;
 using CS2MenuManager.API.Interface;
 using CS2MenuManager.API.Menu;
-using static CS2MenuManager.API.Class.ConfigManager;
 using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
 
 namespace CS2MenuManager.API.Class;
@@ -54,8 +53,9 @@ public static class MenuManager
     /// <typeparam name="TMenu">The type of the menu.</typeparam>
     /// <param name="player">The player controller.</param>
     /// <param name="menu">The menu to open.</param>
+    /// <param name="firstItem">The index of the first item to display.</param>
     /// <param name="createInstance">The function to create a menu instance.</param>
-    public static void OpenMenu<TMenu>(CCSPlayerController player, TMenu menu, Func<CCSPlayerController, TMenu, IMenuInstance> createInstance)
+    public static void OpenMenu<TMenu>(CCSPlayerController player, TMenu menu, int? firstItem, Func<CCSPlayerController, TMenu, IMenuInstance> createInstance)
         where TMenu : IMenu
     {
         CloseActiveMenu(player);
@@ -69,6 +69,21 @@ public static class MenuManager
         {
             baseMenuInstance.RegisterOnKeyPress();
             baseMenuInstance.RegisterPlayerDisconnectEvent();
+
+            if (firstItem.HasValue)
+            {
+                int item = Math.Clamp(firstItem.Value, 0, menu.ItemOptions.Count - 1);
+
+                while (baseMenuInstance.CurrentChoiceIndex != item)
+                {
+                    baseMenuInstance.CurrentChoiceIndex++;
+
+                    if (baseMenuInstance.CurrentChoiceIndex >= baseMenuInstance.CurrentOffset + baseMenuInstance.NumPerPage)
+                        baseMenuInstance.NextPage();
+                }
+
+                baseMenuInstance.CurrentChoiceIndex -= baseMenuInstance.CurrentOffset;
+            }
         }
 
         Timer? timer = menu.MenuTime > 0 ?

@@ -159,7 +159,9 @@ public void VoteHandlerCallback(YesNoVoteAction action, int param1, CastVote par
 ![Wasd Menu](images/wasdmenu.png)
 
 ## Screen Menu
-![Screen Menu](images/screenmenu.png)
+![Screen Menu](images/screenmenu1.png)
+
+![Screen Menu](images/screenmenu2.png)
 
 ## Panorama Vote
 ![Screen Menu](images/panoramavote.png)

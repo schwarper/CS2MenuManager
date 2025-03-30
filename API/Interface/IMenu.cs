@@ -64,10 +64,25 @@ public interface IMenu
     void Display(CCSPlayerController player, int time);
 
     /// <summary>
+    /// Displays the menu to a specific player for a specified duration, starting from the given item.
+    /// </summary>
+    /// <param name="player">The player to whom the menu is displayed.</param>
+    /// <param name="firstItem">First item to begin drawing from.</param>
+    /// <param name="time">The duration for which the menu is displayed.</param>
+    void DisplayAt(CCSPlayerController player, int firstItem, int time);
+
+    /// <summary>
     /// Displays the menu to all players for a specified duration.
     /// </summary>
     /// <param name="time">The duration for which the menu is displayed.</param>
     void DisplayToAll(int time);
+
+    /// <summary>
+    /// Displays the menu to all players for a specified duration, starting from the given item.
+    /// <param name="firstItem">First item to begin drawing from.</param>
+    /// </summary>
+    /// <param name="time">The duration for which the menu is displayed.</param>
+    void DisplayAtToAll(int firstItem, int time);
 }
 
 /// <summary>

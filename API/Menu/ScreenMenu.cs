@@ -101,10 +101,22 @@ public class ScreenMenu(string title, BasePlugin plugin) : BaseMenu(title, plugi
     /// </summary>
     /// <param name="player">The player to whom the menu is displayed.</param>
     /// <param name="time">The duration for which the menu is displayed.</param>
-    public override void Display(CCSPlayerController player, int time = 0)
+    public override void Display(CCSPlayerController player, int time)
     {
         MenuTime = time;
-        MenuManager.OpenMenu(player, this, (p, m) => new ScreenMenuInstance(p, m));
+        MenuManager.OpenMenu(player, this, null, (p, m) => new ScreenMenuInstance(p, m));
+    }
+
+    /// <summary>
+    /// Displays the menu to the specified player for a specified duration, starting from the given item.
+    /// </summary>
+    /// <param name="player">The player to whom the menu is displayed.</param>
+    /// <param name="firstItem">The index of the first item to display.</param>
+    /// <param name="time">The duration for which the menu is displayed.</param>
+    public override void DisplayAt(CCSPlayerController player, int firstItem, int time)
+    {
+        MenuTime = time;
+        MenuManager.OpenMenu(player, this, firstItem, (p, m) => new ScreenMenuInstance(p, m));
     }
 }
 
@@ -114,11 +126,6 @@ public class ScreenMenu(string title, BasePlugin plugin) : BaseMenu(title, plugi
 public class ScreenMenuInstance : BaseMenuInstance
 {
     private readonly Dictionary<string, Action> Buttons = [];
-
-    /// <summary>
-    /// Gets or sets the index of the currently selected option.
-    /// </summary>
-    public int CurrentChoiceIndex;
 
     /// <summary>
     /// Gets the number of items displayed per page.

@@ -50,7 +50,7 @@ internal static partial class Library
 
         if (size.HasValue)
         {
-            (var newX, var newY, var newSize) = GetWorldTextPosition(player, resolution.PositionX, resolution.PositionY, size.Value);
+            (float newX, float newY, float newSize) = GetWorldTextPosition(player, resolution.PositionX, resolution.PositionY, size.Value);
 
             resolution.PositionX = newX;
             resolution.PositionY = newY;

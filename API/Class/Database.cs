@@ -7,25 +7,40 @@ namespace CS2MenuManager.API.Class;
 
 internal static class Database
 {
-    private static readonly string GlobalDatabaseConnectionString;
-    internal static bool IsMYSQLSet => !string.IsNullOrEmpty(GlobalDatabaseConnectionString);
+    private static readonly string GlobalDatabaseConnectionString = string.Empty;
+    internal static readonly bool IsMYSQLSet;
 
     static Database()
     {
-        MySQL config = Config.MySQL;
+        List<string> credentials = [
+            Config.MySQL.Host,
+            Config.MySQL.Name,
+            Config.MySQL.User,
+            Config.MySQL.Pass
+        ];
+
+        if (credentials.Any(string.IsNullOrEmpty))
+        {
+            IsMYSQLSet = false;
+            GlobalDatabaseConnectionString = string.Empty;
+            return;
+        }
+
         GlobalDatabaseConnectionString = new MySqlConnectionStringBuilder
         {
-            Server = config.Host,
-            Database = config.Name,
-            UserID = config.User,
-            Password = config.Pass,
-            Port = config.Port,
+            Server = credentials[0],
+            Database = credentials[1],
+            UserID = credentials[2],
+            Password = credentials[3],
+            Port = Config.MySQL.Port,
             Pooling = true,
             MinimumPoolSize = 0,
             MaximumPoolSize = 640,
             ConnectionIdleTimeout = 30,
             AllowZeroDateTime = true
         }.ConnectionString;
+
+        IsMYSQLSet = true;
     }
 
     public static async Task<MySqlConnection> ConnectAsync()
@@ -33,6 +48,14 @@ internal static class Database
         MySqlConnection connection = new(GlobalDatabaseConnectionString);
         await connection.OpenAsync();
         return connection;
+    }
+
+    public static void CreateDatabase()
+    {
+        if (!IsMYSQLSet)
+            return;
+
+        Task.Run(CreateDatabaseAsync);
     }
 
     public static async Task CreateDatabaseAsync()

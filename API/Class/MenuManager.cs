@@ -10,7 +10,7 @@ namespace CS2MenuManager.API.Class;
 /// </summary>
 public static class MenuManager
 {
-    private static readonly Dictionary<IntPtr, (IMenuInstance Instance, Timer? Timer)> ActiveMenus = [];
+    private static readonly Dictionary<ulong, (IMenuInstance Instance, Timer? Timer)> ActiveMenus = [];
 
     /// <summary>
     /// Gets the active menu for the specified player.
@@ -19,7 +19,7 @@ public static class MenuManager
     /// <returns>The active menu instance, or null if no menu is active.</returns>
     public static IMenuInstance? GetActiveMenu(CCSPlayerController player)
     {
-        return ActiveMenus.TryGetValue(player.Handle, out (IMenuInstance Instance, Timer? Timer) value) ? value.Instance : null;
+        return ActiveMenus.TryGetValue(player.SteamID, out (IMenuInstance Instance, Timer? Timer) value) ? value.Instance : null;
     }
 
     /// <summary>
@@ -28,22 +28,22 @@ public static class MenuManager
     /// <param name="player">The player controller.</param>
     public static void CloseActiveMenu(CCSPlayerController player)
     {
-        if (ActiveMenus.TryGetValue(player.Handle, out (IMenuInstance Instance, Timer? Timer) value))
+        if (ActiveMenus.TryGetValue(player.SteamID, out (IMenuInstance Instance, Timer? Timer) value))
         {
             value.Instance.Close();
             value.Timer?.Kill();
             value.Timer = null;
-            ActiveMenus.Remove(player.Handle);
+            ActiveMenus.Remove(player.SteamID);
         }
     }
 
     internal static void DisposeActiveMenu(CCSPlayerController player)
     {
-        if (ActiveMenus.TryGetValue(player.Handle, out (IMenuInstance Instance, Timer? Timer) value))
+        if (ActiveMenus.TryGetValue(player.SteamID, out (IMenuInstance Instance, Timer? Timer) value))
         {
             value.Timer?.Kill();
             value.Timer = null;
-            ActiveMenus.Remove(player.Handle);
+            ActiveMenus.Remove(player.SteamID);
         }
     }
 
@@ -90,7 +90,7 @@ public static class MenuManager
             menu.Plugin.AddTimer(menu.MenuTime, () => CloseActiveMenu(player)) :
             null;
 
-        ActiveMenus[player.Handle] = (instance, timer);
+        ActiveMenus[player.SteamID] = (instance, timer);
         instance.Display();
     }
 

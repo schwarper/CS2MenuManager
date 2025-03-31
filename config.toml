@@ -11,6 +11,13 @@ Exit = ""
 ScrollUp = ""
 ScrollDown = ""
 
+[MySQL]
+Host = ""
+Name = ""
+User = ""
+Pass = ""
+Port = 3306
+
 [ChatMenu]
 TitleColor = "Yellow"
 EnabledColor = "Green"

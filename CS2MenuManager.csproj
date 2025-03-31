@@ -12,13 +12,15 @@
 		<RepositoryUrl>https://github.com/schwarper/CS2MenuManager</RepositoryUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
-		<IncludeXmlDocumentation>truue</IncludeXmlDocumentation>
+		<IncludeXmlDocumentation>true</IncludeXmlDocumentation>
 		<OutputPath>$(ProjectDir)BuildOutput\shared\CS2MenuManager\</OutputPath>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="CounterStrikeSharp.API" Version="1.0.307" />
+		<PackageReference Include="Dapper" Version="2.1.66" />
+		<PackageReference Include="MySqlConnector" Version="2.4.0" />
 		<PackageReference Include="Tomlyn" Version="0.19.0" />
 
 		<None Include="README.md" Pack="true" PackagePath="README.md" />
@@ -27,5 +29,7 @@
 	<Target Name="CopyNuGetAssemblies" AfterTargets="Build">
 		<Copy SourceFiles="Tomlyn.dll" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
 		<Copy SourceFiles="config.toml" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="Dapper.dll" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="MySqlConnector.dll" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
 	</Target>
 </Project>

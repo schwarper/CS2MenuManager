@@ -277,6 +277,10 @@ internal static class ConfigManager
             }
         });
 
-        Task.Run(Database.CreateDatabaseAsync);
+        if (!string.IsNullOrEmpty(Config.MySQL.Host) &&
+            !string.IsNullOrEmpty(Config.MySQL.Name) &&
+            !string.IsNullOrEmpty(Config.MySQL.User) &&
+            !string.IsNullOrEmpty(Config.MySQL.Pass))
+                Task.Run(Database.CreateDatabaseAsync);
     }
 }

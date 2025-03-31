@@ -37,9 +37,6 @@ internal static class Database
 
     public static async Task CreateDatabaseAsync()
     {
-        if (!IsMYSQLSet)
-            return;
-
         using DbConnection connection = await ConnectAsync();
 
         await connection.ExecuteAsync(@"
@@ -70,9 +67,6 @@ internal static class Database
 
     public static async Task Insert(ulong SteamID, float PositionX, float PositionY)
     {
-        if (!IsMYSQLSet)
-            return;
-
         using MySqlConnection connection = await ConnectAsync();
 
         await connection.ExecuteAsync(@"
@@ -80,7 +74,5 @@ internal static class Database
             VALUES (@PositionX, @PositionY, @SteamID)
             ON DUPLICATE KEY UPDATE PositionX = VALUES(PositionX), PositionY = VALUES(PositionY);
         ", new { PositionX, PositionY, SteamID });
-
-        Console.WriteLine($"INSERT => {SteamID}, {PositionX}, {PositionY}");
     }
 }

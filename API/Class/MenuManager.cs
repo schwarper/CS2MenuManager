@@ -95,17 +95,6 @@ public static class MenuManager
     }
 
     /// <summary>
-    /// Represent an instance of a menu of type <typeparamref name="T"/>.
-    /// </summary>
-    /// <typeparam name="T">The type of the menu to create, which must implement <see cref="IMenu"/>.</typeparam>
-    /// <param name="title">The title of the menu.</param>
-    /// <param name="plugin">The plugin associated with the menu.</param>
-    public static T CreateMenu<T>(string title, BasePlugin plugin) where T : IMenu
-    {
-        return (T)Activator.CreateInstance(typeof(T), title, plugin)!;
-    }
-
-    /// <summary>
     /// Handles key press events for the active menu of the specified player.
     /// </summary>
     /// <param name="player">The player controller.</param>
@@ -113,5 +102,35 @@ public static class MenuManager
     public static void OnKeyPress(CCSPlayerController player, int key)
     {
         GetActiveMenu(player)?.OnKeyPress(player, key);
+    }
+
+    /// <summary>
+    /// Creates a menu instance of specified type
+    /// </summary>
+    /// <typeparam name="T">Type of menu to create (must implement BaseMenu)</typeparam>
+    /// <param name="title">The title of the menu.</param>
+    /// <param name="plugin">The plugin associated with the menu.</param>
+    /// <returns>New menu instance of requested type</returns>
+    public static T CreateMenu<T>(string title, BasePlugin plugin) where T : BaseMenu =>
+        (T)MenuByType(typeof(T), title, plugin);
+
+    /// <summary>
+    /// Creates a menu instance based on Type parameter
+    /// </summary>
+    /// <param name="menuType">Type of menu to create</param>
+    /// <param name="title">The title of the menu.</param>
+    /// <param name="plugin">The plugin associated with the menu.</param>
+    /// <returns>New menu instance of requested type</returns>
+    public static IMenu MenuByType(Type menuType, string title, BasePlugin plugin)
+    {
+        return menuType switch
+        {
+            Type t when t == typeof(ChatMenu) => new ChatMenu(title, plugin),
+            Type t when t == typeof(ConsoleMenu) => new ConsoleMenu(title, plugin),
+            Type t when t == typeof(CenterHtmlMenu) => new CenterHtmlMenu(title, plugin),
+            Type t when t == typeof(WasdMenu) => new WasdMenu(title, plugin),
+            Type t when t == typeof(ScreenMenu) => new ScreenMenu(title, plugin),
+            _ => throw new ArgumentException($"Unsupported menu type: {menuType.FullName}", nameof(menuType))
+        };
     }
 }

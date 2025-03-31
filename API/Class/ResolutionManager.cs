@@ -1,4 +1,6 @@
 ﻿using CounterStrikeSharp.API.Core;
+using CS2MenuManager.API.Interface;
+using CS2MenuManager.API.Menu;
 using static CS2MenuManager.API.Class.ConfigManager;
 using static CS2MenuManager.API.Class.Database;
 
@@ -76,5 +78,32 @@ public static class ResolutionManager
 
         if (IsMYSQLSet)
             Task.Run(async () => await Insert(player.SteamID, resolution.PositionX, resolution.PositionY));
+    }
+
+    /// <summary>
+    /// Creates and configures a resolution selection menu of the specified type.
+    /// </summary>
+    /// <typeparam name="T">The type of menu to create, must inherit from <see cref="BaseMenu"/></typeparam>
+    /// <param name="player">The player controller this menu is for</param>
+    /// <param name="plugin">The plugin instance that owns this menu</param>
+    /// <param name="prevMenu">The previous menu to return to after selection</param>
+    /// <returns>A configured menu instance of type <typeparamref name="T"/></returns>
+    public static T ResolutionMenu<T>(CCSPlayerController player, BasePlugin plugin, IMenu? prevMenu) where T : BaseMenu
+    {
+        var menu = MenuManager.CreateMenu<T>(player.Localizer("SelectResolution"), plugin);
+
+        if (menu is Menu.ScreenMenu screenMenu)
+            screenMenu.ShowResolutionsOption = false;
+
+        foreach (KeyValuePair<string, Resolution> resolution in Config.Resolutions)
+        {
+            menu.AddItem(resolution.Key, (p, o) =>
+            {
+                SetPlayerResolution(p, resolution.Value);
+                prevMenu?.Display(p, prevMenu.MenuTime);
+            });
+        }
+
+        return menu;
     }
 }

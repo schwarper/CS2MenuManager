@@ -10,7 +10,7 @@ namespace CS2MenuManager.API.Class;
 /// </summary>
 public static class MenuManager
 {
-    private static readonly Dictionary<IntPtr, (IMenuInstance Instance, Timer? Timer)> ActiveMenus = [];
+    private static readonly Dictionary<ulong, (IMenuInstance Instance, Timer? Timer)> ActiveMenus = [];
 
     /// <summary>
     /// Gets the active menu for the specified player.
@@ -19,7 +19,7 @@ public static class MenuManager
     /// <returns>The active menu instance, or null if no menu is active.</returns>
     public static IMenuInstance? GetActiveMenu(CCSPlayerController player)
     {
-        return ActiveMenus.TryGetValue(player.Handle, out (IMenuInstance Instance, Timer? Timer) value) ? value.Instance : null;
+        return ActiveMenus.TryGetValue(player.SteamID, out (IMenuInstance Instance, Timer? Timer) value) ? value.Instance : null;
     }
 
     /// <summary>
@@ -28,22 +28,22 @@ public static class MenuManager
     /// <param name="player">The player controller.</param>
     public static void CloseActiveMenu(CCSPlayerController player)
     {
-        if (ActiveMenus.TryGetValue(player.Handle, out (IMenuInstance Instance, Timer? Timer) value))
+        if (ActiveMenus.TryGetValue(player.SteamID, out (IMenuInstance Instance, Timer? Timer) value))
         {
             value.Instance.Close();
             value.Timer?.Kill();
             value.Timer = null;
-            ActiveMenus.Remove(player.Handle);
+            ActiveMenus.Remove(player.SteamID);
         }
     }
 
     internal static void DisposeActiveMenu(CCSPlayerController player)
     {
-        if (ActiveMenus.TryGetValue(player.Handle, out (IMenuInstance Instance, Timer? Timer) value))
+        if (ActiveMenus.TryGetValue(player.SteamID, out (IMenuInstance Instance, Timer? Timer) value))
         {
             value.Timer?.Kill();
             value.Timer = null;
-            ActiveMenus.Remove(player.Handle);
+            ActiveMenus.Remove(player.SteamID);
         }
     }
 
@@ -90,19 +90,8 @@ public static class MenuManager
             menu.Plugin.AddTimer(menu.MenuTime, () => CloseActiveMenu(player)) :
             null;
 
-        ActiveMenus[player.Handle] = (instance, timer);
+        ActiveMenus[player.SteamID] = (instance, timer);
         instance.Display();
-    }
-
-    /// <summary>
-    /// Represent an instance of a menu of type <typeparamref name="T"/>.
-    /// </summary>
-    /// <typeparam name="T">The type of the menu to create, which must implement <see cref="IMenu"/>.</typeparam>
-    /// <param name="title">The title of the menu.</param>
-    /// <param name="plugin">The plugin associated with the menu.</param>
-    public static T CreateMenu<T>(string title, BasePlugin plugin) where T : IMenu
-    {
-        return (T)Activator.CreateInstance(typeof(T), title, plugin)!;
     }
 
     /// <summary>
@@ -113,5 +102,37 @@ public static class MenuManager
     public static void OnKeyPress(CCSPlayerController player, int key)
     {
         GetActiveMenu(player)?.OnKeyPress(player, key);
+    }
+
+    /// <summary>
+    /// Creates a menu instance of specified type
+    /// </summary>
+    /// <typeparam name="T">Type of menu to create (must implement BaseMenu)</typeparam>
+    /// <param name="title">The title of the menu.</param>
+    /// <param name="plugin">The plugin associated with the menu.</param>
+    /// <returns>New menu instance of requested type</returns>
+    public static T CreateMenu<T>(string title, BasePlugin plugin) where T : BaseMenu
+    {
+        return (T)MenuByType(typeof(T), title, plugin);
+    }
+
+    /// <summary>
+    /// Creates a menu instance based on Type parameter
+    /// </summary>
+    /// <param name="menuType">Type of menu to create</param>
+    /// <param name="title">The title of the menu.</param>
+    /// <param name="plugin">The plugin associated with the menu.</param>
+    /// <returns>New menu instance of requested type</returns>
+    public static IMenu MenuByType(Type menuType, string title, BasePlugin plugin)
+    {
+        return menuType switch
+        {
+            Type t when t == typeof(ChatMenu) => new ChatMenu(title, plugin),
+            Type t when t == typeof(ConsoleMenu) => new ConsoleMenu(title, plugin),
+            Type t when t == typeof(CenterHtmlMenu) => new CenterHtmlMenu(title, plugin),
+            Type t when t == typeof(WasdMenu) => new WasdMenu(title, plugin),
+            Type t when t == typeof(ScreenMenu) => new ScreenMenu(title, plugin),
+            _ => throw new ArgumentException($"Unsupported menu type: {menuType.FullName}", nameof(menuType))
+        };
     }
 }

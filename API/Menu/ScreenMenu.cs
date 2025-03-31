@@ -187,8 +187,8 @@ public class ScreenMenuInstance : BaseMenuInstance
                 disabledOptions.AppendLine();
             }
 
-            if (maxLength < displayLine.Length)
-                maxLength = displayLine.Length;
+            if (maxLength < text.Length)
+                maxLength = text.Length;
         }
 
         noneOptions.AppendLine();
@@ -202,7 +202,7 @@ public class ScreenMenuInstance : BaseMenuInstance
             disabledOptions.AppendLine(Player.Localizer("SelectKey", screenMenu.SelectKey));
         }
 
-        for (int i = 0; i < maxLength - 5; i++)
+        for (int i = 0; i < maxLength; i++)
             disabledOptions.Append('ᅠ');
 
         UpdateWorldText(ref WorldText, noneOptions.ToString(), false, screenMenu, screenMenu.TextColor);
@@ -343,7 +343,7 @@ public class ScreenMenuInstance : BaseMenuInstance
         {
             case 7 when ((ScreenMenu)Menu).ShowResolutionsOption:
                 Close();
-                ResolutionMenu(Player, Menu.Plugin, Menu).Display(Player, 0);
+                ResolutionMenu<ScreenMenu>(player, Menu.Plugin, Menu).Display(Player, 0);
                 break;
             case 8 when HasPrevButton:
                 if (Page > 0) PrevPage();
@@ -376,7 +376,7 @@ public class ScreenMenuInstance : BaseMenuInstance
                 else PrevSubMenu();
                 return;
             case -3: Close(); return;
-            case -4: Close(); ResolutionMenu(Player, Menu.Plugin, Menu).Display(Player, 0); return;
+            case -4: Close(); ResolutionMenu<ScreenMenu>(Player, Menu.Plugin, Menu).Display(Player, 0); return;
             default:
                 HandleOption(globalIndex);
                 break;
@@ -464,25 +464,5 @@ public class ScreenMenuInstance : BaseMenuInstance
     {
         if (WorldText != null && WorldText.IsValid && WorldText == entity)
             Close();
-    }
-
-    private ScreenMenu ResolutionMenu(CCSPlayerController player, BasePlugin plugin, IMenu prevMenu)
-    {
-        ScreenMenu menu = new(player.Localizer("SelectResolution"), plugin)
-        {
-            ShowResolutionsOption = false,
-            MenuType = ((ScreenMenu)Menu).MenuType
-        };
-
-        foreach (KeyValuePair<string, Resolution> resolution in Config.Resolutions)
-        {
-            menu.AddItem(resolution.Key, (p, o) =>
-            {
-                SetPlayerResolution(p, resolution.Value);
-                prevMenu.Display(p, prevMenu.MenuTime);
-            });
-        }
-
-        return menu;
     }
 }

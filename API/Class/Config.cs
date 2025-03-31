@@ -21,6 +21,7 @@ internal static class ConfigManager
             Exit = "Tab"
         };
         public Sound Sound { get; set; } = new();
+        public MySQL MySQL { get; set; } = new();
         public ChatMenuSettings ChatMenu { get; set; } = new()
         {
             TitleColor = ChatColors.Yellow,
@@ -86,6 +87,15 @@ internal static class ConfigManager
         public string Exit { get; set; } = string.Empty;
         public string ScrollUp { get; set; } = string.Empty;
         public string ScrollDown { get; set; } = string.Empty;
+    }
+
+    public class MySQL
+    {
+        public string Host { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string User { get; set; } = string.Empty;
+        public string Pass { get; set; } = string.Empty;
+        public uint Port { get; set; } = 3306;
     }
 
     public class ChatMenuSettings
@@ -165,6 +175,7 @@ internal static class ConfigManager
             throw new FileNotFoundException($"Configuration file not found: {ConfigFilePath}");
 
         _isSet = true;
+
         string configText = File.ReadAllText(ConfigFilePath);
         TomlTable model = Toml.ToModel(configText);
 
@@ -178,6 +189,12 @@ internal static class ConfigManager
         model.SetIfPresent("Sound.Exit", (string value) => Config.Sound.Exit = value);
         model.SetIfPresent("Sound.ScrollUp", (string value) => Config.Sound.ScrollUp = value);
         model.SetIfPresent("Sound.ScrollDown", (string value) => Config.Sound.ScrollDown = value);
+
+        model.SetIfPresent("MySQL.Host", (string value) => Config.MySQL.Host = value);
+        model.SetIfPresent("MySQL.Name", (string value) => Config.MySQL.Name = value);
+        model.SetIfPresent("MySQL.User", (string value) => Config.MySQL.User = value);
+        model.SetIfPresent("MySQL.Pass", (string value) => Config.MySQL.Pass = value);
+        model.SetIfPresent("MySQL.Port", (uint value) => Config.MySQL.Port = value);
 
         model.SetIfPresent("ChatMenu.TitleColor", (string value) => Config.ChatMenu.TitleColor = value.GetChatColor());
         model.SetIfPresent("ChatMenu.EnabledColor", (string value) => Config.ChatMenu.EnabledColor = value.GetChatColor());
@@ -259,5 +276,7 @@ internal static class ConfigManager
                 }
             }
         });
+
+        Database.CreateDatabase();
     }
 }

@@ -8,6 +8,7 @@ Discord link : [Discord server](https://discord.gg/4zQfUzjk36)
 
 # Nuget
 [![NuGet Badge](https://img.shields.io/nuget/v/CS2MenuManager)](https://www.nuget.org/packages/CS2MenuManager)
+[![NuGet-Badge](https://img.shields.io/nuget/dt/CS2MenuManager)](https://www.nuget.org/packages/CS2MenuManager)
 
 # Installation 
 

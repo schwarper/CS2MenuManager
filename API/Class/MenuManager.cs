@@ -111,8 +111,10 @@ public static class MenuManager
     /// <param name="title">The title of the menu.</param>
     /// <param name="plugin">The plugin associated with the menu.</param>
     /// <returns>New menu instance of requested type</returns>
-    public static T CreateMenu<T>(string title, BasePlugin plugin) where T : BaseMenu =>
-        (T)MenuByType(typeof(T), title, plugin);
+    public static T CreateMenu<T>(string title, BasePlugin plugin) where T : BaseMenu
+    {
+        return (T)MenuByType(typeof(T), title, plugin);
+    }
 
     /// <summary>
     /// Creates a menu instance based on Type parameter

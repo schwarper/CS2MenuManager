@@ -1,7 +1,6 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Translations;
-using CounterStrikeSharp.API.Modules.Entities;
 using CS2MenuManager.API.Class;
 using CS2MenuManager.API.Enum;
 using CS2MenuManager.API.Interface;
@@ -188,8 +187,8 @@ public class ScreenMenuInstance : BaseMenuInstance
                 disabledOptions.AppendLine();
             }
 
-            if (maxLength < displayLine.Length)
-                maxLength = displayLine.Length;
+            if (maxLength < text.Length)
+                maxLength = text.Length;
         }
 
         noneOptions.AppendLine();

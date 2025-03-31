@@ -1,6 +1,5 @@
 ﻿using CounterStrikeSharp.API.Core;
 using CS2MenuManager.API.Interface;
-using CS2MenuManager.API.Menu;
 using static CS2MenuManager.API.Class.ConfigManager;
 using static CS2MenuManager.API.Class.Database;
 
@@ -90,7 +89,7 @@ public static class ResolutionManager
     /// <returns>A configured menu instance of type <typeparamref name="T"/></returns>
     public static T ResolutionMenu<T>(CCSPlayerController player, BasePlugin plugin, IMenu? prevMenu) where T : BaseMenu
     {
-        var menu = MenuManager.CreateMenu<T>(player.Localizer("SelectResolution"), plugin);
+        T menu = MenuManager.CreateMenu<T>(player.Localizer("SelectResolution"), plugin);
 
         if (menu is Menu.ScreenMenu screenMenu)
             screenMenu.ShowResolutionsOption = false;

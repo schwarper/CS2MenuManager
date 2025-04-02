@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<OutputPath>$(ProjectDir)..\BuildOutput\plugins\CS2MenuManager-ResolutionMenu\</OutputPath>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<PackageReference Include="CounterStrikeSharp.API" Version="1.0.307" />
+		<ProjectReference Include="..\CS2MenuManager\CS2MenuManager.csproj" />
+	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="Build">
+		<ItemGroup>
+			<FilesToDelete Include="$(OutputPath)CS2MenuManager.dll" />
+			<FilesToDelete Include="$(OutputPath)CS2MenuManager.pdb" />
+			<FilesToDelete Include="$(OutputPath)CS2MenuManager.xml" />
+		</ItemGroup>
+		<Delete Files="@(FilesToDelete)" />
+	</Target>
+</Project>

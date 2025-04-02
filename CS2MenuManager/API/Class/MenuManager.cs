@@ -123,7 +123,7 @@ public static class MenuManager
     /// <param name="title">The title of the menu.</param>
     /// <param name="plugin">The plugin associated with the menu.</param>
     /// <returns>New menu instance of requested type</returns>
-    public static IMenu MenuByType(Type menuType, string title, BasePlugin plugin)
+    public static BaseMenu MenuByType(Type menuType, string title, BasePlugin plugin)
     {
         return menuType switch
         {
@@ -133,6 +133,26 @@ public static class MenuManager
             Type t when t == typeof(WasdMenu) => new WasdMenu(title, plugin),
             Type t when t == typeof(ScreenMenu) => new ScreenMenu(title, plugin),
             _ => throw new ArgumentException($"Unsupported menu type: {menuType.FullName}", nameof(menuType))
+        };
+    }
+
+    /// <summary>
+    /// Creates a menu instance based on (string)Type parameter.
+    /// </summary>
+    /// <param name="menuType">Type of menu to create</param>
+    /// <param name="title">The title of the menu.</param>
+    /// <param name="plugin">The plugin associated with the menu.</param>
+    /// <returns>New menu instance of requested type</returns>
+    public static BaseMenu MenuByType(string menuType, string title, BasePlugin plugin)
+    {
+        return menuType switch
+        {
+            "ChatMenu" => new ChatMenu(title, plugin),
+            "ConsoleMenu" => new ConsoleMenu(title, plugin),
+            "CenterHtmlMenu" => new CenterHtmlMenu(title, plugin),
+            "WasdMenu" => new WasdMenu(title, plugin),
+            "ScreenMenu" => new ScreenMenu(title, plugin),
+            _ => throw new ArgumentException($"Unsupported menu type", nameof(menuType))
         };
     }
 }

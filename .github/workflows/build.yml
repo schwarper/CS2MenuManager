@@ -49,8 +49,8 @@ jobs:
 
       - name: Build and Pack NuGet Package
         run: |
-          dotnet build CS2MenuManager.csproj -c Release --no-restore /p:Version=1.0.${{ env.BUILD_NUMBER }}
-          dotnet pack CS2MenuManager.csproj -c Release --no-build --output ./nupkg /p:Version=1.0.${{ env.BUILD_NUMBER }}
+          dotnet build CS2MenuManager.sln -c Release --no-restore /p:Version=1.0.${{ env.BUILD_NUMBER }}
+          dotnet pack CS2MenuManager/CS2MenuManager.csproj -c Release --no-build --output ./nupkg /p:Version=1.0.${{ env.BUILD_NUMBER }}
 
       - name: Check Artifacts
         run: |

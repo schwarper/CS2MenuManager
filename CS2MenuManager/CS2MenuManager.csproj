@@ -13,8 +13,9 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
 		<IncludeXmlDocumentation>true</IncludeXmlDocumentation>
-		<OutputPath>$(ProjectDir)BuildOutput\shared\CS2MenuManager\</OutputPath>
+		<OutputPath>$(ProjectDir)..\BuildOutput\shared\CS2MenuManager\</OutputPath>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -23,13 +24,13 @@
 		<PackageReference Include="MySqlConnector" Version="2.4.0" />
 		<PackageReference Include="Tomlyn" Version="0.19.0" />
 
-		<None Include="README.md" Pack="true" PackagePath="README.md" />
+		<None Include="../README.md" Pack="true" PackagePath="README.md" />
 	</ItemGroup>
 
 	<Target Name="CopyNuGetAssemblies" AfterTargets="Build">
-		<Copy SourceFiles="Tomlyn.dll" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
-		<Copy SourceFiles="config.toml" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
-		<Copy SourceFiles="Dapper.dll" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
-		<Copy SourceFiles="MySqlConnector.dll" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="..\Tomlyn.dll" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="..\config.toml" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="..\Dapper.dll" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="..\MySqlConnector.dll" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
 	</Target>
 </Project>

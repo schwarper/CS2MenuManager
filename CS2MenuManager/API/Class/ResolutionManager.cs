@@ -90,7 +90,42 @@ public static class ResolutionManager
     public static T ResolutionMenu<T>(CCSPlayerController player, BasePlugin plugin, IMenu? prevMenu) where T : BaseMenu
     {
         T menu = MenuManager.CreateMenu<T>(player.Localizer("SelectResolution"), plugin);
+        menu.AddResolutionMenuItems(prevMenu);
+        return menu;
+    }
 
+    /// <summary>
+    /// Creates and configures a resolution selection menu of the specified type.
+    /// </summary>
+    /// <param name="type">The type of menu</param>
+    /// <param name="player">The player controller this menu is for</param>
+    /// <param name="plugin">The plugin instance that owns this menu</param>
+    /// <param name="prevMenu">The previous menu to return to after selection</param>
+    /// <returns>A configured menu instance of type/></returns>
+    public static BaseMenu ResolutionMenuByType(Type type, CCSPlayerController player, BasePlugin plugin, IMenu? prevMenu)
+    {
+        BaseMenu menu = MenuManager.MenuByType(type, player.Localizer("SelectResolution"), plugin);
+        menu.AddResolutionMenuItems(prevMenu);
+        return menu;
+    }
+
+    /// <summary>
+    /// Creates and configures a resolution selection menu of the specified type.
+    /// </summary>
+    /// <param name="type">The type of menu</param>
+    /// <param name="player">The player controller this menu is for</param>
+    /// <param name="plugin">The plugin instance that owns this menu</param>
+    /// <param name="prevMenu">The previous menu to return to after selection</param>
+    /// <returns>A configured menu instance of type/></returns>
+    public static BaseMenu ResolutionMenuByType(string type, CCSPlayerController player, BasePlugin plugin, IMenu? prevMenu)
+    {
+        BaseMenu menu = MenuManager.MenuByType(type, player.Localizer("SelectResolution"), plugin);
+        menu.AddResolutionMenuItems(prevMenu);
+        return menu;
+    }
+
+    private static void AddResolutionMenuItems(this BaseMenu menu, IMenu? prevMenu)
+    {
         if (menu is Menu.ScreenMenu screenMenu)
             screenMenu.ShowResolutionsOption = false;
 
@@ -102,7 +137,5 @@ public static class ResolutionManager
                 prevMenu?.Display(p, prevMenu.MenuTime);
             });
         }
-
-        return menu;
     }
 }

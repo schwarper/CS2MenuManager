@@ -57,7 +57,7 @@ PositionY = 0.0
 Font = "Tahoma Bold"
 Size = 32
 FreezePlayer = false
-ShowResolutionsOption = true
+ShowResolutionsOption = false
 MenuType = "Both" # Supported Scrollable, KeyPress, Both
 
 [Resolutions]

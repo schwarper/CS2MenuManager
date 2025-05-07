@@ -1,10 +1,12 @@
-CS2MenuManager is a flexible and user-friendly menu system developed for Counter-Strike 2 using the CounterStrikeSharp library. This project provides server administrators and developers with the ability to create customisable menus. It is easy to use for players and easy to configure and extend for administrators.
+CS2MenuManager is a modern, extensible and easy to use menu system for Counter-Strike 2 based on the CounterStrikeSharp library. It provides server administrators and developers with powerful tools to create interactive and customisable menu interfaces. Designed for both ease of use and flexibility, it provides intuitive controls for players and easy configuration for administrators.
 
 If you would like to donate or need assistance with the plugin, feel free to contact me via Discord, either privately or on my server.
 
 Discord nickname: schwarper
 
 Discord link : [Discord server](https://discord.gg/4zQfUzjk36)
+
+[You can buy me a coffee](https://buymeacoffee.com/schwarper)
 
 # Nuget
 [![NuGet Badge](https://img.shields.io/nuget/v/CS2MenuManager)](https://www.nuget.org/packages/CS2MenuManager)
@@ -15,18 +17,16 @@ Discord link : [Discord server](https://discord.gg/4zQfUzjk36)
 1. Download:
 * Download the latest release from [GitHub Releases](https://github.com/schwarper/CS2MenuManager/releases) or [Nuget](https://www.nuget.org/packages/CS2MenuManager).
 2. Install the files:
-* Extract the contents of the downloaded ZIP file to the `addons/counterstrikesharp/shared` folder.
+* Extract the contents of the downloaded ZIP file to the `addons/counterstrikesharp/` folder.
 3. Configure the settings:
 * Adjust the settings in the `config.toml` file in the `addons/counterstrikesharp/shared/CS2MenuManager/` directory.
 4. Restart server:
 * Restart your server for the changes to take effect. You will need to use this API in your plugins.
 
-# Usage
-
 ## Creating Menus
 You can create any type of menu. All menu types have a similar structure. Here's an example of how to create a Chat Menu:
 
-Supported menus: `ChatMenu`, `ConsoleMenu`, `CenterHtmlMenu`, `WasdMenu`, `ScreenMenu`, `PanoramaVote`
+Supported menus: `ChatMenu`, `ConsoleMenu`, `CenterHtmlMenu`, `WasdMenu`, `ScreenMenu`, `PanoramaVote`, `PlayerMenu`
 ```csharp
 ChatMenu menu = new("Title", this);
 
@@ -72,6 +72,26 @@ ConsoleMenu menu = new("Console Menu", this)
 {
     MenuTime = 20
 };
+```
+
+## Creating and opening the menu selected by the player
+The title may not be very descriptive. You can use the PlayerMenu class to show the player the menu that the player has chosen. In other words, the player chooses which menu to open. He can do this with !mm or the command you set. You need to have the CS2MenuManager_MenuManager plugin installed and a database connection.
+```csharp
+PlayerMenu menu = new(Localizer.ForPlayer(player, "MenuManager Title"), this);
+
+menu.AddItem(Localizer.ForPlayer(player, "Change Resolution"), (p, o) =>
+{
+    ResolutionManager.ResolutionMenuByType(typeof(PlayerMenu), player, this, menu)
+        .Display(player, 0);
+});
+
+menu.AddItem(Localizer.ForPlayer(player, "Change Menu Type"), (p, o) =>
+{
+    MenuTypeManager.MenuTypeMenuByType(typeof(PlayerMenu), player, this, menu)
+        .Display(player, 0);
+});
+
+menu.Display(player, 0);
 ```
 
 ## Panorama Vote Menu

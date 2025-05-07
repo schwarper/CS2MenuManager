@@ -65,8 +65,9 @@ internal static class Database
         await connection.ExecuteAsync(@"
             CREATE TABLE IF NOT EXISTS cs2_menu_manager (
                 id INT AUTO_INCREMENT PRIMARY KEY,
-                PositionX FLOAT NOT NULL,
-                PositionY FLOAT NOT NULL,
+                PositionX FLOAT,
+                PositionY FLOAT,
+                Menu VARCHAR(255),
                 SteamID BIGINT UNSIGNED NOT NULL UNIQUE
             );
         ");
@@ -97,5 +98,27 @@ internal static class Database
             VALUES (@PositionX, @PositionY, @SteamID)
             ON DUPLICATE KEY UPDATE PositionX = VALUES(PositionX), PositionY = VALUES(PositionY);
         ", new { PositionX, PositionY, SteamID });
+    }
+
+    public static async Task<string?> SelectMenu(ulong SteamID)
+    {
+        using DbConnection connection = await ConnectAsync();
+
+        string? row = await connection.QueryFirstOrDefaultAsync<string?>(
+            "SELECT Menu FROM cs2_menu_manager WHERE SteamID = @SteamID;",
+            new { SteamID });
+
+        return row;
+    }
+
+    public static async Task InsertMenu(ulong SteamID, string Menu)
+    {
+        using MySqlConnection connection = await ConnectAsync();
+
+        await connection.ExecuteAsync(@"
+            INSERT INTO cs2_menu_manager (Menu, SteamID)
+            VALUES (@Menu, @SteamID)
+            ON DUPLICATE KEY UPDATE Menu = VALUES(Menu);"
+        , new { Menu, SteamID });
     }
 }

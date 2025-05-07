@@ -18,7 +18,6 @@ internal static partial class Library
     [GeneratedRegex("<[^>]+>", RegexOptions.Compiled)] private static partial Regex TagRegex();
 
     public readonly record struct VectorData(Vector Position, QAngle Angle, float? Size);
-    private static bool _isFakeCreated;
 
     public static CCSPlayerPawn? GetPlayerPawn(this CCSPlayerController player)
     {
@@ -143,9 +142,6 @@ internal static partial class Library
 
     public static void CreateFakeWorldText(this CCSPlayerController player, ScreenMenuInstance instance)
     {
-        if (_isFakeCreated)
-            return;
-
         CPointWorldText? entity = CreateWorldText("       ", 35, Color.Orange, "Arial", false, 0f);
         if (entity == null) { instance.Close(); return; }
 
@@ -159,7 +155,6 @@ internal static partial class Library
         entity.AcceptInput("SetParent", viewModel, null, "!activator");
 
         entity.Remove();
-        _isFakeCreated = true;
     }
 
     public static void Freeze(this CCSPlayerController player)

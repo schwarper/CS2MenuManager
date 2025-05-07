@@ -13,6 +13,18 @@ public static class MenuManager
     private static readonly Dictionary<ulong, (IMenuInstance Instance, Timer? Timer)> ActiveMenus = [];
 
     /// <summary>
+    /// A static readonly dictionary that maps menu type names to their corresponding <see cref="Type"/> objects.
+    /// </summary>
+    public static readonly Dictionary<string, Type> MenuTypesList = new()
+    {
+        { "ConsoleMenu", typeof(ConsoleMenu) },
+        { "ChatMenu", typeof(ChatMenu) },
+        { "WasdMenu", typeof(WasdMenu) },
+        { "CenterHtmlMenu", typeof(CenterHtmlMenu) },
+        { "ScreenMenu", typeof(ScreenMenu) }
+    };
+
+    /// <summary>
     /// Gets the active menu for the specified player.
     /// </summary>
     /// <param name="player">The player controller.</param>
@@ -127,6 +139,7 @@ public static class MenuManager
     {
         return menuType switch
         {
+            Type t when t == typeof(PlayerMenu) => new PlayerMenu(title, plugin),
             Type t when t == typeof(ChatMenu) => new ChatMenu(title, plugin),
             Type t when t == typeof(ConsoleMenu) => new ConsoleMenu(title, plugin),
             Type t when t == typeof(CenterHtmlMenu) => new CenterHtmlMenu(title, plugin),
@@ -147,6 +160,7 @@ public static class MenuManager
     {
         return menuType switch
         {
+            "PlayerMenu" => new PlayerMenu(title, plugin),
             "ChatMenu" => new ChatMenu(title, plugin),
             "ConsoleMenu" => new ConsoleMenu(title, plugin),
             "CenterHtmlMenu" => new CenterHtmlMenu(title, plugin),

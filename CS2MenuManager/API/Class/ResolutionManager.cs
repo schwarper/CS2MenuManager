@@ -127,7 +127,7 @@ public static class ResolutionManager
     private static void AddResolutionMenuItems(this BaseMenu menu, IMenu? prevMenu)
     {
         if (menu is Menu.ScreenMenu screenMenu)
-            screenMenu.ShowResolutionsOption = false;
+            screenMenu.ScreenMenu_ShowResolutionsOption = false;
 
         foreach (KeyValuePair<string, Resolution> resolution in Config.Resolutions)
         {

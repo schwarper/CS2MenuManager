@@ -4,7 +4,6 @@ using CS2MenuManager.API.Enum;
 using CS2MenuManager.API.Interface;
 using System.Text;
 using static CounterStrikeSharp.API.Core.Listeners;
-using static CS2MenuManager.API.Class.ConfigManager;
 using static CS2MenuManager.API.Class.Library;
 
 namespace CS2MenuManager.API.Menu;
@@ -16,56 +15,6 @@ namespace CS2MenuManager.API.Menu;
 /// <param name="plugin">The plugin associated with the menu.</param>
 public class CenterHtmlMenu(string title, BasePlugin plugin) : BaseMenu(title, plugin)
 {
-    static CenterHtmlMenu()
-    {
-        LoadConfig();
-    }
-
-    /// <summary>
-    /// Gets or sets the color of the title.
-    /// </summary>
-    public string TitleColor { get; set; } = Config.CenterHtmlMenu.TitleColor;
-
-    /// <summary>
-    /// Gets or sets the color of enabled items.
-    /// </summary>
-    public string EnabledColor { get; set; } = Config.CenterHtmlMenu.EnabledColor;
-
-    /// <summary>
-    /// Gets or sets the color of disabled items.
-    /// </summary>
-    public string DisabledColor { get; set; } = Config.CenterHtmlMenu.DisabledColor;
-
-    /// <summary>
-    /// Gets or sets the color of the previous page button.
-    /// </summary>
-    public string PrevPageColor { get; set; } = Config.CenterHtmlMenu.PrevPageColor;
-
-    /// <summary>
-    /// Gets or sets the color of the next page button.
-    /// </summary>
-    public string NextPageColor { get; set; } = Config.CenterHtmlMenu.NextPageColor;
-
-    /// <summary>
-    /// Gets or sets the color of the close button.
-    /// </summary>
-    public string ExitColor { get; set; } = Config.CenterHtmlMenu.ExitColor;
-
-    /// <summary>
-    /// Gets or sets a value indicating whether page options are displayed inline.
-    /// </summary>
-    public bool InlinePageOptions { get; set; } = Config.CenterHtmlMenu.InlinePageOptions;
-
-    /// <summary>
-    /// Gets or sets the maximum length of the title.
-    /// </summary>
-    public int MaxTitleLength { get; set; } = Config.CenterHtmlMenu.MaxTitleLength;
-
-    /// <summary>
-    /// Gets or sets the maximum length of each option.
-    /// </summary>
-    public int MaxOptionLength { get; set; } = Config.CenterHtmlMenu.MaxOptionLength;
-
     /// <summary>
     /// Displays the menu to the specified player for a specified duration.
     /// </summary>
@@ -73,7 +22,7 @@ public class CenterHtmlMenu(string title, BasePlugin plugin) : BaseMenu(title, p
     /// <param name="time">The duration for which the menu is displayed.</param>
     public override void Display(CCSPlayerController player, int time)
     {
-        Title = Title.TruncateHtml(MaxTitleLength);
+        Title = Title.TruncateHtml(CenterHtmlMenu_MaxTitleLength);
         MenuTime = time;
         MenuManager.OpenMenu(player, this, null, (p, m) => new CenterHtmlMenuInstance(p, m));
     }
@@ -86,7 +35,7 @@ public class CenterHtmlMenu(string title, BasePlugin plugin) : BaseMenu(title, p
     /// <param name="time">The duration for which the menu is displayed.</param>
     public override void DisplayAt(CCSPlayerController player, int firstItem, int time)
     {
-        Title = Title.TruncateHtml(MaxTitleLength);
+        Title = Title.TruncateHtml(CenterHtmlMenu_MaxTitleLength);
         MenuTime = time;
         MenuManager.OpenMenu(player, this, firstItem, (p, m) => new CenterHtmlMenuInstance(p, m));
     }
@@ -119,8 +68,8 @@ public class CenterHtmlMenuInstance : BaseMenuInstance
     /// <param name="menu">The menu associated with this instance.</param>
     public CenterHtmlMenuInstance(CCSPlayerController player, IMenu menu) : base(player, menu)
     {
-        if (Menu is CenterHtmlMenu centerHtmlMenu && centerHtmlMenu.MaxOptionLength > 0)
-            Menu.ItemOptions.ForEach(option => option.Text = option.Text.TruncateHtml(centerHtmlMenu.MaxOptionLength));
+        if (Menu is CenterHtmlMenu centerHtmlMenu && centerHtmlMenu.CenterHtmlMenu_MaxOptionLength > 0)
+            Menu.ItemOptions.ForEach(option => option.Text = option.Text.TruncateHtml(centerHtmlMenu.CenterHtmlMenu_MaxOptionLength));
 
         Menu.Plugin.RegisterListener<OnTick>(Display);
     }
@@ -134,14 +83,14 @@ public class CenterHtmlMenuInstance : BaseMenuInstance
             return;
 
         StringBuilder builder = new();
-        builder.Append($"<b><font color='{centerHtmlMenu.TitleColor}'>{centerHtmlMenu.Title}</font></b><br>");
+        builder.Append($"<b><font color='{centerHtmlMenu.CenterHtmlMenu_TitleColor}'>{centerHtmlMenu.Title}</font></b><br>");
 
         int keyOffset = 1;
         int maxIndex = Math.Min(CurrentOffset + MenuItemsPerPage, Menu.ItemOptions.Count);
         for (int i = CurrentOffset; i < maxIndex; i++)
         {
             ItemOption option = centerHtmlMenu.ItemOptions[i];
-            string color = option.DisableOption == DisableOption.None ? centerHtmlMenu.EnabledColor : centerHtmlMenu.DisabledColor;
+            string color = option.DisableOption == DisableOption.None ? centerHtmlMenu.CenterHtmlMenu_EnabledColor : centerHtmlMenu.CenterHtmlMenu_DisabledColor;
 
             builder.Append(option.DisableOption switch
             {
@@ -169,11 +118,11 @@ public class CenterHtmlMenuInstance : BaseMenuInstance
 
     private void AddPageOptions(CenterHtmlMenu centerHtmlMenu, StringBuilder builder)
     {
-        string prevText = $"<font color='{centerHtmlMenu.PrevPageColor}'>!8 &#60;</font> {Player.Localizer("Prev")}";
-        string closeText = $"<font color='{centerHtmlMenu.ExitColor}'>!0 X</font> {Player.Localizer("Exit")}";
-        string nextText = $"<font color='{centerHtmlMenu.NextPageColor}'>!9 ></font> {Player.Localizer("Next")}";
+        string prevText = $"<font color='{centerHtmlMenu.CenterHtmlMenu_PrevPageColor}'>!8 &#60;</font> {Player.Localizer("Prev")}";
+        string closeText = $"<font color='{centerHtmlMenu.CenterHtmlMenu_ExitColor}'>!0 X</font> {Player.Localizer("Exit")}";
+        string nextText = $"<font color='{centerHtmlMenu.CenterHtmlMenu_NextPageColor}'>!9 ></font> {Player.Localizer("Next")}";
 
-        if (centerHtmlMenu.InlinePageOptions)
+        if (centerHtmlMenu.CenterHtmlMenu_InlinePageOptions)
             AddInlinePageOptions(prevText, closeText, nextText, builder);
         else
             AddMultilinePageOptions(prevText, closeText, nextText, builder);
@@ -198,7 +147,7 @@ public class CenterHtmlMenuInstance : BaseMenuInstance
     private int CalculateMenuItemsPerPage()
     {
         int count = NumPerPage;
-        if (!((CenterHtmlMenu)Menu).InlinePageOptions)
+        if (!((CenterHtmlMenu)Menu).CenterHtmlMenu_InlinePageOptions)
         {
             if (!HasPrevButton) count++;
             if (!HasNextButton) count++;

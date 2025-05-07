@@ -15,7 +15,6 @@
 		<IncludeXmlDocumentation>true</IncludeXmlDocumentation>
 		<OutputPath>$(ProjectDir)..\BuildOutput\shared\CS2MenuManager\</OutputPath>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-		
 	</PropertyGroup>
 
 	<ItemGroup>

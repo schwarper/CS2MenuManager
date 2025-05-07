@@ -68,6 +68,7 @@ internal static class ConfigManager
             ShowResolutionsOption = true,
             MenuType = "Both"
         };
+        public string DefaultMenuType { get; set; } = "ScreenMenu";
         public Dictionary<string, Resolution> Resolutions { get; set; } = [];
         public Dictionary<string, Dictionary<string, string>> Lang { get; set; } = [];
     }
@@ -276,6 +277,15 @@ internal static class ConfigManager
                 }
             }
         });
+
+        if (Toml.ToModel(configText).TryGetValue("DefaultMenuType", out object menuTypeObj) &&
+            menuTypeObj is TomlTable menuTypeTable &&
+            menuTypeTable.TryGetValue("DefaultMenuType", out object defaultMenuTypeObj) &&
+            defaultMenuTypeObj is string defaultMenuType &&
+            MenuManager.MenuTypesList.ContainsKey(defaultMenuType))
+        {
+            Config.DefaultMenuType = defaultMenuType;
+        }
 
         Database.CreateDatabase();
     }

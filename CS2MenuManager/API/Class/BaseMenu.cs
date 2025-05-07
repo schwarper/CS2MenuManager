@@ -13,7 +13,7 @@ namespace CS2MenuManager.API.Class;
 /// </summary>
 /// <param name="title">The title of the menu.</param>
 /// <param name="plugin">The plugin associated with the menu.</param>
-public abstract class BaseMenu(string title, BasePlugin plugin) : IMenu
+public abstract partial class BaseMenu(string title, BasePlugin plugin) : IMenu
 {
     /// <summary>
     /// Gets or sets the title of the menu.
@@ -23,7 +23,7 @@ public abstract class BaseMenu(string title, BasePlugin plugin) : IMenu
     /// <summary>
     /// Gets the list of item options in the menu.
     /// </summary>
-    public List<ItemOption> ItemOptions { get; } = [];
+    public List<ItemOption> ItemOptions { get; internal set; } = [];
 
     /// <summary>
     /// Gets or sets a value indicating whether the menu has an exit button.
@@ -274,7 +274,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
 
     internal void RegisterOnKeyPress()
     {
-        if (Menu is WasdMenu || (Menu is ScreenMenu screenMenu && screenMenu.MenuType == MenuType.Scrollable))
+        if (Menu is WasdMenu || (Menu is ScreenMenu screenMenu && screenMenu.ScreenMenu_MenuType == MenuType.Scrollable))
             return;
 
         for (int i = 0; i <= 9; i++)
@@ -296,7 +296,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
 
     internal void DeregisterOnKeyPress()
     {
-        if (Menu is WasdMenu || (Menu is ScreenMenu screenMenu && screenMenu.MenuType == MenuType.Scrollable))
+        if (Menu is WasdMenu || (Menu is ScreenMenu screenMenu && screenMenu.ScreenMenu_MenuType == MenuType.Scrollable))
             return;
 
         foreach (KeyValuePair<string, CommandCallback> kvp in _keyCommands)

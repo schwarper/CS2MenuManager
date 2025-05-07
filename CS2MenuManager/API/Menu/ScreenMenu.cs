@@ -142,7 +142,7 @@ public class ScreenMenuInstance : BaseMenuInstance
             disabledOptions.AppendLine(Player.Localizer("SelectKey", screenMenu.ScreenMenu_SelectKey));
         }
 
-        for (int i = 0; i < maxLength; i++)
+        for (int i = 0; i < maxLength + 2; i++)
             disabledOptions.Append('ᅠ');
 
         UpdateWorldText(ref WorldText, noneOptions.ToString(), false, screenMenu, screenMenu.ScreenMenu_TextColor);

@@ -17,86 +17,6 @@ namespace CS2MenuManager.API.Menu;
 /// <param name="plugin">The plugin associated with the menu.</param>
 public class WasdMenu(string title, BasePlugin plugin) : BaseMenu(title, plugin)
 {
-    static WasdMenu()
-    {
-        LoadConfig();
-    }
-
-    /// <summary>
-    /// Gets or sets the color of the title.
-    /// </summary>
-    public string TitleColor { get; set; } = Config.WasdMenu.TitleColor;
-
-    /// <summary>
-    /// Gets or sets the color of the scroll up/down buttons.
-    /// </summary>
-    public string ScrollUpDownKeyColor { get; set; } = Config.WasdMenu.ScrollUpDownKeyColor;
-
-    /// <summary>
-    /// Gets or sets the color of the select button.
-    /// </summary>
-    public string SelectKeyColor { get; set; } = Config.WasdMenu.SelectKeyColor;
-
-    /// <summary>
-    /// Gets or sets the color of the prev button.
-    /// </summary>
-    public string PrevKeyColor { get; set; } = Config.WasdMenu.PrevKeyColor;
-
-    /// <summary>
-    /// Gets or sets the color of the exit button.
-    /// </summary>
-    public string ExitKeyColor { get; set; } = Config.WasdMenu.ExitKeyColor;
-
-    /// <summary>
-    /// Gets or sets the color of the selected option.
-    /// </summary>
-    public string SelectedOptionColor { get; set; } = Config.WasdMenu.SelectedOptionColor;
-
-    /// <summary>
-    /// Gets or sets the color of the options.
-    /// </summary>
-    public string OptionColor { get; set; } = Config.WasdMenu.OptionColor;
-
-    /// <summary>
-    /// Gets or sets the color of the disabled options.
-    /// </summary>
-    public string DisabledOptionColor { get; set; } = Config.WasdMenu.DisabledOptionColor;
-
-    /// <summary>
-    /// Gets or sets the color of the arrows.
-    /// </summary>
-    public string ArrowColor { get; set; } = Config.WasdMenu.ArrowColor;
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the player is frozen while the menu is open.
-    /// </summary>
-    public bool FreezePlayer { get; set; } = Config.WasdMenu.FreezePlayer;
-
-    /// <summary>
-    /// The key binding used to scroll up in the menu.
-    /// </summary>
-    public string ScrollUpKey { get; set; } = Config.Buttons.ScrollUp;
-
-    /// <summary>
-    /// The key binding used to scroll down in the menu.
-    /// </summary>
-    public string ScrollDownKey { get; set; } = Config.Buttons.ScrollDown;
-
-    /// <summary>
-    /// The key binding used to select the currently highlighted menu option.
-    /// </summary>
-    public string SelectKey { get; set; } = Config.Buttons.Select;
-
-    /// <summary>
-    /// The key binding used to navigate to the previous page or option in the menu.
-    /// </summary>
-    public string PrevKey { get; set; } = Config.Buttons.Prev;
-
-    /// <summary>
-    /// The key binding used to close the menu.
-    /// </summary>
-    public string ExitKey { get; set; } = Config.Buttons.Exit;
-
     /// <summary>
     /// Displays the menu to the specified player for a specified duration.
     /// </summary>
@@ -155,16 +75,16 @@ public class WasdMenuInstance : BaseMenuInstance
 
         Menu.Plugin.RegisterListener<OnTick>(OnTick);
 
-        if (wasdMenu.FreezePlayer)
+        if (wasdMenu.WasdMenu_FreezePlayer)
             Player.Freeze();
 
         Buttons = new Dictionary<string, Action>()
         {
-            { wasdMenu.ScrollUpKey, ScrollUp },
-            { wasdMenu.ScrollDownKey, ScrollDown },
-            { wasdMenu.SelectKey, Choose },
-            { wasdMenu.PrevKey, PrevSubMenu },
-            { wasdMenu.ExitKey, () => { if (Menu.ExitButton) Close(); } }
+            { wasdMenu.WasdMenu_ScrollUpKey, ScrollUp },
+            { wasdMenu.WasdMenu_ScrollDownKey, ScrollDown },
+            { wasdMenu.WasdMenu_SelectKey, Choose },
+            { wasdMenu.WasdMenu_PrevKey, PrevSubMenu },
+            { wasdMenu.WasdMenu_ExitKey, () => { if (Menu.ExitButton) Close(); } }
         };
     }
 
@@ -175,13 +95,13 @@ public class WasdMenuInstance : BaseMenuInstance
     {
         if (Menu is not WasdMenu wasdMenu) return;
 
-        string leftArrow = $"<font color='{wasdMenu.ArrowColor}'>▶ [</font>";
-        string rightArrow = $"<font color='{wasdMenu.ArrowColor}'> ] ◀</font>";
+        string leftArrow = $"<font color='{wasdMenu.WasdMenu_ArrowColor}'>▶ [</font>";
+        string rightArrow = $"<font color='{wasdMenu.WasdMenu_ArrowColor}'> ] ◀</font>";
 
         StringBuilder builder = new();
         int totalPages = (int)Math.Ceiling((double)Menu.ItemOptions.Count / MenuItemsPerPage);
         int currentPage = Page + 1;
-        builder.Append($"<font color='{wasdMenu.TitleColor}'>{Menu.Title}</font> ({currentPage}/{totalPages})<br>");
+        builder.Append($"<font color='{wasdMenu.WasdMenu_TitleColor}'>{Menu.Title}</font> ({currentPage}/{totalPages})<br>");
 
         int keyOffset = 1;
         int maxIndex = Math.Min(CurrentOffset + MenuItemsPerPage, Menu.ItemOptions.Count);
@@ -193,9 +113,9 @@ public class WasdMenuInstance : BaseMenuInstance
                 builder.AppendLine(option.DisableOption switch
                 {
                     DisableOption.None =>
-                        $"{leftArrow} <font color='{wasdMenu.SelectedOptionColor}'>{option.Text}</font> {rightArrow}<br>",
+                        $"{leftArrow} <font color='{wasdMenu.WasdMenu_SelectedOptionColor}'>{option.Text}</font> {rightArrow}<br>",
                     DisableOption.DisableShowNumber or DisableOption.DisableHideNumber =>
-                        $"{leftArrow} <font color='{wasdMenu.DisabledOptionColor}'>{option.Text}</font> {rightArrow}<br>",
+                        $"{leftArrow} <font color='{wasdMenu.WasdMenu_DisabledOptionColor}'>{option.Text}</font> {rightArrow}<br>",
                     _ => string.Empty
                 });
             }
@@ -204,9 +124,9 @@ public class WasdMenuInstance : BaseMenuInstance
                 builder.AppendLine(option.DisableOption switch
                 {
                     DisableOption.None =>
-                        $"<font color='{wasdMenu.OptionColor}'>{option.Text}</font><br>",
+                        $"<font color='{wasdMenu.WasdMenu_OptionColor}'>{option.Text}</font><br>",
                     DisableOption.DisableShowNumber or DisableOption.DisableHideNumber =>
-                        $"<font color='{wasdMenu.DisabledOptionColor}'>{option.Text}</font><br>",
+                        $"<font color='{wasdMenu.WasdMenu_DisabledOptionColor}'>{option.Text}</font><br>",
                     _ => string.Empty
                 });
             }
@@ -214,14 +134,14 @@ public class WasdMenuInstance : BaseMenuInstance
         }
 
         List<string> buttomText = [];
-        buttomText.Add($"<font class='fontSize-s' color='{wasdMenu.ScrollUpDownKeyColor}'>{Player.Localizer("ScrollKey", wasdMenu.ScrollUpKey, wasdMenu.ScrollDownKey)}</font>");
-        buttomText.Add($"<font class='fontSize-s' color='{wasdMenu.SelectKeyColor}'>{Player.Localizer("SelectKey", wasdMenu.SelectKey)}</font>");
+        buttomText.Add($"<font class='fontSize-s' color='{wasdMenu.WasdMenu_ScrollUpDownKeyColor}'>{Player.Localizer("ScrollKey", wasdMenu.WasdMenu_ScrollUpKey, wasdMenu.WasdMenu_ScrollDownKey)}</font>");
+        buttomText.Add($"<font class='fontSize-s' color='{wasdMenu.WasdMenu_SelectKeyColor}'>{Player.Localizer("SelectKey", wasdMenu.WasdMenu_SelectKey)}</font>");
 
         if (wasdMenu.PrevMenu != null)
-            buttomText.Add($"<font class='fontSize-s' color='{wasdMenu.PrevKeyColor}'>{Player.Localizer("PrevKey", wasdMenu.PrevKey)}</font>");
+            buttomText.Add($"<font class='fontSize-s' color='{wasdMenu.WasdMenu_PrevKeyColor}'>{Player.Localizer("PrevKey", wasdMenu.WasdMenu_PrevKey)}</font>");
 
         if (HasExitButton)
-            buttomText.Add($"<font class='fontSize-s' color='{wasdMenu.ExitKeyColor}'>{Player.Localizer("ExitKey", wasdMenu.ExitKey)}</font>");
+            buttomText.Add($"<font class='fontSize-s' color='{wasdMenu.WasdMenu_ExitKeyColor}'>{Player.Localizer("ExitKey", wasdMenu.WasdMenu_ExitKey)}</font>");
 
         builder.AppendLine(string.Join(" | ", buttomText));
 
@@ -237,7 +157,7 @@ public class WasdMenuInstance : BaseMenuInstance
         Menu.Plugin.RemoveListener<OnTick>(OnTick);
         Player.PrintToCenterHtml(" ");
 
-        if (((WasdMenu)Menu).FreezePlayer)
+        if (((WasdMenu)Menu).WasdMenu_FreezePlayer)
             Player.Unfreeze();
 
         if (!string.IsNullOrEmpty(Config.Sound.Exit))

@@ -4,7 +4,7 @@ VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CS2MenuManager", "CS2MenuManager\CS2MenuManager.csproj", "{646ED3B0-FDE7-B57E-904C-0E036440FED0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CS2MenuManager-ResolutionMenu", "ResolutionMenu\CS2MenuManager-ResolutionMenu.csproj", "{51C1B46C-7BD1-C8F5-C162-4C032FF3A95A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CS2MenuManager_MenuManager", "CS2MenuManager_MenuManager\CS2MenuManager_MenuManager.csproj", "{44A0DD82-DF15-4BD2-1140-9B00EEB0154A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,10 +16,10 @@ Global
 		{646ED3B0-FDE7-B57E-904C-0E036440FED0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{646ED3B0-FDE7-B57E-904C-0E036440FED0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{646ED3B0-FDE7-B57E-904C-0E036440FED0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{51C1B46C-7BD1-C8F5-C162-4C032FF3A95A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{51C1B46C-7BD1-C8F5-C162-4C032FF3A95A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{51C1B46C-7BD1-C8F5-C162-4C032FF3A95A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{51C1B46C-7BD1-C8F5-C162-4C032FF3A95A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44A0DD82-DF15-4BD2-1140-9B00EEB0154A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44A0DD82-DF15-4BD2-1140-9B00EEB0154A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44A0DD82-DF15-4BD2-1140-9B00EEB0154A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44A0DD82-DF15-4BD2-1140-9B00EEB0154A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

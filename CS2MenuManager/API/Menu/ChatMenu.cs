@@ -2,7 +2,6 @@
 using CounterStrikeSharp.API.Modules.Utils;
 using CS2MenuManager.API.Class;
 using CS2MenuManager.API.Enum;
-using static CS2MenuManager.API.Class.ConfigManager;
 
 namespace CS2MenuManager.API.Menu;
 
@@ -13,41 +12,6 @@ namespace CS2MenuManager.API.Menu;
 /// <param name="plugin">The plugin associated with the menu.</param>
 public class ChatMenu(string title, BasePlugin plugin) : BaseMenu(title, plugin)
 {
-    static ChatMenu()
-    {
-        LoadConfig();
-    }
-
-    /// <summary>
-    /// Gets or sets the color of the title.
-    /// </summary>
-    public char TitleColor { get; set; } = Config.ChatMenu.TitleColor;
-
-    /// <summary>
-    /// Gets or sets the color of enabled items.
-    /// </summary>
-    public char EnabledColor { get; set; } = Config.ChatMenu.EnabledColor;
-
-    /// <summary>
-    /// Gets or sets the color of disabled items.
-    /// </summary>
-    public char DisabledColor { get; set; } = Config.ChatMenu.DisabledColor;
-
-    /// <summary>
-    /// Gets or sets the color of the previous page button.
-    /// </summary>
-    public char PrevPageColor { get; set; } = Config.ChatMenu.PrevPageColor;
-
-    /// <summary>
-    /// Gets or sets the color of the next page button.
-    /// </summary>
-    public char NextPageColor { get; set; } = Config.ChatMenu.NextPageColor;
-
-    /// <summary>
-    /// Gets or sets the color of the close button.
-    /// </summary>
-    public char ExitColor { get; set; } = Config.ChatMenu.ExitColor;
-
     /// <summary>
     /// Displays the menu to the specified player for a specified duration.
     /// </summary>
@@ -87,7 +51,7 @@ public class ChatMenuInstance(CCSPlayerController player, ChatMenu menu) : BaseM
         if (Menu is not ChatMenu chatMenu)
             return;
 
-        Player.PrintToChat($" {chatMenu.EnabledColor} {chatMenu.Title}");
+        Player.PrintToChat($" {chatMenu.ChatMenu_EnabledColor} {chatMenu.Title}");
         Player.PrintToChat($"---");
 
         int keyOffset = 1;
@@ -95,7 +59,7 @@ public class ChatMenuInstance(CCSPlayerController player, ChatMenu menu) : BaseM
         for (int i = CurrentOffset; i < maxIndex; i++)
         {
             ItemOption option = Menu.ItemOptions[i];
-            char color = option.DisableOption == DisableOption.None ? chatMenu.EnabledColor : chatMenu.DisabledColor;
+            char color = option.DisableOption == DisableOption.None ? chatMenu.ChatMenu_EnabledColor : chatMenu.ChatMenu_DisabledColor;
 
             Player.PrintToChat(option.DisableOption switch
             {
@@ -110,12 +74,12 @@ public class ChatMenuInstance(CCSPlayerController player, ChatMenu menu) : BaseM
         }
 
         if (HasPrevButton)
-            Player.PrintToChat($" {chatMenu.PrevPageColor}!8 {ChatColors.Default}-> {Player.Localizer("Prev")}");
+            Player.PrintToChat($" {chatMenu.ChatMenu_PrevPageColor}!8 {ChatColors.Default}-> {Player.Localizer("Prev")}");
 
         if (HasNextButton)
-            Player.PrintToChat($" {chatMenu.NextPageColor}!9 {ChatColors.Default}-> {Player.Localizer("Next")}");
+            Player.PrintToChat($" {chatMenu.ChatMenu_NextPageColor}!9 {ChatColors.Default}-> {Player.Localizer("Next")}");
 
         if (Menu.ExitButton)
-            Player.PrintToChat($" {chatMenu.ExitColor}!0 {ChatColors.Default}->  {Player.Localizer("Exit")}");
+            Player.PrintToChat($" {chatMenu.ChatMenu_ExitColor}!0 {ChatColors.Default}->  {Player.Localizer("Exit")}");
     }
 }

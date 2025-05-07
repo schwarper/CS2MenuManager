@@ -21,66 +21,6 @@ namespace CS2MenuManager.API.Menu;
 /// <param name="plugin">The plugin associated with the menu.</param>
 public class ScreenMenu(string title, BasePlugin plugin) : BaseMenu(title, plugin)
 {
-    static ScreenMenu()
-    {
-        LoadConfig();
-    }
-
-    /// <summary>
-    /// Gets or sets the color of the text.
-    /// </summary>
-    public Color TextColor { get; set; } = Config.ScreenMenu.TextColor;
-
-    /// <summary>
-    /// Gets or sets the color of the disabled text.
-    /// </summary>
-    public Color DisabledTextColor { get; set; } = Config.ScreenMenu.DisabledTextColor;
-
-    /// <summary>
-    /// Gets or sets the font used for the text.
-    /// </summary>
-    public string Font { get; set; } = Config.ScreenMenu.Font;
-
-    /// <summary>
-    /// Gets or sets the size of the text.
-    /// </summary>
-    public int Size { get; set; } = Config.ScreenMenu.Size;
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the player is frozen while the menu is open.
-    /// </summary>
-    public bool FreezePlayer { get; set; } = Config.ScreenMenu.FreezePlayer;
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the menu shows a resolutions option.
-    /// </summary>
-    public bool ShowResolutionsOption { get; set; } = Config.ScreenMenu.ShowResolutionsOption;
-
-    /// <summary>
-    /// The key binding used to scroll up in the menu.
-    /// </summary>
-    public string ScrollUpKey { get; set; } = Config.Buttons.ScrollUp;
-
-    /// <summary>
-    /// The key binding used to scroll down in the menu.
-    /// </summary>
-    public string ScrollDownKey { get; set; } = Config.Buttons.ScrollDown;
-
-    /// <summary>
-    /// The key binding used to select the currently highlighted menu option.
-    /// </summary>
-    public string SelectKey { get; set; } = Config.Buttons.Select;
-
-    /// <summary>
-    /// Defines the types of menus.
-    /// </summary>
-    public MenuType MenuType { get; set; } = Config.ScreenMenu.MenuType switch
-    {
-        string text when text.Length > 0 && char.ToLower(text[0]) == 's' => MenuType.Scrollable,
-        string text when text.Length > 0 && char.ToLower(text[0]) == 'k' => MenuType.KeyPress,
-        _ => MenuType.Both
-    };
-
     /// <summary>
     /// Displays the menu to the specified player for a specified duration.
     /// </summary>
@@ -115,7 +55,7 @@ public class ScreenMenuInstance : BaseMenuInstance
     /// <summary>
     /// Gets the number of items displayed per page.
     /// </summary>
-    public override int NumPerPage => ((ScreenMenu)Menu).ShowResolutionsOption ? 6 : 7;
+    public override int NumPerPage => ((ScreenMenu)Menu).ScreenMenu_ShowResolutionsOption ? 6 : 7;
 
     private PlayerButtons OldButton;
     private CPointWorldText? WorldText;
@@ -132,20 +72,20 @@ public class ScreenMenuInstance : BaseMenuInstance
         if (Menu is not ScreenMenu screenMenu)
             return;
 
-        if (screenMenu.MenuType != MenuType.KeyPress)
+        if (screenMenu.ScreenMenu_MenuType != MenuType.KeyPress)
         {
             Buttons = new Dictionary<string, Action>()
             {
-                { screenMenu.ScrollUpKey, ScrollUp },
-                { screenMenu.ScrollDownKey, ScrollDown },
-                { screenMenu.SelectKey, Choose },
+                { screenMenu.ScreenMenu_ScrollUpKey, ScrollUp },
+                { screenMenu.ScreenMenu_ScrollDownKey, ScrollDown },
+                { screenMenu.ScreenMenu_SelectKey, Choose },
             };
         }
 
         Menu.Plugin.RegisterListener<OnTick>(OnTick);
         Menu.Plugin.RegisterListener<CheckTransmit>(OnCheckTransmit);
         Menu.Plugin.RegisterListener<OnEntityDeleted>(OnEntityDeleted);
-        if (screenMenu.FreezePlayer) Player.Freeze();
+        if (screenMenu.ScreenMenu_FreezePlayer) Player.Freeze();
     }
 
     /// <summary>
@@ -169,7 +109,7 @@ public class ScreenMenuInstance : BaseMenuInstance
         {
             (string text, int _, bool disabled) = visibleOptions[i];
 
-            string displayLine = screenMenu.MenuType switch
+            string displayLine = screenMenu.ScreenMenu_MenuType switch
             {
                 MenuType.KeyPress => text,
                 MenuType.Scrollable or MenuType.Both => (i == CurrentChoiceIndex) ? $"> {text}" : text,
@@ -194,19 +134,19 @@ public class ScreenMenuInstance : BaseMenuInstance
         noneOptions.AppendLine();
         disabledOptions.AppendLine();
 
-        if (screenMenu.MenuType != MenuType.KeyPress)
+        if (screenMenu.ScreenMenu_MenuType != MenuType.KeyPress)
         {
             noneOptions.AppendLine();
             noneOptions.AppendLine();
-            disabledOptions.AppendLine(Player.Localizer("ScrollKey", screenMenu.ScrollUpKey, screenMenu.ScrollDownKey));
-            disabledOptions.AppendLine(Player.Localizer("SelectKey", screenMenu.SelectKey));
+            disabledOptions.AppendLine(Player.Localizer("ScrollKey", screenMenu.ScreenMenu_ScrollUpKey, screenMenu.ScreenMenu_ScrollDownKey));
+            disabledOptions.AppendLine(Player.Localizer("SelectKey", screenMenu.ScreenMenu_SelectKey));
         }
 
         for (int i = 0; i < maxLength; i++)
             disabledOptions.Append('ᅠ');
 
-        UpdateWorldText(ref WorldText, noneOptions.ToString(), false, screenMenu, screenMenu.TextColor);
-        UpdateWorldText(ref WorldTextDisabled, disabledOptions.ToString(), true, screenMenu, screenMenu.DisabledTextColor);
+        UpdateWorldText(ref WorldText, noneOptions.ToString(), false, screenMenu, screenMenu.ScreenMenu_TextColor);
+        UpdateWorldText(ref WorldTextDisabled, disabledOptions.ToString(), true, screenMenu, screenMenu.ScreenMenu_DisabledTextColor);
     }
 
     private static void UpdateWorldText(ref CPointWorldText? worldText, string message, bool background, ScreenMenu screenMenu, Color color)
@@ -215,9 +155,9 @@ public class ScreenMenuInstance : BaseMenuInstance
         {
             worldText = CreateWorldText(
                 message,
-                screenMenu.Size,
+                screenMenu.ScreenMenu_Size,
                 color,
-                screenMenu.Font,
+                screenMenu.ScreenMenu_Font,
                 background,
                 background ? -0.001f : 0f
             );
@@ -241,7 +181,7 @@ public class ScreenMenuInstance : BaseMenuInstance
 
         if (WorldText != null && WorldText.IsValid) WorldText.Remove();
         if (WorldTextDisabled != null && WorldTextDisabled.IsValid) WorldTextDisabled.Remove();
-        if (((ScreenMenu)Menu).FreezePlayer) Player.Unfreeze();
+        if (((ScreenMenu)Menu).ScreenMenu_FreezePlayer) Player.Unfreeze();
 
         if (!string.IsNullOrEmpty(Config.Sound.Exit))
             Player.ExecuteClientCommand($"play {Config.Sound.Exit}");
@@ -249,7 +189,7 @@ public class ScreenMenuInstance : BaseMenuInstance
 
     private void OnTick()
     {
-        if (((ScreenMenu)Menu).MenuType != MenuType.KeyPress)
+        if (((ScreenMenu)Menu).ScreenMenu_MenuType != MenuType.KeyPress)
         {
             PlayerButtons button = Player.Buttons;
 
@@ -272,7 +212,7 @@ public class ScreenMenuInstance : BaseMenuInstance
         if (viewModel == null) { Close(); return; }
         if (OldViewModel == viewModel) return;
 
-        VectorData? vectorData = Player.FindVectorData(((ScreenMenu)Menu).Size);
+        VectorData? vectorData = Player.FindVectorData(((ScreenMenu)Menu).ScreenMenu_Size);
         if (vectorData == null) { Close(); return; }
 
         OldViewModel = viewModel;
@@ -341,7 +281,7 @@ public class ScreenMenuInstance : BaseMenuInstance
     {
         switch (key)
         {
-            case 7 when ((ScreenMenu)Menu).ShowResolutionsOption:
+            case 7 when ((ScreenMenu)Menu).ScreenMenu_ShowResolutionsOption:
                 Close();
                 ResolutionMenu<ScreenMenu>(player, Menu.Plugin, Menu).Display(Player, 0);
                 break;
@@ -434,7 +374,7 @@ public class ScreenMenuInstance : BaseMenuInstance
             visible.Add(("", -99, true));
         }
 
-        if (((ScreenMenu)Menu).ShowResolutionsOption)
+        if (((ScreenMenu)Menu).ScreenMenu_ShowResolutionsOption)
             visible.Add(($"7. {Player.Localizer("SelectResolution")}", -4, false));
         if (HasPrevButton)
             visible.Add(($"8. {Player.Localizer("Prev")}", -2, false));

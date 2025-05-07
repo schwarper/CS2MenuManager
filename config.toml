@@ -1,3 +1,6 @@
+[DefaultMenuType]
+DefaultMenuType = "ScreenMenu" # Supported ConsoleMenu,ChatMenu,WasdMenu,CenterHtmlMenu, ScreenMenu
+
 [Buttons]
 ScrollUp = "W"
 ScrollDown = "S"
@@ -183,3 +186,17 @@ SelectResolution = "選擇解析度"
 WarnDisabledItem = "{Grey}你 {Red}無法 {Grey}進入此選項."
 CancelledVote = "{darkred}{0} {Grey}已停止投票。"
 Console = "控制台"
+
+[Lang.pl]
+Prev = "Poprzednia"
+Next = "Następna"
+Exit = "Wyjdź"
+Disabled = "Wyłączone"
+ScrollKey = "{0}/{1} - Przewiń"
+SelectKey = "{0} - Wybierz"
+PrevKey = "{0} - Wstecz"
+ExitKey = "{0} - Wyjście"
+SelectResolution = "Wybierz Rozdzielczość"
+WarnDisabledItem = "{Grey}Nie {Red}możesz {Grey}wybrać tej opcji."
+CancelledVote = "{darkred}{0} {Grey}anulował głosowanie."
+Console = "Konsola"

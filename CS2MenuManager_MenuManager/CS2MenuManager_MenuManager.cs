@@ -52,6 +52,7 @@ public class CS2MenuManager_Menu : BasePlugin, IPluginConfig<Config>
         Server.PrintToChatAll($"OPEN {player.PlayerName}");
     }
 
+    /*
     [ConsoleCommand("css_testme")]
     public void OnTestMe(CCSPlayerController? player, CommandInfo info)
     {
@@ -72,4 +73,5 @@ public class CS2MenuManager_Menu : BasePlugin, IPluginConfig<Config>
 
         menu.Display(player, 0);
     }
+    */
 }

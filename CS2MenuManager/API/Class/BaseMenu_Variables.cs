@@ -11,7 +11,6 @@ public abstract partial class BaseMenu
 {
     static BaseMenu()
     {
-        Console.WriteLine("LOADED CONFIG");
         LoadConfig();
     }
 

@@ -17,7 +17,7 @@ public class PlayerMenu(string title, BasePlugin plugin) : BaseMenu(title, plugi
     /// <param name="time">The duration for which the menu is displayed.</param>
     public override void Display(CCSPlayerController player, int time)
     {
-        BaseMenu instance = GetInstanceFromPlayer(player, Title, Plugin, ItemOptions);
+        BaseMenu instance = GetInstanceFromPlayer(player, Title, Plugin, ItemOptions, this);
         instance.Display(player, time);
     }
 
@@ -29,11 +29,11 @@ public class PlayerMenu(string title, BasePlugin plugin) : BaseMenu(title, plugi
     /// <param name="time">The duration for which the menu is displayed.</param>
     public override void DisplayAt(CCSPlayerController player, int firstItem, int time)
     {
-        BaseMenu instance = GetInstanceFromPlayer(player, Title, Plugin, ItemOptions);
+        BaseMenu instance = GetInstanceFromPlayer(player, Title, Plugin, ItemOptions, this);
         instance.DisplayAt(player, firstItem, time);
     }
 
-    private static BaseMenu GetInstanceFromPlayer(CCSPlayerController player, string title, BasePlugin plugin, List<ItemOption> options)
+    private static BaseMenu GetInstanceFromPlayer(CCSPlayerController player, string title, BasePlugin plugin, List<ItemOption> options, PlayerMenu oldMenu)
     {
         Type? playerMenuType = MenuTypeManager.GetPlayerMenuType(player);
         BaseMenu menu = playerMenuType switch
@@ -46,6 +46,7 @@ public class PlayerMenu(string title, BasePlugin plugin) : BaseMenu(title, plugi
         };
 
         menu.ItemOptions = options;
+        CopySettings(oldMenu, menu);
         return menu;
     }
 }

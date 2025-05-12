@@ -1,6 +1,4 @@
-﻿using CounterStrikeSharp.API;
-using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Core.Attributes.Registration;
+﻿using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Commands;
 using CS2MenuManager.API.Class;
@@ -11,6 +9,8 @@ namespace CS2MenuManager_MenuManager;
 public class Config : BasePluginConfig
 {
     public string[] Commands { get; set; } = ["css_mm", "css_menumanager"];
+    public string[] ChangeResolutionCommands { get; set; } = ["css_resolution", "css_cr"];
+    public string[] ChangeMenuTypeCommands { get; set; } = ["css_menutype", "css_ct"];
 }
 
 public class CS2MenuManager_Menu : BasePlugin, IPluginConfig<Config>
@@ -25,6 +25,12 @@ public class CS2MenuManager_Menu : BasePlugin, IPluginConfig<Config>
     {
         foreach (string command in config.Commands)
             AddCommand(command, "CS2MenuManager-MenuManager", Command_MenuManager);
+
+        foreach (string command in config.ChangeResolutionCommands)
+            AddCommand(command, "CS2MenuManager-ChangeResolution-Menu", Command_ChangeResolution);
+
+        foreach (string command in config.ChangeMenuTypeCommands)
+            AddCommand(command, "CS2MenuManager-ChangeMenuType-Menu", Command_ChangeMenuType);
 
         Config = config;
     }
@@ -49,7 +55,24 @@ public class CS2MenuManager_Menu : BasePlugin, IPluginConfig<Config>
         });
 
         menu.Display(player, 0);
-        Server.PrintToChatAll($"OPEN {player.PlayerName}");
+    }
+
+    public void Command_ChangeResolution(CCSPlayerController? player, CommandInfo info)
+    {
+        if (player == null)
+            return;
+
+        ResolutionManager.ResolutionMenuByType(typeof(PlayerMenu), player, this, null)
+            .Display(player, 0);
+    }
+
+    public void Command_ChangeMenuType(CCSPlayerController? player, CommandInfo info)
+    {
+        if (player == null)
+            return;
+
+        MenuTypeManager.MenuTypeMenuByType(typeof(PlayerMenu), player, this, null)
+            .Display(player, 0);
     }
 
     /*
@@ -61,8 +84,11 @@ public class CS2MenuManager_Menu : BasePlugin, IPluginConfig<Config>
 
         PlayerMenu menu = new("Test Player Menu", this)
         {
-            ScreenMenu_ShowResolutionsOption = false,
-            WasdMenu_ExitKeyColor = "Pink"
+            ScreenMenu_ShowResolutionsOption = true,
+            WasdMenu_ExitKeyColor = "Pink",
+            ScreenMenu_SelectKey = "R",
+            ScreenMenu_DisabledTextColor = Color.Red,
+            ScreenMenu_ScrollUpKey = "D"
         };
 
         menu.AddItem("Test Item 1", (p, o) => { p.PrintToChat("Test Item 1 selected"); });

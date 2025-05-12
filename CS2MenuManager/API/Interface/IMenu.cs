@@ -138,7 +138,7 @@ public interface IMenuInstance : IDisposable
     /// <summary>
     /// Closes the menu.
     /// </summary>
-    void Close();
+    void Close(bool exitSound);
 
     /// <summary>
     /// Displays the menu to the player.

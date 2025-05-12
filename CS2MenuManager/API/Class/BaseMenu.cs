@@ -222,7 +222,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     /// <summary>
     /// Closes the menu.
     /// </summary>
-    public virtual void Close()
+    public virtual void Close(bool exitSound)
     {
         ((IDisposable)this).Dispose();
     }
@@ -252,7 +252,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
                 NextPage();
                 break;
             case 0 when HasExitButton:
-                Close();
+                Close(true);
                 break;
             default:
                 HandleMenuItemSelection(key);
@@ -268,7 +268,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
         ItemOption menuOption = Menu.ItemOptions[menuItemIndex];
         if (menuOption.DisableOption != DisableOption.None) return;
 
-        Close();
+        Close(false);
         menuOption.OnSelect?.Invoke(Player, menuOption);
     }
 
@@ -320,7 +320,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
         if (@event.Userid != Player)
             return HookResult.Continue;
 
-        Close();
+        Close(false);
         return HookResult.Continue;
     }
 

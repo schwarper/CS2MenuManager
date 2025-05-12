@@ -1,4 +1,5 @@
-﻿using CounterStrikeSharp.API.Core;
+﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Core;
 using CS2MenuManager.API.Interface;
 using CS2MenuManager.API.Menu;
 using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
@@ -42,7 +43,7 @@ public static class MenuManager
     {
         if (ActiveMenus.TryGetValue(player.SteamID, out (IMenuInstance Instance, Timer? Timer) value))
         {
-            value.Instance.Close();
+            value.Instance.Close(true);
             value.Timer?.Kill();
             value.Timer = null;
             ActiveMenus.Remove(player.SteamID);
@@ -72,38 +73,42 @@ public static class MenuManager
     {
         CloseActiveMenu(player);
 
-        IMenuInstance instance = createInstance.Invoke(player, menu);
-
-        if (instance is ScreenMenuInstance screenMenuInstance)
-            player.CreateFakeWorldText(screenMenuInstance);
-
-        if (instance is BaseMenuInstance baseMenuInstance)
+        Server.NextFrame(() =>
         {
-            baseMenuInstance.RegisterOnKeyPress();
-            baseMenuInstance.RegisterPlayerDisconnectEvent();
+            IMenuInstance instance = createInstance.Invoke(player, menu);
 
-            if (firstItem.HasValue)
+            if (instance is ScreenMenuInstance screenMenuInstance)
+                player.CreateFakeWorldText(screenMenuInstance);
+
+            if (instance is BaseMenuInstance baseMenuInstance)
             {
-                int item = Math.Clamp(firstItem.Value, 0, menu.ItemOptions.Count - 1);
+                baseMenuInstance.RegisterOnKeyPress();
+                baseMenuInstance.RegisterPlayerDisconnectEvent();
 
-                while (baseMenuInstance.CurrentChoiceIndex != item)
+                if (firstItem.HasValue)
                 {
-                    baseMenuInstance.CurrentChoiceIndex++;
+                    int item = Math.Clamp(firstItem.Value, 0, menu.ItemOptions.Count - 1);
 
-                    if (baseMenuInstance.CurrentChoiceIndex >= baseMenuInstance.CurrentOffset + baseMenuInstance.NumPerPage)
-                        baseMenuInstance.NextPage();
+                    while (baseMenuInstance.CurrentChoiceIndex != item)
+                    {
+                        baseMenuInstance.CurrentChoiceIndex++;
+
+                        if (baseMenuInstance.CurrentChoiceIndex >= baseMenuInstance.CurrentOffset + baseMenuInstance.NumPerPage)
+                            baseMenuInstance.NextPage();
+                    }
+
+                    baseMenuInstance.CurrentChoiceIndex -= baseMenuInstance.CurrentOffset;
                 }
-
-                baseMenuInstance.CurrentChoiceIndex -= baseMenuInstance.CurrentOffset;
             }
-        }
 
-        Timer? timer = menu.MenuTime > 0 ?
-            menu.Plugin.AddTimer(menu.MenuTime, () => CloseActiveMenu(player)) :
-            null;
+            Timer? timer = menu.MenuTime > 0 ?
+                menu.Plugin.AddTimer(menu.MenuTime, () => CloseActiveMenu(player)) :
+                null;
 
-        ActiveMenus[player.SteamID] = (instance, timer);
-        instance.Display();
+            ActiveMenus[player.SteamID] = (instance, timer);
+
+            instance.Display();
+        });
     }
 
     /// <summary>

@@ -14,6 +14,22 @@ public abstract partial class BaseMenu
         LoadConfig();
     }
 
+    internal static void CopySettings(BaseMenu oldMenu, BaseMenu newMenu)
+    {
+        System.Reflection.PropertyInfo[] properties = typeof(BaseMenu).GetProperties(
+            System.Reflection.BindingFlags.Public |
+            System.Reflection.BindingFlags.Instance);
+
+        foreach (System.Reflection.PropertyInfo property in properties)
+        {
+            if (property.CanWrite)
+            {
+                object? value = property.GetValue(oldMenu);
+                property.SetValue(newMenu, value);
+            }
+        }
+    }
+
     /// <summary>
     /// Gets or sets the color of the title.
     /// </summary>

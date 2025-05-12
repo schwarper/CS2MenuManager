@@ -172,9 +172,9 @@ public class ScreenMenuInstance : BaseMenuInstance
     /// <summary>
     /// Closes the menu.
     /// </summary>
-    public override void Close()
+    public override void Close(bool exitSound)
     {
-        base.Close();
+        base.Close(exitSound);
         Menu.Plugin.RemoveListener<OnTick>(OnTick);
         Menu.Plugin.RemoveListener<CheckTransmit>(OnCheckTransmit);
         Menu.Plugin.RemoveListener<OnEntityDeleted>(OnEntityDeleted);
@@ -183,7 +183,7 @@ public class ScreenMenuInstance : BaseMenuInstance
         if (WorldTextDisabled != null && WorldTextDisabled.IsValid) WorldTextDisabled.Remove();
         if (((ScreenMenu)Menu).ScreenMenu_FreezePlayer) Player.Unfreeze();
 
-        if (!string.IsNullOrEmpty(Config.Sound.Exit))
+        if (exitSound && !string.IsNullOrEmpty(Config.Sound.Exit))
             Player.ExecuteClientCommand($"play {Config.Sound.Exit}");
     }
 
@@ -209,11 +209,11 @@ public class ScreenMenuInstance : BaseMenuInstance
         }
 
         CCSGOViewModel? viewModel = Player.EnsureCustomView();
-        if (viewModel == null) { Close(); return; }
+        if (viewModel == null) { Close(false); return; }
         if (OldViewModel == viewModel) return;
 
         VectorData? vectorData = Player.FindVectorData(((ScreenMenu)Menu).ScreenMenu_Size);
-        if (vectorData == null) { Close(); return; }
+        if (vectorData == null) { Close(false); return; }
 
         OldViewModel = viewModel;
 
@@ -282,7 +282,7 @@ public class ScreenMenuInstance : BaseMenuInstance
         switch (key)
         {
             case 7 when ((ScreenMenu)Menu).ScreenMenu_ShowResolutionsOption:
-                Close();
+                Close(false);
                 ResolutionMenu<ScreenMenu>(player, Menu.Plugin, Menu).Display(Player, 0);
                 break;
             case 8 when HasPrevButton:
@@ -293,7 +293,7 @@ public class ScreenMenuInstance : BaseMenuInstance
                 NextPage();
                 break;
             case 0 when HasExitButton:
-                Close();
+                Close(true);
                 break;
             default:
                 HandleMenuItemSelection(key);
@@ -315,8 +315,8 @@ public class ScreenMenuInstance : BaseMenuInstance
                 if (Page > 0) PrevPage();
                 else PrevSubMenu();
                 return;
-            case -3: Close(); return;
-            case -4: Close(); ResolutionMenu<ScreenMenu>(Player, Menu.Plugin, Menu).Display(Player, 0); return;
+            case -3: Close(true); return;
+            case -4: Close(false); ResolutionMenu<ScreenMenu>(Player, Menu.Plugin, Menu).Display(Player, 0); return;
             default:
                 HandleOption(globalIndex);
                 break;
@@ -333,12 +333,11 @@ public class ScreenMenuInstance : BaseMenuInstance
             return;
         }
 
-        option.OnSelect?.Invoke(Player, option);
-
         if (!string.IsNullOrEmpty(Config.Sound.Select))
             Player.ExecuteClientCommand($"play {Config.Sound.Select}");
 
-        Close();
+        Close(false);
+        option.OnSelect?.Invoke(Player, option);
     }
 
     private List<(string Text, int GlobalIndex, bool disabled)> GetVisibleOptions()
@@ -402,7 +401,9 @@ public class ScreenMenuInstance : BaseMenuInstance
 
     private void OnEntityDeleted(CEntityInstance entity)
     {
-        if (WorldText != null && WorldText.IsValid && WorldText == entity)
-            Close();
+        if (WorldText == entity || WorldTextDisabled == entity)
+        {
+            Close(false);
+        }
     }
 }

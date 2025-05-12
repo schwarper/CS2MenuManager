@@ -109,9 +109,9 @@ public class CenterHtmlMenuInstance : BaseMenuInstance
     /// <summary>
     /// Closes the menu.
     /// </summary>
-    public override void Close()
+    public override void Close(bool exitSound)
     {
-        base.Close();
+        base.Close(exitSound);
         Menu.Plugin.RemoveListener<OnTick>(Display);
         Player.PrintToCenterHtml(" ");
     }

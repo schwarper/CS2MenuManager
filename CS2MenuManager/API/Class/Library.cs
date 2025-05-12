@@ -143,13 +143,13 @@ internal static partial class Library
     public static void CreateFakeWorldText(this CCSPlayerController player, ScreenMenuInstance instance)
     {
         CPointWorldText? entity = CreateWorldText("       ", 35, Color.Orange, "Arial", false, 0f);
-        if (entity == null) { instance.Close(); return; }
+        if (entity == null) { instance.Close(false); return; }
 
         CCSGOViewModel? viewModel = player.EnsureCustomView();
-        if (viewModel == null) { instance.Close(); return; }
+        if (viewModel == null) { instance.Close(false); return; }
 
         VectorData? vectorData = player.FindVectorData();
-        if (vectorData == null) { instance.Close(); return; }
+        if (vectorData == null) { instance.Close(false); return; }
 
         entity.Teleport(vectorData.Value.Position, vectorData.Value.Angle, null);
         entity.AcceptInput("SetParent", viewModel, null, "!activator");

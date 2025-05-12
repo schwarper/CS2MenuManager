@@ -84,7 +84,7 @@ public class WasdMenuInstance : BaseMenuInstance
             { wasdMenu.WasdMenu_ScrollDownKey, ScrollDown },
             { wasdMenu.WasdMenu_SelectKey, Choose },
             { wasdMenu.WasdMenu_PrevKey, PrevSubMenu },
-            { wasdMenu.WasdMenu_ExitKey, () => { if (Menu.ExitButton) Close(); } }
+            { wasdMenu.WasdMenu_ExitKey, () => { if (Menu.ExitButton) Close(true); } }
         };
     }
 
@@ -151,16 +151,16 @@ public class WasdMenuInstance : BaseMenuInstance
     /// <summary>
     /// Closes the menu.
     /// </summary>
-    public override void Close()
+    public override void Close(bool exitSound)
     {
-        base.Close();
+        base.Close(exitSound);
         Menu.Plugin.RemoveListener<OnTick>(OnTick);
         Player.PrintToCenterHtml(" ");
 
         if (((WasdMenu)Menu).WasdMenu_FreezePlayer)
             Player.Unfreeze();
 
-        if (!string.IsNullOrEmpty(Config.Sound.Exit))
+        if (exitSound && !string.IsNullOrEmpty(Config.Sound.Exit))
             Player.ExecuteClientCommand($"play {Config.Sound.Exit}");
     }
 
@@ -208,7 +208,7 @@ public class WasdMenuInstance : BaseMenuInstance
         if (!string.IsNullOrEmpty(Config.Sound.Select))
             Player.ExecuteClientCommand($"play {Config.Sound.Select}");
 
-        Close();
+        Close(false);
         option.OnSelect?.Invoke(Player, option);
     }
 

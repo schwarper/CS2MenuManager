@@ -63,16 +63,41 @@ FreezePlayer = false
 ShowResolutionsOption = false
 MenuType = "Both" # Supported Scrollable, KeyPress, Both
 
-[Resolutions]
-"1920x1080" = { PositionX = -9.0, PositionY = 0.0 }
-"1680x1050" = { PositionX = -8.2, PositionY = 0.0 }
-"1600x900" = { PositionX = -9.0, PositionY = 0.0 }
-"1440x1080" = { PositionX = -6.8, PositionY = 0.0 }
-"1280x1080" = { PositionX = -6.0, PositionY = 0.0 }
-"1280x720" = { PositionX = -9.0, PositionY = 0.0 }
-"1280x1024" = { PositionX = -6.3, PositionY = 0.0 }
-"1024x768" = { PositionX = -6.8, PositionY = 0.0 }
-"800x600" = { PositionX = -6.8, PositionY = 0.0 }
+[Resolutions.1920x1080]
+PositionX = -9.0
+PositionY = 0.0
+
+[Resolutions.1680x1050]
+PositionX = -8.2
+PositionY = 0.0
+
+[Resolutions.1600x900]
+PositionX = -9.0
+PositionY = 0.0
+
+[Resolutions.1440x1080]
+PositionX = -6.8
+PositionY = 0.0
+
+[Resolutions.1280x1080]
+PositionX = -6.0
+PositionY = 0.0
+
+[Resolutions.1280x720]
+PositionX = -9.0
+PositionY = 0.0
+
+[Resolutions.1280x1024]
+PositionX = -6.3
+PositionY = 0.0
+
+[Resolutions.1024x768]
+PositionX = -6.8
+PositionY = 0.0
+
+[Resolutions.800x600]
+PositionX = -6.8
+PositionY = 0.0
 
 [Lang]
 [Lang.en]

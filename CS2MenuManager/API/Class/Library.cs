@@ -253,22 +253,25 @@ internal static partial class Library
         }
     }
 
-    public static void SetIfExist(this TomlTable table, string key, Action<TomlTable> setter)
-    {
-        if (table.TryGetValue(key, out object? value) && value is TomlTable innerTable)
-        {
-            setter(innerTable);
-        }
-    }
-
-    public static T? GetValue<T>(this TomlTable table, string key)
-    {
-        return table.TryGetValue(key, out object? value) ? (T)Convert.ChangeType(value, typeof(T)) : default;
-    }
-
     public static char GetChatColor(this string colorName)
     {
         return (char)typeof(ChatColors).GetField(colorName)?.GetValue(null)!;
+    }
+
+    public static T GetValueOrDefault<T>(this TomlTable table, string key, T defaultValue)
+    {
+        if (table.TryGetValue(key, out object? value))
+        {
+            try
+            {
+                return (T)Convert.ChangeType(value, typeof(T));
+            }
+            catch
+            {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
     }
 
     public static Color HexToColor(this string hex)

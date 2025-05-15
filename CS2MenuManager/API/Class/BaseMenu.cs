@@ -181,7 +181,19 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     protected bool HasExitButton => Menu.ExitButton;
 
     internal int CurrentChoiceIndex;
+    internal double NextProcessTime;
     private readonly Dictionary<string, CommandCallback> _keyCommands = [];
+
+    internal bool ShouldProcess()
+    {
+        double engineTime = Server.EngineTime;
+
+        if (engineTime < NextProcessTime)
+            return false;
+
+        NextProcessTime = engineTime + 0.1f;
+        return true;
+    }
 
     internal void PrevSubMenu()
     {

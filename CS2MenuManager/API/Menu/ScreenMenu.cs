@@ -189,6 +189,9 @@ public class ScreenMenuInstance : BaseMenuInstance
 
     private void OnTick()
     {
+        if (!ShouldProcess())
+            return;
+
         if (((ScreenMenu)Menu).ScreenMenu_MenuType != MenuType.KeyPress)
         {
             PlayerButtons button = Player.Buttons;
@@ -220,9 +223,8 @@ public class ScreenMenuInstance : BaseMenuInstance
         if (WorldText != null)
         {
             if (vectorData.Value.Size.HasValue)
-            {
                 WorldText.FontSize = vectorData.Value.Size.Value;
-            }
+
             WorldText.Teleport(vectorData.Value.Position, vectorData.Value.Angle, null);
             WorldText.AcceptInput("SetParent", viewModel, null, "!activator");
         }
@@ -230,9 +232,8 @@ public class ScreenMenuInstance : BaseMenuInstance
         if (WorldTextDisabled != null)
         {
             if (vectorData.Value.Size.HasValue)
-            {
                 WorldTextDisabled.FontSize = vectorData.Value.Size.Value;
-            }
+
             WorldTextDisabled.Teleport(vectorData.Value.Position, vectorData.Value.Angle, null);
             WorldTextDisabled.AcceptInput("SetParent", viewModel, null, "!activator");
         }

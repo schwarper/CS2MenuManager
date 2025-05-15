@@ -122,6 +122,8 @@ internal static class ConfigManager
         if (!File.Exists(ConfigFilePath))
             throw new FileNotFoundException($"Configuration file not found: {ConfigFilePath}");
 
+        Console.WriteLine("LOAD CONFIG");
+
         string configText = File.ReadAllText(ConfigFilePath);
         TomlTable model = Toml.ToModel(configText);
 

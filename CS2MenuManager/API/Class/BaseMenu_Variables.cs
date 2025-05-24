@@ -221,6 +221,11 @@ public abstract partial class BaseMenu
     public string ScreenMenu_ScrollDownKey { get; set; } = Config.Buttons.ScrollDown;
 
     /// <summary>
+    /// The key binding used to close the menu.
+    /// </summary>
+    public string ScreenMenu_ExitKey { get; set; } = Config.Buttons.Exit;
+
+    /// <summary>
     /// The key binding used to select the currently highlighted menu option.
     /// </summary>
     public string ScreenMenu_SelectKey { get; set; } = Config.Buttons.Select;

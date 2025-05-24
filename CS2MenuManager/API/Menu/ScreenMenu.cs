@@ -5,6 +5,7 @@ using CS2MenuManager.API.Class;
 using CS2MenuManager.API.Enum;
 using CS2MenuManager.API.Interface;
 using System.Drawing;
+using System.Runtime.CompilerServices;
 using System.Text;
 using static CounterStrikeSharp.API.Core.Listeners;
 using static CS2MenuManager.API.Class.Buttons;
@@ -74,12 +75,20 @@ public class ScreenMenuInstance : BaseMenuInstance
 
         if (screenMenu.ScreenMenu_MenuType != MenuType.KeyPress)
         {
-            Buttons = new Dictionary<string, Action>()
+            Buttons = new[]
             {
-                { screenMenu.ScreenMenu_ScrollUpKey, ScrollUp },
-                { screenMenu.ScreenMenu_ScrollDownKey, ScrollDown },
-                { screenMenu.ScreenMenu_SelectKey, Choose },
-            };
+                new { Key = screenMenu.ScreenMenu_ScrollUpKey, Action = (Action)ScrollUp },
+                new { Key = screenMenu.ScreenMenu_ScrollDownKey, Action = (Action)ScrollDown },
+                new { Key = screenMenu.ScreenMenu_SelectKey, Action = (Action)Choose },
+                new { Key = screenMenu.ScreenMenu_ExitKey, Action = (Action)(() =>
+                    {
+                        if (HasExitButton)
+                            Close(true);
+                    })
+                }
+            }
+            .Where(x => !string.IsNullOrWhiteSpace(x.Key))
+            .ToDictionary(x => x.Key, x => x.Action);
         }
 
         Menu.Plugin.RegisterListener<OnTick>(OnTick);
@@ -374,14 +383,23 @@ public class ScreenMenuInstance : BaseMenuInstance
             visible.Add(("", -99, true));
         }
 
-        if (((ScreenMenu)Menu).ScreenMenu_ShowResolutionsOption)
+        ScreenMenu screenMenu = (ScreenMenu)Menu;
+
+        if (screenMenu.ScreenMenu_ShowResolutionsOption)
             visible.Add(($"7. {Player.Localizer("SelectResolution")}", -4, false));
+
         if (HasPrevButton)
             visible.Add(($"8. {Player.Localizer("Prev")}", -2, false));
+
         if (HasNextButton)
             visible.Add(($"9. {Player.Localizer("Next")}", -1, false));
+
         if (HasExitButton)
-            visible.Add(($"0. {Player.Localizer("Exit")}", -3, false));
+        {
+            string exitKey = screenMenu.ScreenMenu_ExitKey;
+            string exitLabel = $"0. {Player.Localizer("Exit")}{(string.IsNullOrEmpty(exitKey) ? "" : $" [{exitKey}]")}";
+            visible.Add((exitLabel, -3, false));
+        }
 
         return visible;
     }

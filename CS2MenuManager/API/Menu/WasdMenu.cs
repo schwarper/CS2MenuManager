@@ -58,10 +58,8 @@ public class WasdMenuInstance : BaseMenuInstance
     /// </summary>
     public string DisplayString = "";
 
-    /// <summary>
-    /// Gets or sets the previous button state.
-    /// </summary>
-    public PlayerButtons OldButton;
+    private PlayerButtons OldButton;
+    private float OldVelocityModifier;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="WasdMenuInstance"/> class.
@@ -76,7 +74,7 @@ public class WasdMenuInstance : BaseMenuInstance
         Menu.Plugin.RegisterListener<OnTick>(OnTick);
 
         if (wasdMenu.WasdMenu_FreezePlayer)
-            Player.Freeze();
+            Player.Freeze(ref OldVelocityModifier);
 
         Buttons = new Dictionary<string, Action>()
         {
@@ -158,7 +156,7 @@ public class WasdMenuInstance : BaseMenuInstance
         Player.PrintToCenterHtml(" ");
 
         if (((WasdMenu)Menu).WasdMenu_FreezePlayer)
-            Player.Unfreeze();
+            Player.Unfreeze(OldVelocityModifier);
 
         if (exitSound && !string.IsNullOrEmpty(Config.Sound.Exit))
             Player.ExecuteClientCommand($"play {Config.Sound.Exit}");

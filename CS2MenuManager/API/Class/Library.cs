@@ -157,14 +157,21 @@ internal static partial class Library
         entity.Remove();
     }
 
-    public static void Freeze(this CCSPlayerController player)
+    public static void Freeze(this CCSPlayerController player, ref float oldModifier)
     {
-        player.PlayerPawn.Value?.ChangeMoveType(MoveType_t.MOVETYPE_OBSOLETE);
+        if (player.PlayerPawn.Value is { } playerPawn)
+        {
+            oldModifier = playerPawn.VelocityModifier;
+            playerPawn.VelocityModifier = 0.0f;
+        }
     }
 
-    public static void Unfreeze(this CCSPlayerController player)
+    public static void Unfreeze(this CCSPlayerController player, float oldModifier)
     {
-        player.PlayerPawn.Value?.ChangeMoveType(MoveType_t.MOVETYPE_WALK);
+        if (player.PlayerPawn.Value is { } playerPawn)
+        {
+            playerPawn.VelocityModifier = oldModifier;
+        }
     }
 
     public static void ChangeMoveType(this CBasePlayerPawn pawn, MoveType_t movetype)

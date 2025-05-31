@@ -51,7 +51,7 @@ public class ChatMenuInstance(CCSPlayerController player, ChatMenu menu) : BaseM
         if (Menu is not ChatMenu chatMenu)
             return;
 
-        Player.PrintToChat($" {chatMenu.ChatMenu_EnabledColor} {chatMenu.Title}");
+        Player.PrintToChat($" {chatMenu.ChatMenu_TitleColor} {chatMenu.Title}");
         Player.PrintToChat($"---");
 
         int keyOffset = 1;

@@ -12,6 +12,7 @@ internal static class ConfigManager
 {
     public class Cfg
     {
+        public bool ForceConfigSettings { get; set; } = true;
         public ButtonsKey Buttons { get; set; } = new();
         public Sound Sound { get; set; } = new();
         public MySQL MySQL { get; set; } = new();
@@ -122,11 +123,10 @@ internal static class ConfigManager
         if (!File.Exists(ConfigFilePath))
             throw new FileNotFoundException($"Configuration file not found: {ConfigFilePath}");
 
-        Console.WriteLine("LOAD CONFIG");
-
         string configText = File.ReadAllText(ConfigFilePath);
         TomlTable model = Toml.ToModel(configText);
 
+        LoadForceConfig(model);
         LoadButtonsConfig(model);
         LoadSoundConfig(model);
         LoadMySQLConfig(model);
@@ -139,6 +139,15 @@ internal static class ConfigManager
         LoadDefaultMenuType(model);
 
         Database.CreateDatabase();
+    }
+
+    private static void LoadForceConfig(TomlTable model)
+    {
+        if (model.TryGetValue(("ForceConfigSettings"), out object? forceConfigObj) &&
+            forceConfigObj is TomlTable forceConfig)
+        {
+            Config.ForceConfigSettings = forceConfig.GetValueOrDefault(("ForceConfigSettings"), Config.ForceConfigSettings);
+        }
     }
 
     private static void LoadButtonsConfig(TomlTable model)

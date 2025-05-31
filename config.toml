@@ -1,5 +1,16 @@
 [DefaultMenuType]
-DefaultMenuType = "ScreenMenu" # Supported ConsoleMenu,ChatMenu,WasdMenu,CenterHtmlMenu, ScreenMenu
+# Default Menu Type
+# Specifies the default menu style to use.
+# Options: ConsoleMenu, ChatMenu, WasdMenu, CenterHtmlMenu, ScreenMenu
+# Default: ScreenMenu
+DefaultMenuType = "ScreenMenu"
+
+[ForceConfigSettings]
+# Force Configuration Settings
+# Enforces the configuration settings defined in this file.
+# When true, plugin attempts to override settings will be ignored.
+# Default: true
+ForceConfigSettings = true
 
 [Buttons]
 ScrollUp = "W"
@@ -61,7 +72,7 @@ Font = "Tahoma Bold"
 Size = 32
 FreezePlayer = false
 ShowResolutionsOption = false
-MenuType = "Both" # Supported Scrollable, KeyPress, Both
+MenuType = "Both" # Options: Scrollable, KeyPress, Both
 
 [Resolutions.1920x1080]
 PositionX = -9.0

@@ -1,4 +1,5 @@
 ﻿using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Commands;
 using CS2MenuManager.API.Class;
@@ -75,7 +76,6 @@ public class CS2MenuManager_Menu : BasePlugin, IPluginConfig<Config>
             .Display(player, 0);
     }
 
-    /*
     [ConsoleCommand("css_testme")]
     public void OnTestMe(CCSPlayerController? player, CommandInfo info)
     {
@@ -87,7 +87,6 @@ public class CS2MenuManager_Menu : BasePlugin, IPluginConfig<Config>
             ScreenMenu_ShowResolutionsOption = true,
             WasdMenu_ExitKeyColor = "Pink",
             ScreenMenu_SelectKey = "R",
-            ScreenMenu_DisabledTextColor = Color.Red,
             ScreenMenu_ScrollUpKey = "D"
         };
 
@@ -99,5 +98,4 @@ public class CS2MenuManager_Menu : BasePlugin, IPluginConfig<Config>
 
         menu.Display(player, 0);
     }
-    */
 }

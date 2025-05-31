@@ -73,9 +73,6 @@ public class WasdMenuInstance : BaseMenuInstance
 
         Menu.Plugin.RegisterListener<OnTick>(OnTick);
 
-        if (wasdMenu.WasdMenu_FreezePlayer)
-            Player.Freeze(ref OldVelocityModifier);
-
         Buttons = new Dictionary<string, Action>()
         {
             { wasdMenu.WasdMenu_ScrollUpKey, ScrollUp },
@@ -84,6 +81,8 @@ public class WasdMenuInstance : BaseMenuInstance
             { wasdMenu.WasdMenu_PrevKey, PrevSubMenu },
             { wasdMenu.WasdMenu_ExitKey, () => { if (Menu.ExitButton) Close(true); } }
         };
+        
+        Player.SaveSpeed(ref OldVelocityModifier);
     }
 
     /// <summary>
@@ -92,7 +91,7 @@ public class WasdMenuInstance : BaseMenuInstance
     public override void Display()
     {
         if (Menu is not WasdMenu wasdMenu) return;
-
+ 
         string leftArrow = $"<font color='{wasdMenu.WasdMenu_ArrowColor}'>▶ [</font>";
         string rightArrow = $"<font color='{wasdMenu.WasdMenu_ArrowColor}'> ] ◀</font>";
 
@@ -185,6 +184,9 @@ public class WasdMenuInstance : BaseMenuInstance
 
         if (!string.IsNullOrEmpty(DisplayString))
             Player.PrintToCenterHtml(DisplayString);
+        
+        if (((WasdMenu)Menu).WasdMenu_FreezePlayer)
+            Player.Freeze();
     }
 
     /// <summary>

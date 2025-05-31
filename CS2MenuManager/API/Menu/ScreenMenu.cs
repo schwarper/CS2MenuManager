@@ -95,7 +95,8 @@ public class ScreenMenuInstance : BaseMenuInstance
         Menu.Plugin.RegisterListener<OnTick>(OnTick);
         Menu.Plugin.RegisterListener<CheckTransmit>(OnCheckTransmit);
         Menu.Plugin.RegisterListener<OnEntityDeleted>(OnEntityDeleted);
-        if (screenMenu.ScreenMenu_FreezePlayer) Player.Freeze(ref OldVelocityModifier);
+        
+        Player.SaveSpeed(ref OldVelocityModifier);
     }
 
     /// <summary>
@@ -199,6 +200,9 @@ public class ScreenMenuInstance : BaseMenuInstance
 
     private void OnTick()
     {
+        if (((ScreenMenu)Menu).ScreenMenu_FreezePlayer)
+            Player.Freeze();
+        
         if (!ShouldProcess())
             return;
 

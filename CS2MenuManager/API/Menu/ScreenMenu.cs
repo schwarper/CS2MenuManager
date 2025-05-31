@@ -62,6 +62,7 @@ public class ScreenMenuInstance : BaseMenuInstance
     private CPointWorldText? WorldText;
     private CPointWorldText? WorldTextDisabled;
     private CCSGOViewModel? OldViewModel;
+    private float OldVelocityModifier;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ScreenMenuInstance"/> class.
@@ -94,7 +95,8 @@ public class ScreenMenuInstance : BaseMenuInstance
         Menu.Plugin.RegisterListener<OnTick>(OnTick);
         Menu.Plugin.RegisterListener<CheckTransmit>(OnCheckTransmit);
         Menu.Plugin.RegisterListener<OnEntityDeleted>(OnEntityDeleted);
-        if (screenMenu.ScreenMenu_FreezePlayer) Player.Freeze();
+        
+        Player.SaveSpeed(ref OldVelocityModifier);
     }
 
     /// <summary>
@@ -190,7 +192,7 @@ public class ScreenMenuInstance : BaseMenuInstance
 
         if (WorldText != null && WorldText.IsValid) WorldText.Remove();
         if (WorldTextDisabled != null && WorldTextDisabled.IsValid) WorldTextDisabled.Remove();
-        if (((ScreenMenu)Menu).ScreenMenu_FreezePlayer) Player.Unfreeze();
+        if (((ScreenMenu)Menu).ScreenMenu_FreezePlayer) Player.Unfreeze(OldVelocityModifier);
 
         if (exitSound && !string.IsNullOrEmpty(Config.Sound.Exit))
             Player.ExecuteClientCommand($"play {Config.Sound.Exit}");
@@ -198,6 +200,9 @@ public class ScreenMenuInstance : BaseMenuInstance
 
     private void OnTick()
     {
+        if (((ScreenMenu)Menu).ScreenMenu_FreezePlayer)
+            Player.Freeze();
+        
         if (!ShouldProcess())
             return;
 

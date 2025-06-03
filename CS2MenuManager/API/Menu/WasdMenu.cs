@@ -208,8 +208,7 @@ public class WasdMenuInstance : BaseMenuInstance
         if (!string.IsNullOrEmpty(Config.Sound.Select))
             Player.ExecuteClientCommand($"play {Config.Sound.Select}");
 
-        Close(false);
-        option.OnSelect?.Invoke(Player, option);
+        HandleSelectAction(option);
     }
 
     /// <summary>

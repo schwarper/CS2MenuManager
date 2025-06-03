@@ -350,9 +350,8 @@ public class ScreenMenuInstance : BaseMenuInstance
 
         if (!string.IsNullOrEmpty(Config.Sound.Select))
             Player.ExecuteClientCommand($"play {Config.Sound.Select}");
-
-        Close(false);
-        option.OnSelect?.Invoke(Player, option);
+        
+        HandleSelectAction(option);
     }
 
     private List<(string Text, int GlobalIndex, bool disabled)> GetVisibleOptions()

@@ -3,6 +3,7 @@ using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Commands;
 using CS2MenuManager.API.Class;
+using CS2MenuManager.API.Enum;
 using CS2MenuManager.API.Menu;
 
 namespace CS2MenuManager_MenuManager;
@@ -76,6 +77,7 @@ public class CS2MenuManager_Menu : BasePlugin, IPluginConfig<Config>
             .Display(player, 0);
     }
 
+    /*
     [ConsoleCommand("css_testme")]
     public void OnTestMe(CCSPlayerController? player, CommandInfo info)
     {
@@ -90,12 +92,17 @@ public class CS2MenuManager_Menu : BasePlugin, IPluginConfig<Config>
             ScreenMenu_ScrollUpKey = "D"
         };
 
-        menu.AddItem("Test Item 1", (p, o) => { p.PrintToChat("Test Item 1 selected"); });
+        menu.AddItem("Test Item 1", (p, o) => { p.PrintToChat("Test Item 1 selected");});
         menu.AddItem("Test Item 2", (p, o) => { p.PrintToChat("Test Item 2 selected"); });
         menu.AddItem("Test Item 3", (p, o) => { p.PrintToChat("Test Item 3 selected"); });
-        menu.AddItem("Test Item 4", (p, o) => { p.PrintToChat("Test Item 4 selected"); });
-        menu.AddItem("Test Item 5", (p, o) => { p.PrintToChat("Test Item 5 selected"); });
+        menu.AddItem($"Test Reset", (p, o) => { p.PrintToChat("Test Reset selected"); o.PostSelectAction = PostSelectAction.Reset; o.Text = "Reset"; });
+        menu.AddItem($"Test Nothing", (p, o) => { p.PrintToChat("Test Nothing selected"); o.PostSelectAction = PostSelectAction.Nothing; o.Text = "Nothing"; });
+        menu.AddItem("Test Item 6", (p, o) => { p.PrintToChat("Test Item 6 selected"); });
+        menu.AddItem("Test Item 7", (p, o) => { p.PrintToChat("Test Item 7 selected"); });
+        menu.AddItem($"Test Reset", (p, o) => { p.PrintToChat("Test Reset selected"); o.PostSelectAction = PostSelectAction.Reset; o.Text = "Reset"; });
+        menu.AddItem($"Test Nothing", (p, o) => { p.PrintToChat("Test Nothing selected"); o.PostSelectAction = PostSelectAction.Nothing; o.Text = "Nothing"; });
 
         menu.Display(player, 0);
     }
+    */
 }

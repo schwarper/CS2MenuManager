@@ -181,17 +181,17 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     protected bool HasExitButton => Menu.ExitButton;
 
     internal int CurrentChoiceIndex;
-    internal int NextProcessTime;
+    private int _nextProcessTime;
     private readonly Dictionary<string, CommandCallback> _keyCommands = [];
 
     internal bool ShouldProcess()
     {
         int tickCount = Server.TickCount;
 
-        if (tickCount < NextProcessTime)
+        if (tickCount < _nextProcessTime)
             return false;
 
-        NextProcessTime = tickCount + 3;
+        _nextProcessTime = tickCount + 3;
         return true;
     }
 
@@ -226,9 +226,11 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     /// </summary>
     public virtual void Reset()
     {
-        CurrentOffset = 0;
+        CurrentChoiceIndex = 0;
         Page = 0;
+        CurrentOffset = 0;
         PrevPageOffsets.Clear();
+        Display();
     }
 
     /// <summary>
@@ -279,9 +281,21 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
 
         ItemOption menuOption = Menu.ItemOptions[menuItemIndex];
         if (menuOption.DisableOption != DisableOption.None) return;
+        
+        HandleSelectAction(menuOption);
+    }
 
-        Close(false);
+    internal void HandleSelectAction(ItemOption menuOption)
+    {
         menuOption.OnSelect?.Invoke(Player, menuOption);
+
+        switch (menuOption.PostSelectAction)
+        {
+            case PostSelectAction.Close: Close(false); break;
+            case PostSelectAction.Reset: Reset(); break;
+            case PostSelectAction.Nothing: Display(); break;
+            default: throw new NotImplementedException($"The PostSelectAction value '{menuOption.PostSelectAction}' is not implemented.");
+        }
     }
 
     internal void RegisterOnKeyPress()
@@ -293,7 +307,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
         {
             int key = i;
 
-            void _func(CCSPlayerController? player, CommandInfo info)
+            void Func(CCSPlayerController? player, CommandInfo info)
             {
                 if (player != Player)
                     return;
@@ -301,8 +315,8 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
                 MenuManager.OnKeyPress(player, key);
             }
 
-            _keyCommands[$"css_{i}"] = _func;
-            Menu.Plugin.AddCommand($"css_{i}", "Command Key Handler", _func);
+            _keyCommands[$"css_{i}"] = Func;
+            Menu.Plugin.AddCommand($"css_{i}", "Command Key Handler", Func);
         }
     }
 

@@ -99,7 +99,7 @@ public class CS2MenuManager_Menu : BasePlugin, IPluginConfig<Config>
         menu.AddItem($"Test Nothing", (p, o) => { p.PrintToChat("Test Nothing selected"); o.PostSelectAction = PostSelectAction.Nothing; o.Text = "Nothing"; });
         menu.AddItem("Test Item 6", (p, o) => { p.PrintToChat("Test Item 6 selected"); });
         menu.AddItem("Test Item 7", (p, o) => { p.PrintToChat("Test Item 7 selected"); });
-        menu.AddItem($"Test Reset", (p, o) => { p.PrintToChat("Test Reset selected"); o.PostSelectAction = PostSelectAction.Reset; o.Text = "Reset"; });
+        menu.AddItem($"Test Reset", (p, o) => { p.PrintToChat("Test Reset selected"); o.PostSelectAction = PostSelectAction.Reset; o.Text = "Reset";  });
         menu.AddItem($"Test Nothing", (p, o) => { p.PrintToChat("Test Nothing selected"); o.PostSelectAction = PostSelectAction.Nothing; o.Text = "Nothing"; });
 
         menu.Display(player, 0);

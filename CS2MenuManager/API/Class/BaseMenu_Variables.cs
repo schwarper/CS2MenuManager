@@ -9,8 +9,6 @@ namespace CS2MenuManager.API.Class;
 /// </summary>
 public abstract partial class BaseMenu
 {
-    static BaseMenu() => LoadConfig();
-
     internal static void CopySettings(BaseMenu oldMenu, BaseMenu newMenu)
     {
         System.Reflection.PropertyInfo[] properties = typeof(BaseMenu).GetProperties(
@@ -34,8 +32,8 @@ public abstract partial class BaseMenu
     {
         return Config.ScreenMenu.MenuType switch
         {
-            string text when text.Length > 0 && char.ToLower(text[0]) == 's' => MenuType.Scrollable,
-            string text when text.Length > 0 && char.ToLower(text[0]) == 'k' => MenuType.KeyPress,
+            { Length: > 0 } text when char.ToLower(text[0]) == 's' => MenuType.Scrollable,
+            { Length: > 0 } text when char.ToLower(text[0]) == 'k' => MenuType.KeyPress,
             _ => MenuType.Both
         };
     }
@@ -398,7 +396,7 @@ public abstract partial class BaseMenu
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the menu shows a resolutions option.
+    /// Gets or sets a value indicating whether the menu shows resolution options.
     /// </summary>
     public bool ScreenMenu_ShowResolutionsOption
     {

@@ -57,24 +57,24 @@ public static class MenuTypeManager
     /// Sets the preferred menu type for a specific player.
     /// </summary>
     /// <param name="player">The player controller to update.</param>
-    /// <param name="menuType">The menu type to set as preferred.</param>
+    /// <param name="menuType">The menu types to set as preferred.</param>
     /// <returns>
-    /// The menu type that was set, or the default menu type if the specified type wasn't valid.
+    /// The menu type that was set or the default menu type if the specified type wasn't valid.
     /// Will update the database if MySQL is configured.
     /// </returns>
     public static Type SetPlayerMenuType(CCSPlayerController player, Type menuType)
     {
         MenuTypes[player.SteamID] = menuType;
 
-        if (IsMYSQLSet)
-        {
-            string menuTypeStr = MenuTypesList.FirstOrDefault(x => x.Value == menuType).Key;
+        if (!IsMYSQLSet)
+            return menuType;
+        
+        string menuTypeStr = MenuTypesList.FirstOrDefault(x => x.Value == menuType).Key;
 
-            if (menuTypeStr == null)
-                return GetDefaultMenu();
+        if (menuTypeStr == null)
+            return GetDefaultMenu();
 
-            Task.Run(async () => await InsertMenu(player.SteamID, menuTypeStr));
-        }
+        Task.Run(async () => await InsertMenu(player.SteamID, menuTypeStr));
 
         return menuType;
     }
@@ -131,7 +131,7 @@ public static class MenuTypeManager
     {
         foreach (KeyValuePair<string, Type> menuType in MenuTypesList)
         {
-            menu.AddItem(menuType.Key, (p, o) =>
+            menu.AddItem(menuType.Key, (p, _) =>
             {
                 SetPlayerMenuType(p, menuType.Value);
                 prevMenu?.Display(p, prevMenu.MenuTime);

@@ -5,7 +5,6 @@ using CS2MenuManager.API.Class;
 using CS2MenuManager.API.Enum;
 using CS2MenuManager.API.Interface;
 using System.Drawing;
-using System.Runtime.CompilerServices;
 using System.Text;
 using static CounterStrikeSharp.API.Core.Listeners;
 using static CS2MenuManager.API.Class.Buttons;
@@ -62,7 +61,7 @@ public class ScreenMenuInstance : BaseMenuInstance
     private CPointWorldText? WorldText;
     private CPointWorldText? WorldTextDisabled;
     private CCSGOViewModel? OldViewModel;
-    private float OldVelocityModifier;
+    private readonly float OldVelocityModifier;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ScreenMenuInstance"/> class.
@@ -239,7 +238,7 @@ public class ScreenMenuInstance : BaseMenuInstance
             if (vectorData.Value.Size.HasValue)
                 WorldText.FontSize = vectorData.Value.Size.Value;
 
-            WorldText.Teleport(vectorData.Value.Position, vectorData.Value.Angle, null);
+            WorldText.Teleport(vectorData.Value.Position, vectorData.Value.Angle);
             WorldText.AcceptInput("SetParent", viewModel, null, "!activator");
         }
 
@@ -248,7 +247,7 @@ public class ScreenMenuInstance : BaseMenuInstance
             if (vectorData.Value.Size.HasValue)
                 WorldTextDisabled.FontSize = vectorData.Value.Size.Value;
 
-            WorldTextDisabled.Teleport(vectorData.Value.Position, vectorData.Value.Angle, null);
+            WorldTextDisabled.Teleport(vectorData.Value.Position, vectorData.Value.Angle);
             WorldTextDisabled.AcceptInput("SetParent", viewModel, null, "!activator");
         }
     }
@@ -410,7 +409,8 @@ public class ScreenMenuInstance : BaseMenuInstance
 
     private void OnCheckTransmit(CCheckTransmitInfoList infoList)
     {
-        if (WorldText == null || WorldTextDisabled == null) return;
+        if (WorldText == null || WorldTextDisabled == null)
+            return;
 
         foreach ((CCheckTransmitInfo info, CCSPlayerController? player) in infoList)
         {

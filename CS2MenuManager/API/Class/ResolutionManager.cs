@@ -19,13 +19,13 @@ public static class ResolutionManager
     {
         /// <summary>
         /// The X-coordinate position of the menu on screen.
-        /// Default value is loaded from configuration.
+        /// The default value is loaded from configuration.
         /// </summary>
         public float PositionX = Config.ScreenMenu.PositionX;
 
         /// <summary>
         /// The Y-coordinate position of the menu on screen.
-        /// Default value is loaded from configuration.
+        /// The default value is loaded from configuration.
         /// </summary>
         public float PositionY = Config.ScreenMenu.PositionY;
     }
@@ -36,7 +36,7 @@ public static class ResolutionManager
     /// <returns>A new Resolution instance with default values.</returns>
     public static Resolution GetDefaultResolution()
     {
-        return new();
+        return new Resolution();
     }
 
     /// <summary>
@@ -45,11 +45,11 @@ public static class ResolutionManager
     /// <param name="player">The player controller.</param>
     /// <returns>
     /// The player's custom resolution if available, otherwise returns default resolution.
-    /// Will query database if MySQL is configured and player settings aren't cached.
+    /// Will query a database if MySQL is configured and player settings aren't cached.
     /// </returns>
     public static Resolution GetPlayerResolution(CCSPlayerController player)
     {
-        if (Resolutions.TryGetValue(player.SteamID, out Resolution? resolution) && resolution != null)
+        if (Resolutions.TryGetValue(player.SteamID, out Resolution? resolution))
             return resolution;
 
         if (!IsMYSQLSet)
@@ -131,7 +131,7 @@ public static class ResolutionManager
 
         foreach (KeyValuePair<string, Resolution> resolution in Config.Resolutions)
         {
-            menu.AddItem(resolution.Key, (p, o) =>
+            menu.AddItem(resolution.Key, (p, _) =>
             {
                 SetPlayerResolution(p, resolution.Value);
                 prevMenu?.Display(p, prevMenu.MenuTime);

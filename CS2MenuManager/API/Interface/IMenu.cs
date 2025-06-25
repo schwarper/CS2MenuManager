@@ -79,8 +79,8 @@ public interface IMenu
 
     /// <summary>
     /// Displays the menu to all players for a specified duration, starting from the given item.
-    /// <param name="firstItem">First item to begin drawing from.</param>
     /// </summary>
+    /// <param name="firstItem">First item to begin drawing from.</param>
     /// <param name="time">The duration for which the menu is displayed.</param>
     void DisplayAtToAll(int firstItem, int time);
 }

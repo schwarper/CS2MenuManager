@@ -38,10 +38,10 @@ public class PlayerMenu(string title, BasePlugin plugin) : BaseMenu(title, plugi
         Type? playerMenuType = MenuTypeManager.GetPlayerMenuType(player);
         BaseMenu menu = playerMenuType switch
         {
-            Type t when t == typeof(ChatMenu) => new ChatMenu(title, plugin),
-            Type t when t == typeof(ConsoleMenu) => new ConsoleMenu(title, plugin),
-            Type t when t == typeof(CenterHtmlMenu) => new CenterHtmlMenu(title, plugin),
-            Type t when t == typeof(WasdMenu) => new WasdMenu(title, plugin),
+            not null when playerMenuType == typeof(ChatMenu) => new ChatMenu(title, plugin),
+            not null when playerMenuType == typeof(ConsoleMenu) => new ConsoleMenu(title, plugin),
+            not null when playerMenuType == typeof(CenterHtmlMenu) => new CenterHtmlMenu(title, plugin),
+            not null when playerMenuType == typeof(WasdMenu) => new WasdMenu(title, plugin),
             _ => new ScreenMenu(title, plugin),
         };
 

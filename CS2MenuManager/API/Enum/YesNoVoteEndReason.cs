@@ -16,7 +16,7 @@ public enum YesNoVoteEndReason
     VoteEnd_TimeUp,
 
     /// <summary>
-    /// The vote was cancelled before it could complete.
+    /// The vote was canceled before it could complete.
     /// </summary>
     VoteEnd_Cancelled
 }

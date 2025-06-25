@@ -4,7 +4,6 @@ using CS2MenuManager.API.Enum;
 using CS2MenuManager.API.Interface;
 using System.Text;
 using static CounterStrikeSharp.API.Core.Listeners;
-using static CS2MenuManager.API.Class.Library;
 
 namespace CS2MenuManager.API.Menu;
 
@@ -68,7 +67,7 @@ public class CenterHtmlMenuInstance : BaseMenuInstance
     /// <param name="menu">The menu associated with this instance.</param>
     public CenterHtmlMenuInstance(CCSPlayerController player, IMenu menu) : base(player, menu)
     {
-        if (Menu is CenterHtmlMenu centerHtmlMenu && centerHtmlMenu.CenterHtmlMenu_MaxOptionLength > 0)
+        if (Menu is CenterHtmlMenu { CenterHtmlMenu_MaxOptionLength: > 0 } centerHtmlMenu)
             Menu.ItemOptions.ForEach(option => option.Text = option.Text.TruncateHtml(centerHtmlMenu.CenterHtmlMenu_MaxOptionLength));
 
         Menu.Plugin.RegisterListener<OnTick>(Display);

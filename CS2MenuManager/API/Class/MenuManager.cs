@@ -73,7 +73,7 @@ public static class MenuManager
     {
         if (menu.ItemOptions.Count == 0)
         {
-            player.PrintToChat(player.Localizer("WarnDisabledItem"));
+            player.PrintToChat(player.Localizer("OptionListEmpty"));
             return;
         }
 

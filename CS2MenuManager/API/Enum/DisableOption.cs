@@ -11,12 +11,12 @@ public enum DisableOption
     None,
 
     /// <summary>
-    /// Disables the item and displays its number.
+    /// Disables the item and displays it's number.
     /// </summary>
     DisableShowNumber,
 
     /// <summary>
-    /// Disables the item and hides its number.
+    /// Disables the item and hides it's number.
     /// </summary>
     DisableHideNumber
 }

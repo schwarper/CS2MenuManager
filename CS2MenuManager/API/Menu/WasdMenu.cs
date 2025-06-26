@@ -59,7 +59,7 @@ public class WasdMenuInstance : BaseMenuInstance
     public string DisplayString = "";
 
     private PlayerButtons OldButton;
-    private float OldVelocityModifier;
+    private readonly float OldVelocityModifier;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="WasdMenuInstance"/> class.
@@ -100,7 +100,6 @@ public class WasdMenuInstance : BaseMenuInstance
         int currentPage = Page + 1;
         builder.Append($"<font color='{wasdMenu.WasdMenu_TitleColor}'>{Menu.Title}</font> ({currentPage}/{totalPages})<br>");
 
-        int keyOffset = 1;
         int maxIndex = Math.Min(CurrentOffset + MenuItemsPerPage, Menu.ItemOptions.Count);
         for (int i = CurrentOffset; i < maxIndex; i++)
         {
@@ -127,12 +126,13 @@ public class WasdMenuInstance : BaseMenuInstance
                     _ => string.Empty
                 });
             }
-            keyOffset++;
         }
 
-        List<string> buttomText = [];
-        buttomText.Add($"<font class='fontSize-s' color='{wasdMenu.WasdMenu_ScrollUpDownKeyColor}'>{Player.Localizer("ScrollKey", wasdMenu.WasdMenu_ScrollUpKey, wasdMenu.WasdMenu_ScrollDownKey)}</font>");
-        buttomText.Add($"<font class='fontSize-s' color='{wasdMenu.WasdMenu_SelectKeyColor}'>{Player.Localizer("SelectKey", wasdMenu.WasdMenu_SelectKey)}</font>");
+        List<string> buttomText =
+        [
+            $"<font class='fontSize-s' color='{wasdMenu.WasdMenu_ScrollUpDownKeyColor}'>{Player.Localizer("ScrollKey", wasdMenu.WasdMenu_ScrollUpKey, wasdMenu.WasdMenu_ScrollDownKey)}</font>",
+            $"<font class='fontSize-s' color='{wasdMenu.WasdMenu_SelectKeyColor}'>{Player.Localizer("SelectKey", wasdMenu.WasdMenu_SelectKey)}</font>"
+        ];
 
         if (wasdMenu.PrevMenu != null)
             buttomText.Add($"<font class='fontSize-s' color='{wasdMenu.WasdMenu_PrevKeyColor}'>{Player.Localizer("PrevKey", wasdMenu.WasdMenu_PrevKey)}</font>");
@@ -170,14 +170,14 @@ public class WasdMenuInstance : BaseMenuInstance
 
         foreach (KeyValuePair<string, Action> kvp in Buttons)
         {
-            if (ButtonMapping.TryGetValue(kvp.Key, out PlayerButtons mappedBtn))
-            {
-                if ((button & mappedBtn) == 0 && (OldButton & mappedBtn) != 0)
-                {
-                    kvp.Value.Invoke();
-                    break;
-                }
-            }
+            if (!ButtonMapping.TryGetValue(kvp.Key, out PlayerButtons mappedBtn))
+                continue;
+
+            if ((button & mappedBtn) != 0 || (OldButton & mappedBtn) == 0)
+                continue;
+            
+            kvp.Value.Invoke();
+            break;
         }
 
         OldButton = button;

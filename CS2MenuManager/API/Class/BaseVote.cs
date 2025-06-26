@@ -27,7 +27,7 @@ public abstract class BaseVote(string title, string details, YesNoVoteResult res
     public string Details { get; } = details;
 
     /// <summary>
-    /// Gets or sets the player who initiated the current vote. (Null if the vote was initiated by the server)
+    /// Gets or sets the player who initiated the current vote. (Null if the server initiated the vote)
     /// </summary>
     public CCSPlayerController? VoteCaller { get; set; }
 
@@ -49,7 +49,7 @@ public abstract class BaseVote(string title, string details, YesNoVoteResult res
     /// <summary>
     /// Gets or sets the duration of the vote in seconds.
     /// </summary>
-    public int VoteTime { get; set; } = 20;
+    public int VoteTime { get; protected set; } = 20;
 
     /// <summary>
     /// Displays the vote to all players.
@@ -82,17 +82,17 @@ public abstract class BaseVoteInstance(List<CCSPlayerController> players, IVoteM
 
     /// <summary>
     /// </summary>
-    public Timer? Timer { get; set; }
+    public Timer? Timer { get; protected set; }
 
     /// <summary>
     /// Gets or sets the count of votes that have been cast in the current vote.
     /// </summary>
-    public int VoteCount { get; set; }
+    public int VoteCount { get; protected set; }
 
     /// <summary>
     /// Gets or sets the number of players who are eligible to vote in the current vote.
     /// </summary>
-    public int VoterCount { get; set; }
+    public int VoterCount { get; protected set; }
 
     /// <summary>
     /// Gets or sets an array that stores the slots of players who are eligible to vote.
@@ -146,7 +146,7 @@ public abstract class BaseVoteInstance(List<CCSPlayerController> players, IVoteM
         VoteMenu.Plugin.AddCommand("css_revote", "Allows you to revote.", Command_Revote);
     }
 
-    internal void DeregisterCommands()
+    private void DeregisterCommands()
     {
         VoteMenu.Plugin.RemoveCommand("css_cancelvote", Command_CancelVote);
         VoteMenu.Plugin.RemoveCommand("css_revote", Command_Revote);

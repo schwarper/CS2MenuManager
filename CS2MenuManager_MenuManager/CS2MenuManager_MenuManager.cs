@@ -1,9 +1,8 @@
 ﻿using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Core.Translations;
+using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
 using CS2MenuManager.API.Class;
-using CS2MenuManager.API.Enum;
 using CS2MenuManager.API.Menu;
 
 namespace CS2MenuManager_MenuManager;
@@ -13,6 +12,13 @@ public class Config : BasePluginConfig
     public string[] Commands { get; set; } = ["css_mm", "css_menumanager"];
     public string[] ChangeResolutionCommands { get; set; } = ["css_resolution", "css_cr"];
     public string[] ChangeMenuTypeCommands { get; set; } = ["css_menutype", "css_ct"];
+    public MenuManager_Config MenuManagerConfig { get; set; } = new();
+
+    public class MenuManager_Config
+    {
+        public string Flag { get; set; } = "@css/root";
+        public string[] ReloadConfigCommands { get; set; } = ["css_mm_reload_config"];
+    }
 }
 
 public class CS2MenuManager_Menu : BasePlugin, IPluginConfig<Config>
@@ -25,6 +31,8 @@ public class CS2MenuManager_Menu : BasePlugin, IPluginConfig<Config>
 
     public void OnConfigParsed(Config config)
     {
+        MenuManager.ReloadConfig();
+        
         foreach (string command in config.Commands)
             AddCommand(command, "CS2MenuManager-MenuManager", Command_MenuManager);
 
@@ -33,6 +41,9 @@ public class CS2MenuManager_Menu : BasePlugin, IPluginConfig<Config>
 
         foreach (string command in config.ChangeMenuTypeCommands)
             AddCommand(command, "CS2MenuManager-ChangeMenuType-Menu", Command_ChangeMenuType);
+        
+        foreach (string command in config.MenuManagerConfig.ReloadConfigCommands)
+            AddCommand(command, "CS2MenuManager-ReloadConfig", Command_ReloadConfig);
 
         Config = config;
     }
@@ -44,15 +55,15 @@ public class CS2MenuManager_Menu : BasePlugin, IPluginConfig<Config>
 
         PlayerMenu menu = new(Localizer.ForPlayer(player, "MenuManager Title"), this);
 
-        menu.AddItem(Localizer.ForPlayer(player, "Change Resolution"), (p, o) =>
+        menu.AddItem(Localizer.ForPlayer(player, "Change Resolution"), (p, _) =>
         {
-            ResolutionManager.ResolutionMenuByType(typeof(PlayerMenu), player, this, menu)
+            ResolutionManager.ResolutionMenuByType(typeof(PlayerMenu), p, this, menu)
                 .Display(player, 0);
         });
 
-        menu.AddItem(Localizer.ForPlayer(player, "Change Menu Type"), (p, o) =>
+        menu.AddItem(Localizer.ForPlayer(player, "Change Menu Type"), (p, _) =>
         {
-            MenuTypeManager.MenuTypeMenuByType(typeof(PlayerMenu), player, this, menu)
+            MenuTypeManager.MenuTypeMenuByType(typeof(PlayerMenu), p, this, menu)
                 .Display(player, 0);
         });
 
@@ -77,32 +88,12 @@ public class CS2MenuManager_Menu : BasePlugin, IPluginConfig<Config>
             .Display(player, 0);
     }
 
-    /*
-    [ConsoleCommand("css_testme")]
-    public void OnTestMe(CCSPlayerController? player, CommandInfo info)
+    public void Command_ReloadConfig(CCSPlayerController? player, CommandInfo info)
     {
-        if (player == null)
+        string flag = Config.MenuManagerConfig.Flag;
+        if (string.IsNullOrWhiteSpace(flag) || AdminManager.PlayerHasPermissions(player, flag))
             return;
 
-        PlayerMenu menu = new("Test Player Menu", this)
-        {
-            ScreenMenu_ShowResolutionsOption = true,
-            WasdMenu_ExitKeyColor = "Pink",
-            ScreenMenu_SelectKey = "R",
-            ScreenMenu_ScrollUpKey = "D"
-        };
-
-        menu.AddItem("Test Item 1", (p, o) => { p.PrintToChat("Test Item 1 selected");});
-        menu.AddItem("Test Item 2", (p, o) => { p.PrintToChat("Test Item 2 selected"); });
-        menu.AddItem("Test Item 3", (p, o) => { p.PrintToChat("Test Item 3 selected"); });
-        menu.AddItem($"Test Reset", (p, o) => { p.PrintToChat("Test Reset selected"); o.PostSelectAction = PostSelectAction.Reset; o.Text = "Reset"; });
-        menu.AddItem($"Test Nothing", (p, o) => { p.PrintToChat("Test Nothing selected"); o.PostSelectAction = PostSelectAction.Nothing; o.Text = "Nothing"; });
-        menu.AddItem("Test Item 6", (p, o) => { p.PrintToChat("Test Item 6 selected"); });
-        menu.AddItem("Test Item 7", (p, o) => { p.PrintToChat("Test Item 7 selected"); });
-        menu.AddItem($"Test Reset", (p, o) => { p.PrintToChat("Test Reset selected"); o.PostSelectAction = PostSelectAction.Reset; o.Text = "Reset";  });
-        menu.AddItem($"Test Nothing", (p, o) => { p.PrintToChat("Test Nothing selected"); o.PostSelectAction = PostSelectAction.Nothing; o.Text = "Nothing"; });
-
-        menu.Display(player, 0);
+        MenuManager.ReloadConfig();
     }
-    */
 }

@@ -1,11 +1,10 @@
-﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Translations;
 using CS2MenuManager.API.Class;
 using CS2MenuManager.API.Enum;
 using CS2MenuManager.API.Interface;
 using System.Drawing;
-using System.Runtime.CompilerServices;
 using System.Text;
 using static CounterStrikeSharp.API.Core.Listeners;
 using static CS2MenuManager.API.Class.Buttons;
@@ -62,7 +61,7 @@ public class ScreenMenuInstance : BaseMenuInstance
     private CPointWorldText? WorldText;
     private CPointWorldText? WorldTextDisabled;
     private CCSGOViewModel? OldViewModel;
-    private float OldVelocityModifier;
+    private readonly float OldVelocityModifier;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ScreenMenuInstance"/> class.
@@ -106,24 +105,26 @@ public class ScreenMenuInstance : BaseMenuInstance
     {
         if (Menu is not ScreenMenu screenMenu)
             return;
+        
+        List<(string Text, int GlobalIndex, bool Disabled)> visibleOptions = GetVisibleOptions();
+
+        int maxLength = visibleOptions.Max(x => x.Text.Length);
 
         StringBuilder noneOptions = new();
-        StringBuilder disabledOptions = new();
-
-        disabledOptions.AppendLine(Menu.Title);
+        StringBuilder disabledOptions = new(Menu.Title);
+        
+        string line = new('\u00A0', maxLength);
         noneOptions.AppendLine();
+        disabledOptions.AppendLine(line);
 
-        List<(string Text, int GlobalIndex, bool disabled)> visibleOptions = GetVisibleOptions();
-
-        int maxLength = 0;
         for (int i = 0; i < visibleOptions.Count; i++)
         {
-            (string text, int _, bool disabled) = visibleOptions[i];
+            (string text, _, bool disabled) = visibleOptions[i];
 
             string displayLine = screenMenu.ScreenMenu_MenuType switch
             {
                 MenuType.KeyPress => text,
-                MenuType.Scrollable or MenuType.Both => (i == CurrentChoiceIndex) ? $"> {text}" : text,
+                MenuType.Scrollable or MenuType.Both => i == CurrentChoiceIndex ? $"> {text}" : text,
                 _ => string.Empty
             };
 
@@ -137,9 +138,6 @@ public class ScreenMenuInstance : BaseMenuInstance
                 noneOptions.AppendLine(displayLine);
                 disabledOptions.AppendLine();
             }
-
-            if (maxLength < text.Length)
-                maxLength = text.Length;
         }
 
         noneOptions.AppendLine();
@@ -149,12 +147,10 @@ public class ScreenMenuInstance : BaseMenuInstance
         {
             noneOptions.AppendLine();
             noneOptions.AppendLine();
+
             disabledOptions.AppendLine(Player.Localizer("ScrollKey", screenMenu.ScreenMenu_ScrollUpKey, screenMenu.ScreenMenu_ScrollDownKey));
             disabledOptions.AppendLine(Player.Localizer("SelectKey", screenMenu.ScreenMenu_SelectKey));
         }
-
-        for (int i = 0; i < maxLength + 2; i++)
-            disabledOptions.Append('ᅠ');
 
         UpdateWorldText(ref WorldText, noneOptions.ToString(), false, screenMenu, screenMenu.ScreenMenu_TextColor);
         UpdateWorldText(ref WorldTextDisabled, disabledOptions.ToString(), true, screenMenu, screenMenu.ScreenMenu_DisabledTextColor);
@@ -239,7 +235,7 @@ public class ScreenMenuInstance : BaseMenuInstance
             if (vectorData.Value.Size.HasValue)
                 WorldText.FontSize = vectorData.Value.Size.Value;
 
-            WorldText.Teleport(vectorData.Value.Position, vectorData.Value.Angle, null);
+            WorldText.Teleport(vectorData.Value.Position, vectorData.Value.Angle);
             WorldText.AcceptInput("SetParent", viewModel, null, "!activator");
         }
 
@@ -248,7 +244,7 @@ public class ScreenMenuInstance : BaseMenuInstance
             if (vectorData.Value.Size.HasValue)
                 WorldTextDisabled.FontSize = vectorData.Value.Size.Value;
 
-            WorldTextDisabled.Teleport(vectorData.Value.Position, vectorData.Value.Angle, null);
+            WorldTextDisabled.Teleport(vectorData.Value.Position, vectorData.Value.Angle);
             WorldTextDisabled.AcceptInput("SetParent", viewModel, null, "!activator");
         }
     }
@@ -410,15 +406,17 @@ public class ScreenMenuInstance : BaseMenuInstance
 
     private void OnCheckTransmit(CCheckTransmitInfoList infoList)
     {
-        if (WorldText == null || WorldTextDisabled == null) return;
+        if (WorldText == null || WorldTextDisabled == null)
+            return;
 
         foreach ((CCheckTransmitInfo info, CCSPlayerController? player) in infoList)
         {
             if (player == null || player == Player)
                 continue;
 
-            info.TransmitEntities.Remove(WorldText);
-            info.TransmitEntities.Remove(WorldTextDisabled);
+            CFixedBitVecBase entities = info.TransmitEntities;
+            entities.Remove(WorldText);
+            entities.Remove(WorldTextDisabled);
         }
     }
 

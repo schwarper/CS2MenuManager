@@ -33,7 +33,7 @@ public abstract partial class BaseMenu(string title, BasePlugin plugin) : IMenu
     /// <summary>
     /// Gets or sets the time duration for which the menu is displayed.
     /// </summary>
-    public int MenuTime { get; set; } = 0;
+    public int MenuTime { get; set; }
 
     /// <summary>
     /// Gets or sets the previous menu.
@@ -94,19 +94,16 @@ public abstract partial class BaseMenu(string title, BasePlugin plugin) : IMenu
     public void DisplayToAll(int time)
     {
         List<CCSPlayerController> players = Utilities.GetPlayers();
-        foreach (CCSPlayerController player in players)
+        foreach (CCSPlayerController player in players.Where(player => !player.IsBot))
         {
-            if (player.IsBot)
-                continue;
-
             Display(player, time);
         }
     }
 
     /// <summary>
     /// Displays the menu to all players for a specified duration, starting from the given item.
-    /// <param name="firstItem">First item to begin drawing from.</param>
     /// </summary>
+    /// <param name="firstItem">First item to begin drawing from.</param>
     /// <param name="time">The duration for which the menu is displayed.</param>
     public void DisplayAtToAll(int firstItem, int time)
     {
@@ -128,7 +125,7 @@ public abstract partial class BaseMenu(string title, BasePlugin plugin) : IMenu
 /// <param name="menu">The menu associated with this instance.</param>
 public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) : IMenuInstance
 {
-    private bool _disposed = false;
+    private bool _disposed;
 
     /// <summary>
     /// Gets or the player associated with this menu instance.
@@ -138,12 +135,12 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     /// <summary>
     /// Gets or sets the current page number of the menu.
     /// </summary>
-    public int Page { get; set; }
+    public int Page { get; private set; }
 
     /// <summary>
     /// Gets or sets the current offset of the menu items.
     /// </summary>
-    public int CurrentOffset { get; set; }
+    public int CurrentOffset { get; private set; }
 
     /// <summary>
     /// Gets the number of items displayed per page.
@@ -300,12 +297,16 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
 
     internal void RegisterOnKeyPress()
     {
-        if (Menu is WasdMenu || (Menu is ScreenMenu screenMenu && screenMenu.ScreenMenu_MenuType == MenuType.Scrollable))
+        if (Menu is WasdMenu or ScreenMenu { ScreenMenu_MenuType: MenuType.Scrollable })
             return;
 
         for (int i = 0; i <= 9; i++)
         {
             int key = i;
+
+            _keyCommands[$"css_{i}"] = Func;
+            Menu.Plugin.AddCommand($"css_{i}", "Command Key Handler", Func);
+            continue;
 
             void Func(CCSPlayerController? player, CommandInfo info)
             {
@@ -314,15 +315,12 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
 
                 MenuManager.OnKeyPress(player, key);
             }
-
-            _keyCommands[$"css_{i}"] = Func;
-            Menu.Plugin.AddCommand($"css_{i}", "Command Key Handler", Func);
         }
     }
 
-    internal void DeregisterOnKeyPress()
+    private void DeregisterOnKeyPress()
     {
-        if (Menu is WasdMenu || (Menu is ScreenMenu screenMenu && screenMenu.ScreenMenu_MenuType == MenuType.Scrollable))
+        if (Menu is WasdMenu or ScreenMenu { ScreenMenu_MenuType: MenuType.Scrollable })
             return;
 
         foreach (KeyValuePair<string, CommandCallback> kvp in _keyCommands)
@@ -336,7 +334,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
         Menu.Plugin.RegisterEventHandler<EventPlayerDisconnect>(OnPlayerDisconnect);
     }
 
-    internal void DeregisterPlayerDisconnectEvent()
+    private void DeregisterPlayerDisconnectEvent()
     {
         Menu.Plugin.DeregisterEventHandler<EventPlayerDisconnect>(OnPlayerDisconnect);
     }
@@ -359,18 +357,18 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     /// <summary>
     /// Disposes the menu instance.
     /// </summary>
-    protected virtual void Dispose(bool disposing)
+    private void Dispose(bool disposing)
     {
-        if (!_disposed)
+        if (_disposed)
+            return;
+        
+        if (disposing)
         {
-            if (disposing)
-            {
-                DeregisterOnKeyPress();
-                DeregisterPlayerDisconnectEvent();
-                MenuManager.DisposeActiveMenu(Player);
-            }
-
-            _disposed = true;
+            DeregisterOnKeyPress();
+            DeregisterPlayerDisconnectEvent();
+            MenuManager.DisposeActiveMenu(Player);
         }
+
+        _disposed = true;
     }
 }

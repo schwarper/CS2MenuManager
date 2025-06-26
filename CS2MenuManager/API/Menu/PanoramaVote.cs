@@ -80,7 +80,7 @@ public class PanoramaVoteInstance : BaseVoteInstance
 
     private HookResult OnVoteCast(EventVoteCast @event, GameEventInfo info)
     {
-        if (@event.Userid is not CCSPlayerController player)
+        if (@event.Userid is not { } player)
             return HookResult.Continue;
 
         VoteMenu.Handler?.Invoke(YesNoVoteAction.VoteAction_Vote, player.Slot, (CastVote)@event.VoteOption);
@@ -145,13 +145,10 @@ public class PanoramaVoteInstance : BaseVoteInstance
 
         VoteMenu.Handler?.Invoke(YesNoVoteAction.VoteAction_End, (int)reason, 0);
 
-        if (VoteController == null || VoteMenu.Result == null || reason == YesNoVoteEndReason.VoteEnd_Cancelled)
+        if (reason == YesNoVoteEndReason.VoteEnd_Cancelled)
         {
             SendVoteFailed(reason);
-
-            if (VoteController != null)
-                VoteController.ActiveIssueIndex = -1;
-
+            VoteController.ActiveIssueIndex = -1;
             ActiveVoteEnded = true;
             Close();
             return;
@@ -160,13 +157,13 @@ public class PanoramaVoteInstance : BaseVoteInstance
         YesNoVoteInfo info = new()
         {
             TotalClients = VoterCount,
-            YesVotes = VoteController!.VoteOptionCount[(int)CastVote.VOTE_OPTION1],
-            NoVotes = VoteController!.VoteOptionCount[(int)CastVote.VOTE_OPTION2],
-            TotalVotes = VoteController!.VoteOptionCount[(int)CastVote.VOTE_OPTION1] + VoteController!.VoteOptionCount[(int)CastVote.VOTE_OPTION2]
+            YesVotes = VoteController.VoteOptionCount[(int)CastVote.VOTE_OPTION1],
+            NoVotes = VoteController.VoteOptionCount[(int)CastVote.VOTE_OPTION2],
+            TotalVotes = VoteController.VoteOptionCount[(int)CastVote.VOTE_OPTION1] + VoteController.VoteOptionCount[(int)CastVote.VOTE_OPTION2]
         };
 
         for (int i = 0; i < CurrentVotefilter.Count; i++)
-            info.ClientInfo[i] = i < VoterCount ? (Voters[i], VoteController!.VotesCast[Voters[i]]) : (-1, -1);
+            info.ClientInfo[i] = i < VoterCount ? (Voters[i], VoteController.VotesCast[Voters[i]]) : (-1, -1);
 
         if (VoteMenu.Result(info))
             SendVotePassed("#SFUI_vote_passed_panorama_vote", "Vote Passed!");

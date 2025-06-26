@@ -15,22 +15,23 @@ namespace CS2MenuManager.API.Class;
 
 internal static partial class Library
 {
+    private const float TOLERANCE = 0.0001f;
     [GeneratedRegex("<[^>]+>", RegexOptions.Compiled)] private static partial Regex TagRegex();
 
     public readonly record struct VectorData(Vector Position, QAngle Angle, float? Size);
 
-    public static CCSPlayerPawn? GetPlayerPawn(this CCSPlayerController player)
+    private static CCSPlayerPawn? GetPlayerPawn(this CCSPlayerController player)
     {
-        if (player.Pawn.Value is not CBasePlayerPawn pawn)
+        if (player.Pawn.Value is not { } pawn)
             return null;
 
-        if (pawn.LifeState == (byte)LifeState_t.LIFE_DEAD)
-        {
-            if (pawn.ObserverServices?.ObserverTarget.Value?.As<CBasePlayerPawn>() is not CBasePlayerPawn observer)
-                return null;
-
-            pawn = observer;
-        }
+        if (pawn.LifeState != (byte)LifeState_t.LIFE_DEAD)
+            return pawn.As<CCSPlayerPawn>();
+        
+        if (pawn.ObserverServices?.ObserverTarget.Value?.As<CBasePlayerPawn>() is not { } observer)
+            return null;
+        
+        pawn = observer;
 
         return pawn.As<CCSPlayerPawn>();
     }
@@ -43,7 +44,7 @@ internal static partial class Library
 
         ResolutionManager.Resolution resolution = ResolutionManager.GetPlayerResolution(player);
 
-        QAngle eyeAngles = playerPawn!.EyeAngles;
+        QAngle eyeAngles = playerPawn.EyeAngles;
         Vector forward = new(), right = new(), up = new();
         NativeAPI.AngleVectors(eyeAngles.Handle, forward.Handle, right.Handle, up.Handle);
 
@@ -76,7 +77,7 @@ internal static partial class Library
     {
         float fov = controller.DesiredFOV == 0 ? 90 : controller.DesiredFOV;
 
-        if (fov == 90)
+        if (Math.Abs(fov - 90) < TOLERANCE)
             return (x, y, size);
 
         float scaleFactor = (float)Math.Tan((fov / 2) * Math.PI / 180) / (float)Math.Tan(45 * Math.PI / 180);
@@ -101,13 +102,13 @@ internal static partial class Library
         IntPtr viewModelHandleAddress = playerPawn.ViewModelServices.Handle + offset + 4;
 
         CHandle<CCSGOViewModel> handle = new(viewModelHandleAddress);
-        if (!handle.IsValid)
-        {
-            CCSGOViewModel viewmodel = Utilities.CreateEntityByName<CCSGOViewModel>("predicted_viewmodel")!;
-            viewmodel.DispatchSpawn();
-            handle.Raw = viewmodel.EntityHandle.Raw;
-            Utilities.SetStateChanged(playerPawn, "CCSPlayerPawnBase", "m_pViewModelServices");
-        }
+        if (handle.IsValid)
+            return handle.Value;
+        
+        CCSGOViewModel viewmodel = Utilities.CreateEntityByName<CCSGOViewModel>("predicted_viewmodel")!;
+        viewmodel.DispatchSpawn();
+        handle.Raw = viewmodel.EntityHandle.Raw;
+        Utilities.SetStateChanged(playerPawn, "CCSPlayerPawnBase", "m_pViewModelServices");
 
         return handle.Value;
     }
@@ -116,7 +117,7 @@ internal static partial class Library
     {
         CPointWorldText entity = Utilities.CreateEntityByName<CPointWorldText>("point_worldtext")!;
 
-        if (entity == null || !entity.IsValid)
+        if (!entity.IsValid)
             return null;
 
         entity.MessageText = text;
@@ -151,7 +152,7 @@ internal static partial class Library
         CPointWorldText? entity = CreateWorldText("       ", 35, Color.Orange, "Arial", false, 0f);
         if (entity == null) { instance.Close(false); return; }
 
-        entity.Teleport(vectorData.Value.Position, vectorData.Value.Angle, null);
+        entity.Teleport(vectorData.Value.Position, vectorData.Value.Angle);
         entity.AcceptInput("SetParent", viewModel, null, "!activator");
 
         entity.Remove();
@@ -175,7 +176,7 @@ internal static partial class Library
             playerPawn.VelocityModifier = oldModifier;
     }
 
-    public static string Localizer(this CCSPlayerController player, string key, params string[] args)
+    public static string Localizer(this CCSPlayerController player, string key, params object?[] args)
     {
         CultureInfo cultureInfo = player.GetLanguage();
 
@@ -238,19 +239,6 @@ internal static partial class Library
         return result.ToString();
     }
 
-    public static void SetIfPresent<T>(this TomlTable table, string key, Action<T> setter)
-    {
-        string[] split = key.Split('.', StringSplitOptions.TrimEntries);
-
-        if (table.TryGetValue(split[0], out object? innerValue) && innerValue is TomlTable innerTable)
-        {
-            if (innerTable.TryGetValue(split[1], out object? value) && value is T typedValue)
-            {
-                setter(typedValue);
-            }
-        }
-    }
-
     public static char GetChatColor(this string colorName)
     {
         return (char)typeof(ChatColors).GetField(colorName)?.GetValue(null)!;
@@ -258,18 +246,17 @@ internal static partial class Library
 
     public static T GetValueOrDefault<T>(this TomlTable table, string key, T defaultValue)
     {
-        if (table.TryGetValue(key, out object? value))
+        if (!table.TryGetValue(key, out object value))
+            return defaultValue;
+        
+        try
         {
-            try
-            {
-                return (T)Convert.ChangeType(value, typeof(T));
-            }
-            catch
-            {
-                return defaultValue;
-            }
+            return (T)Convert.ChangeType(value, typeof(T));
         }
-        return defaultValue;
+        catch
+        {
+            return defaultValue;
+        }
     }
 
     public static Color HexToColor(this string hex)

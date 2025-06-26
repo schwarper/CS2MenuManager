@@ -7,7 +7,7 @@ namespace CS2MenuManager.API.Class;
 
 internal static class Database
 {
-    private static readonly string GlobalDatabaseConnectionString = string.Empty;
+    private static readonly string GlobalDatabaseConnectionString;
     internal static readonly bool IsMYSQLSet;
 
     static Database()
@@ -43,7 +43,7 @@ internal static class Database
         IsMYSQLSet = true;
     }
 
-    public static async Task<MySqlConnection> ConnectAsync()
+    private static async Task<MySqlConnection> ConnectAsync()
     {
         MySqlConnection connection = new(GlobalDatabaseConnectionString);
         await connection.OpenAsync();
@@ -58,24 +58,26 @@ internal static class Database
         Task.Run(CreateDatabaseAsync);
     }
 
-    public static async Task CreateDatabaseAsync()
+    private static async Task CreateDatabaseAsync()
     {
-        using DbConnection connection = await ConnectAsync();
+        await using DbConnection connection = await ConnectAsync();
 
-        await connection.ExecuteAsync(@"
-            CREATE TABLE IF NOT EXISTS cs2_menu_manager (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                PositionX FLOAT,
-                PositionY FLOAT,
-                Menu VARCHAR(255),
-                SteamID BIGINT UNSIGNED NOT NULL UNIQUE
-            );
-        ");
+        await connection.ExecuteAsync("""
+
+                                                  CREATE TABLE IF NOT EXISTS cs2_menu_manager (
+                                                      id INT AUTO_INCREMENT PRIMARY KEY,
+                                                      PositionX FLOAT,
+                                                      PositionY FLOAT,
+                                                      Menu VARCHAR(255),
+                                                      SteamID BIGINT UNSIGNED NOT NULL UNIQUE
+                                                  );
+                                              
+                                      """);
     }
 
     public static async Task<(float PositionX, float PositionY)> Select(ulong SteamID)
     {
-        using DbConnection connection = await ConnectAsync();
+        await using DbConnection connection = await ConnectAsync();
 
         (float, float)? row = await connection.QueryFirstOrDefaultAsync<(float, float)?>(
             "SELECT PositionX, PositionY FROM cs2_menu_manager WHERE SteamID = @SteamID;",
@@ -91,7 +93,7 @@ internal static class Database
 
     public static async Task Insert(ulong SteamID, float PositionX, float PositionY)
     {
-        using MySqlConnection connection = await ConnectAsync();
+        await using MySqlConnection connection = await ConnectAsync();
 
         await connection.ExecuteAsync(@"
             INSERT INTO cs2_menu_manager (PositionX, PositionY, SteamID)
@@ -102,7 +104,7 @@ internal static class Database
 
     public static async Task<string?> SelectMenu(ulong SteamID)
     {
-        using DbConnection connection = await ConnectAsync();
+        await using DbConnection connection = await ConnectAsync();
 
         string? row = await connection.QueryFirstOrDefaultAsync<string?>(
             "SELECT Menu FROM cs2_menu_manager WHERE SteamID = @SteamID;",
@@ -113,12 +115,14 @@ internal static class Database
 
     public static async Task InsertMenu(ulong SteamID, string Menu)
     {
-        using MySqlConnection connection = await ConnectAsync();
+        await using MySqlConnection connection = await ConnectAsync();
 
-        await connection.ExecuteAsync(@"
-            INSERT INTO cs2_menu_manager (Menu, SteamID)
-            VALUES (@Menu, @SteamID)
-            ON DUPLICATE KEY UPDATE Menu = VALUES(Menu);"
-        , new { Menu, SteamID });
+        await connection.ExecuteAsync("""
+
+                                                  INSERT INTO cs2_menu_manager (Menu, SteamID)
+                                                  VALUES (@Menu, @SteamID)
+                                                  ON DUPLICATE KEY UPDATE Menu = VALUES(Menu);
+                                      """
+            , new { Menu, SteamID });
     }
 }

@@ -41,23 +41,23 @@ public static class MenuManager
     /// <param name="player">The player controller.</param>
     public static void CloseActiveMenu(CCSPlayerController player)
     {
-        if (ActiveMenus.TryGetValue(player.SteamID, out (IMenuInstance Instance, Timer? Timer) value))
-        {
-            value.Instance.Close(true);
-            value.Timer?.Kill();
-            value.Timer = null;
-            ActiveMenus.Remove(player.SteamID);
-        }
+        if (!ActiveMenus.TryGetValue(player.SteamID, out (IMenuInstance Instance, Timer? Timer) value))
+            return;
+        
+        value.Instance.Close(true);
+        value.Timer?.Kill();
+        value.Timer = null;
+        ActiveMenus.Remove(player.SteamID);
     }
 
     internal static void DisposeActiveMenu(CCSPlayerController player)
     {
-        if (ActiveMenus.TryGetValue(player.SteamID, out (IMenuInstance Instance, Timer? Timer) value))
-        {
-            value.Timer?.Kill();
-            value.Timer = null;
-            ActiveMenus.Remove(player.SteamID);
-        }
+        if (!ActiveMenus.TryGetValue(player.SteamID, out (IMenuInstance Instance, Timer? Timer) value))
+            return;
+        
+        value.Timer?.Kill();
+        value.Timer = null;
+        ActiveMenus.Remove(player.SteamID);
     }
 
     /// <summary>
@@ -71,6 +71,12 @@ public static class MenuManager
     public static void OpenMenu<TMenu>(CCSPlayerController player, TMenu menu, int? firstItem, Func<CCSPlayerController, TMenu, IMenuInstance> createInstance)
         where TMenu : IMenu
     {
+        if (menu.ItemOptions.Count == 0)
+        {
+            player.PrintToChat(player.Localizer("OptionListEmpty"));
+            return;
+        }
+
         CloseActiveMenu(player);
 
         Server.NextFrame(() =>
@@ -122,12 +128,12 @@ public static class MenuManager
     }
 
     /// <summary>
-    /// Creates a menu instance of specified type
+    /// Creates a menu instance of a specified type
     /// </summary>
     /// <typeparam name="T">Type of menu to create (must implement BaseMenu)</typeparam>
     /// <param name="title">The title of the menu.</param>
     /// <param name="plugin">The plugin associated with the menu.</param>
-    /// <returns>New menu instance of requested type</returns>
+    /// <returns>New menu instance of a requested type</returns>
     public static T CreateMenu<T>(string title, BasePlugin plugin) where T : BaseMenu
     {
         return (T)MenuByType(typeof(T), title, plugin);
@@ -139,17 +145,17 @@ public static class MenuManager
     /// <param name="menuType">Type of menu to create</param>
     /// <param name="title">The title of the menu.</param>
     /// <param name="plugin">The plugin associated with the menu.</param>
-    /// <returns>New menu instance of requested type</returns>
+    /// <returns>New menu instance of a requested type</returns>
     public static BaseMenu MenuByType(Type menuType, string title, BasePlugin plugin)
     {
         return menuType switch
         {
-            Type t when t == typeof(PlayerMenu) => new PlayerMenu(title, plugin),
-            Type t when t == typeof(ChatMenu) => new ChatMenu(title, plugin),
-            Type t when t == typeof(ConsoleMenu) => new ConsoleMenu(title, plugin),
-            Type t when t == typeof(CenterHtmlMenu) => new CenterHtmlMenu(title, plugin),
-            Type t when t == typeof(WasdMenu) => new WasdMenu(title, plugin),
-            Type t when t == typeof(ScreenMenu) => new ScreenMenu(title, plugin),
+            { } t when t == typeof(PlayerMenu) => new PlayerMenu(title, plugin),
+            { } t when t == typeof(ChatMenu) => new ChatMenu(title, plugin),
+            { } t when t == typeof(ConsoleMenu) => new ConsoleMenu(title, plugin),
+            { } t when t == typeof(CenterHtmlMenu) => new CenterHtmlMenu(title, plugin),
+            { } t when t == typeof(WasdMenu) => new WasdMenu(title, plugin),
+            { } t when t == typeof(ScreenMenu) => new ScreenMenu(title, plugin),
             _ => throw new ArgumentException($"Unsupported menu type: {menuType.FullName}", nameof(menuType))
         };
     }
@@ -160,7 +166,7 @@ public static class MenuManager
     /// <param name="menuType">Type of menu to create</param>
     /// <param name="title">The title of the menu.</param>
     /// <param name="plugin">The plugin associated with the menu.</param>
-    /// <returns>New menu instance of requested type</returns>
+    /// <returns>New menu instance of a requested type</returns>
     public static BaseMenu MenuByType(string menuType, string title, BasePlugin plugin)
     {
         return menuType switch
@@ -173,5 +179,13 @@ public static class MenuManager
             "ScreenMenu" => new ScreenMenu(title, plugin),
             _ => throw new ArgumentException($"Unsupported menu type", nameof(menuType))
         };
+    }
+
+    /// <summary>
+    /// Reloads config variables
+    /// </summary>
+    public static void ReloadConfig()
+    {
+        ConfigManager.LoadConfig();
     }
 }

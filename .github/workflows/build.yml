@@ -81,11 +81,17 @@ jobs:
           body: |
             ## Release Notes for v1.0.${{ env.BUILD_NUMBER }}
 
+            ---
             ### Changes:
             - ${{ github.event.head_commit.message }}
 
+            ---
             ### Feedback:
             - If you encounter any issues, please report them [here](https://github.com/${{ github.repository }}/issues).
+
+            ---
+            ### Support:
+            If you'd like to support the continued development of this project, you can do so by [buying me a coffee](https://buymeacoffee.com/schwarper). Your support is genuinely appreciated.
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1

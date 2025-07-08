@@ -215,7 +215,7 @@ internal static partial class Library
 
                     if (!tag.StartsWith("</", StringComparison.Ordinal))
                     {
-                        string tagName = tag.Split([' ', '>', '/'], StringSplitOptions.RemoveEmptyEntries)[0].TrimStart('<');
+                        string tagName = tag.Split(new[] { ' ', '>', '/' }, StringSplitOptions.RemoveEmptyEntries)[0].TrimStart('<');
                         if (!tag.EndsWith("/>", StringComparison.Ordinal) && !tagName.StartsWith('!'))
                             tagStack.Push(tagName);
                     }

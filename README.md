@@ -26,7 +26,7 @@ Discord link : [Discord server](https://discord.gg/4zQfUzjk36)
 ## Creating Menus
 You can create any type of menu. All menu types have a similar structure. Here's an example of how to create a Chat Menu:
 
-Supported menus: `ChatMenu`, `ConsoleMenu`, `CenterHtmlMenu`, `WasdMenu`, `ScreenMenu`, `PanoramaVote`, `PlayerMenu`
+Supported menus: `ChatMenu`, `ConsoleMenu`, `CenterHtmlMenu`, `WasdMenu`, `PanoramaVote`, `PlayerMenu`
 ```csharp
 ChatMenu menu = new("Title", this);
 
@@ -162,7 +162,6 @@ public void VoteHandlerCallback(YesNoVoteAction action, int param1, CastVote par
 ## This project was prepared with the help of the following sources.
 * `ChatMenu`,`ConsoleMenu`,`CenterHtmlMenu` => [CounterStrikeSharp](https://github.com/roflmuffin/CounterStrikeSharp) by [roflmuffin](https://github.com/roflmuffin)
 * `WasdMenu` => [WasdMenuAPI](https://github.com/Interesting-exe/WASDMenuAPI) by [Interesting-exe](https://github.com/Interesting-exe)
-* `ScreenMenu` => [CS2ScreenMenuAPI](https://github.com/T3Marius/CS2ScreenMenuAPI) by [T3Marius](https://github.com/T3Marius)
 * `PanoramaVote` => [SLAYER_PanoramaVote](https://github.com/zakriamansoor47/SLAYER_PanoramaVote) by [zakriamansoor47](https://github.com/zakriamansoor47)
 
 # Images
@@ -179,10 +178,5 @@ public void VoteHandlerCallback(YesNoVoteAction action, int param1, CastVote par
 ## Wasd Menu
 ![Wasd Menu](images/wasdmenu.png)
 
-## Screen Menu
-![Screen Menu](images/screenmenu1.png)
-
-![Screen Menu](images/screenmenu2.png)
-
 ## Panorama Vote
-![Screen Menu](images/panoramavote.png)
+![Panorama Vote](images/panoramavote.png)

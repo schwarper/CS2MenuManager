@@ -21,8 +21,7 @@ public static class MenuManager
         { "ConsoleMenu", typeof(ConsoleMenu) },
         { "ChatMenu", typeof(ChatMenu) },
         { "WasdMenu", typeof(WasdMenu) },
-        { "CenterHtmlMenu", typeof(CenterHtmlMenu) },
-        { "ScreenMenu", typeof(ScreenMenu) }
+        { "CenterHtmlMenu", typeof(CenterHtmlMenu) }
     };
 
     /// <summary>
@@ -43,7 +42,7 @@ public static class MenuManager
     {
         if (!ActiveMenus.TryGetValue(player.SteamID, out (IMenuInstance Instance, Timer? Timer) value))
             return;
-        
+
         value.Instance.Close(true);
         value.Timer?.Kill();
         value.Timer = null;
@@ -54,7 +53,7 @@ public static class MenuManager
     {
         if (!ActiveMenus.TryGetValue(player.SteamID, out (IMenuInstance Instance, Timer? Timer) value))
             return;
-        
+
         value.Timer?.Kill();
         value.Timer = null;
         ActiveMenus.Remove(player.SteamID);
@@ -82,9 +81,6 @@ public static class MenuManager
         Server.NextFrame(() =>
         {
             IMenuInstance instance = createInstance.Invoke(player, menu);
-
-            if (instance is ScreenMenuInstance screenMenuInstance)
-                player.CreateFakeWorldText(screenMenuInstance);
 
             if (instance is BaseMenuInstance baseMenuInstance)
             {
@@ -155,7 +151,6 @@ public static class MenuManager
             { } t when t == typeof(ConsoleMenu) => new ConsoleMenu(title, plugin),
             { } t when t == typeof(CenterHtmlMenu) => new CenterHtmlMenu(title, plugin),
             { } t when t == typeof(WasdMenu) => new WasdMenu(title, plugin),
-            { } t when t == typeof(ScreenMenu) => new ScreenMenu(title, plugin),
             _ => throw new ArgumentException($"Unsupported menu type: {menuType.FullName}", nameof(menuType))
         };
     }
@@ -176,7 +171,6 @@ public static class MenuManager
             "ConsoleMenu" => new ConsoleMenu(title, plugin),
             "CenterHtmlMenu" => new CenterHtmlMenu(title, plugin),
             "WasdMenu" => new WasdMenu(title, plugin),
-            "ScreenMenu" => new ScreenMenu(title, plugin),
             _ => throw new ArgumentException($"Unsupported menu type", nameof(menuType))
         };
     }

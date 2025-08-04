@@ -1,9 +1,9 @@
-﻿using CounterStrikeSharp.API;
+﻿using System.Text;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CS2MenuManager.API.Class;
 using CS2MenuManager.API.Enum;
 using CS2MenuManager.API.Interface;
-using System.Text;
 using static CounterStrikeSharp.API.Core.Listeners;
 using static CS2MenuManager.API.Class.Buttons;
 using static CS2MenuManager.API.Class.ConfigManager;
@@ -81,7 +81,7 @@ public class WasdMenuInstance : BaseMenuInstance
             { wasdMenu.WasdMenu_PrevKey, PrevSubMenu },
             { wasdMenu.WasdMenu_ExitKey, () => { if (Menu.ExitButton) Close(true); } }
         };
-        
+
         Player.SaveSpeed(ref OldVelocityModifier);
     }
 
@@ -91,7 +91,7 @@ public class WasdMenuInstance : BaseMenuInstance
     public override void Display()
     {
         if (Menu is not WasdMenu wasdMenu) return;
- 
+
         string leftArrow = $"<font color='{wasdMenu.WasdMenu_ArrowColor}'>▶ [</font>";
         string rightArrow = $"<font color='{wasdMenu.WasdMenu_ArrowColor}'> ] ◀</font>";
 
@@ -175,7 +175,7 @@ public class WasdMenuInstance : BaseMenuInstance
 
             if ((button & mappedBtn) != 0 || (OldButton & mappedBtn) == 0)
                 continue;
-            
+
             kvp.Value.Invoke();
             break;
         }
@@ -184,7 +184,7 @@ public class WasdMenuInstance : BaseMenuInstance
 
         if (!string.IsNullOrEmpty(DisplayString))
             Player.PrintToCenterHtml(DisplayString);
-        
+
         if (((WasdMenu)Menu).WasdMenu_FreezePlayer)
             Player.Freeze();
     }

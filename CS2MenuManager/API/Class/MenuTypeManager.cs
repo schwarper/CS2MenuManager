@@ -68,7 +68,7 @@ public static class MenuTypeManager
 
         if (!IsMYSQLSet)
             return menuType;
-        
+
         string menuTypeStr = MenuTypesList.FirstOrDefault(x => x.Value == menuType).Key;
 
         if (menuTypeStr == null)

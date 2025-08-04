@@ -1,6 +1,4 @@
-﻿using CS2MenuManager.API.Enum;
-using System.Drawing;
-using static CS2MenuManager.API.Class.ConfigManager;
+﻿using static CS2MenuManager.API.Class.ConfigManager;
 
 namespace CS2MenuManager.API.Class;
 
@@ -24,20 +22,12 @@ public abstract partial class BaseMenu
             }
         }
     }
-    
+
     private static T ConditionalSet<T>(T defaultValue, T newValue)
-        => Config.ForceConfigSettings ? defaultValue : newValue;
-    
-    private static MenuType GetDefaultMenuType()
     {
-        return Config.ScreenMenu.MenuType switch
-        {
-            { Length: > 0 } text when char.ToLower(text[0]) == 's' => MenuType.Scrollable,
-            { Length: > 0 } text when char.ToLower(text[0]) == 'k' => MenuType.KeyPress,
-            _ => MenuType.Both
-        };
+        return Config.ForceConfigSettings ? defaultValue : newValue;
     }
-    
+
     private char _chatMenuTitleColor = Config.ChatMenu.TitleColor;
     private char _chatMenuEnabledColor = Config.ChatMenu.EnabledColor;
     private char _chatMenuDisabledColor = Config.ChatMenu.DisabledColor;
@@ -68,17 +58,6 @@ public abstract partial class BaseMenu
     private string _wasdMenuDisabledOptionColor = Config.WasdMenu.DisabledOptionColor;
     private string _wasdMenuArrowColor = Config.WasdMenu.ArrowColor;
     private bool _wasdMenuFreezePlayer = Config.WasdMenu.FreezePlayer;
-    private Color _screenMenuTextColor = Config.ScreenMenu.TextColor;
-    private Color _screenMenuDisabledTextColor = Config.ScreenMenu.DisabledTextColor;
-    private string _screenMenuFont = Config.ScreenMenu.Font;
-    private int _screenMenuSize = Config.ScreenMenu.Size;
-    private bool _screenMenuFreezePlayer = Config.ScreenMenu.FreezePlayer;
-    private bool _screenMenuShowResolutionsOption = Config.ScreenMenu.ShowResolutionsOption;
-    private string _screenMenuScrollUpKey = Config.Buttons.ScrollUp;
-    private string _screenMenuScrollDownKey = Config.Buttons.ScrollDown;
-    private string _screenMenuExitKey = Config.Buttons.Exit;
-    private string _screenMenuSelectKey = Config.Buttons.Select;
-    private static MenuType _screenMenu_MenuType;
 
     /// <summary>
     /// Gets or sets the color of the title.
@@ -348,104 +327,5 @@ public abstract partial class BaseMenu
     {
         get => _wasdMenuExitKey;
         set => _wasdMenuExitKey = ConditionalSet(Config.Buttons.Exit, value);
-    }
-
-    /// <summary>
-    /// Gets or sets the color of the text.
-    /// </summary>
-    public Color ScreenMenu_TextColor
-    {
-        get => _screenMenuTextColor;
-        set => _screenMenuTextColor = ConditionalSet(Config.ScreenMenu.TextColor, value);
-    }
-
-    /// <summary>
-    /// Gets or sets the color of the disabled text.
-    /// </summary>
-    public Color ScreenMenu_DisabledTextColor
-    {
-        get => _screenMenuDisabledTextColor;
-        set => _screenMenuDisabledTextColor = ConditionalSet(Config.ScreenMenu.DisabledTextColor, value);
-    }
-
-    /// <summary>
-    /// Gets or sets the font used for the text.
-    /// </summary>
-    public string ScreenMenu_Font
-    {
-        get => _screenMenuFont;
-        set => _screenMenuFont = ConditionalSet(Config.ScreenMenu.Font, value);
-    }
-
-    /// <summary>
-    /// Gets or sets the size of the text.
-    /// </summary>
-    public int ScreenMenu_Size
-    {
-        get => _screenMenuSize;
-        set => _screenMenuSize = ConditionalSet(Config.ScreenMenu.Size, value);
-    }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the player is frozen while the menu is open.
-    /// </summary>
-    public bool ScreenMenu_FreezePlayer
-    {
-        get => _screenMenuFreezePlayer;
-        set => _screenMenuFreezePlayer = ConditionalSet(Config.ScreenMenu.FreezePlayer, value);
-    }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the menu shows resolution options.
-    /// </summary>
-    public bool ScreenMenu_ShowResolutionsOption
-    {
-        get => _screenMenuShowResolutionsOption;
-        set => _screenMenuShowResolutionsOption = ConditionalSet(Config.ScreenMenu.ShowResolutionsOption, value);   
-    }
-
-    /// <summary>
-    /// The key binding used to scroll up in the menu.
-    /// </summary>
-    public string ScreenMenu_ScrollUpKey
-    {
-        get => _screenMenuScrollUpKey;
-        set => _screenMenuScrollUpKey = ConditionalSet(Config.Buttons.ScrollUp, value);
-    }
-
-    /// <summary>
-    /// The key binding used to scroll down in the menu.
-    /// </summary>
-    public string ScreenMenu_ScrollDownKey
-    {
-        get => _screenMenuScrollDownKey;
-        set => _screenMenuScrollDownKey = ConditionalSet(Config.Buttons.ScrollDown, value);   
-    }
-
-    /// <summary>
-    /// The key binding used to close the menu.
-    /// </summary>
-    public string ScreenMenu_ExitKey
-    {
-        get => _screenMenuExitKey;
-        set => _screenMenuExitKey = ConditionalSet(Config.Buttons.Exit, value);
-    }
-
-    /// <summary>
-    /// The key binding used to select the currently highlighted menu option.
-    /// </summary>
-    public string ScreenMenu_SelectKey
-    {
-        get => _screenMenuSelectKey;
-        set => _screenMenuSelectKey = ConditionalSet(Config.Buttons.Select, value);
-    }
-
-    /// <summary>
-    /// Defines the types of menus.
-    /// </summary>
-    public MenuType ScreenMenu_MenuType
-    {
-        get => _screenMenu_MenuType;
-        set => _screenMenu_MenuType = ConditionalSet(GetDefaultMenuType(), value);
     }
 }

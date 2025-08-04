@@ -1,6 +1,6 @@
-﻿using Dapper;
+﻿using System.Data.Common;
+using Dapper;
 using MySqlConnector;
-using System.Data.Common;
 using static CS2MenuManager.API.Class.ConfigManager;
 
 namespace CS2MenuManager.API.Class;
@@ -66,40 +66,11 @@ internal static class Database
 
                                                   CREATE TABLE IF NOT EXISTS cs2_menu_manager (
                                                       id INT AUTO_INCREMENT PRIMARY KEY,
-                                                      PositionX FLOAT,
-                                                      PositionY FLOAT,
                                                       Menu VARCHAR(255),
                                                       SteamID BIGINT UNSIGNED NOT NULL UNIQUE
                                                   );
                                               
                                       """);
-    }
-
-    public static async Task<(float PositionX, float PositionY)> Select(ulong SteamID)
-    {
-        await using DbConnection connection = await ConnectAsync();
-
-        (float, float)? row = await connection.QueryFirstOrDefaultAsync<(float, float)?>(
-            "SELECT PositionX, PositionY FROM cs2_menu_manager WHERE SteamID = @SteamID;",
-            new { SteamID });
-
-        if (row.HasValue)
-            return row.Value;
-
-        ResolutionManager.Resolution defaultResolution = ResolutionManager.GetDefaultResolution();
-        await Insert(SteamID, defaultResolution.PositionX, defaultResolution.PositionY);
-        return (defaultResolution.PositionX, defaultResolution.PositionY);
-    }
-
-    public static async Task Insert(ulong SteamID, float PositionX, float PositionY)
-    {
-        await using MySqlConnection connection = await ConnectAsync();
-
-        await connection.ExecuteAsync(@"
-            INSERT INTO cs2_menu_manager (PositionX, PositionY, SteamID)
-            VALUES (@PositionX, @PositionY, @SteamID)
-            ON DUPLICATE KEY UPDATE PositionX = VALUES(PositionX), PositionY = VALUES(PositionY);
-        ", new { PositionX, PositionY, SteamID });
     }
 
     public static async Task<string?> SelectMenu(ulong SteamID)

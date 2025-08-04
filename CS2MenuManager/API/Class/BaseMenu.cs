@@ -178,19 +178,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     protected bool HasExitButton => Menu.ExitButton;
 
     internal int CurrentChoiceIndex;
-    private int _nextProcessTime;
     private readonly Dictionary<string, CommandCallback> _keyCommands = [];
-
-    internal bool ShouldProcess()
-    {
-        int tickCount = Server.TickCount;
-
-        if (tickCount < _nextProcessTime)
-            return false;
-
-        _nextProcessTime = tickCount + 3;
-        return true;
-    }
 
     internal void PrevSubMenu()
     {
@@ -278,7 +266,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
 
         ItemOption menuOption = Menu.ItemOptions[menuItemIndex];
         if (menuOption.DisableOption != DisableOption.None) return;
-        
+
         HandleSelectAction(menuOption);
     }
 
@@ -297,7 +285,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
 
     internal void RegisterOnKeyPress()
     {
-        if (Menu is WasdMenu or ScreenMenu { ScreenMenu_MenuType: MenuType.Scrollable })
+        if (Menu is WasdMenu)
             return;
 
         for (int i = 0; i <= 9; i++)
@@ -320,7 +308,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
 
     private void DeregisterOnKeyPress()
     {
-        if (Menu is WasdMenu or ScreenMenu { ScreenMenu_MenuType: MenuType.Scrollable })
+        if (Menu is WasdMenu)
             return;
 
         foreach (KeyValuePair<string, CommandCallback> kvp in _keyCommands)
@@ -361,7 +349,7 @@ public abstract class BaseMenuInstance(CCSPlayerController player, IMenu menu) :
     {
         if (_disposed)
             return;
-        
+
         if (disposing)
         {
             DeregisterOnKeyPress();

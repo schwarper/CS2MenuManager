@@ -1,10 +1,8 @@
-﻿using CounterStrikeSharp.API;
+﻿using System.Reflection;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Modules.Utils;
-using System.Drawing;
-using System.Reflection;
 using Tomlyn;
 using Tomlyn.Model;
-using static CS2MenuManager.API.Class.ResolutionManager;
 
 namespace CS2MenuManager.API.Class;
 
@@ -19,9 +17,7 @@ internal static class ConfigManager
         public ChatMenuSettings ChatMenu { get; set; } = new();
         public CenterHtmlMenuSettings CenterHtmlMenu { get; set; } = new();
         public WasdMenuSettings WasdMenu { get; set; } = new();
-        public ScreenMenu ScreenMenu { get; set; } = new();
-        public string DefaultMenuType { get; set; } = "ScreenMenu";
-        public Dictionary<string, Resolution> Resolutions { get; set; } = [];
+        public string DefaultMenuType { get; set; } = "WasdMenu";
         public Dictionary<string, Dictionary<string, string>> Lang { get; set; } = [];
     }
 
@@ -88,19 +84,6 @@ internal static class ConfigManager
         public bool FreezePlayer { get; set; }
     }
 
-    public class ScreenMenu
-    {
-        public Color TextColor { get; set; } = Color.FromArgb(232, 155, 27);
-        public Color DisabledTextColor { get; set; } = Color.FromArgb(231, 210, 177);
-        public float PositionX { get; set; } = -5.5f;
-        public float PositionY { get; set; }
-        public string Font { get; set; } = "Tahoma Bold";
-        public int Size { get; set; } = 32;
-        public bool FreezePlayer { get; set; }
-        public bool ShowResolutionsOption { get; set; } = true;
-        public string MenuType { get; set; } = "Both";
-    }
-
     public static Cfg Config { get; set; } = new();
     private static readonly string ConfigFilePath;
 
@@ -133,8 +116,6 @@ internal static class ConfigManager
         LoadChatMenuConfig(model);
         LoadCenterHtmlMenuConfig(model);
         LoadWasdMenuConfig(model);
-        LoadScreenMenuConfig(model);
-        LoadResolutions(model);
         LoadLanguages(model);
         LoadDefaultMenuType(model);
 
@@ -143,10 +124,10 @@ internal static class ConfigManager
 
     private static void LoadForceConfig(TomlTable model)
     {
-        if (model.TryGetValue(("ForceConfigSettings"), out object forceConfigObj) &&
+        if (model.TryGetValue("ForceConfigSettings", out object forceConfigObj) &&
             forceConfigObj is TomlTable forceConfig)
         {
-            Config.ForceConfigSettings = forceConfig.GetValueOrDefault(("ForceConfigSettings"), Config.ForceConfigSettings);
+            Config.ForceConfigSettings = forceConfig.GetValueOrDefault("ForceConfigSettings", Config.ForceConfigSettings);
         }
     }
 
@@ -154,7 +135,7 @@ internal static class ConfigManager
     {
         if (!model.TryGetValue("Buttons", out object buttonsObj) || buttonsObj is not TomlTable buttons)
             return;
-        
+
         Config.Buttons.ScrollUp = buttons.GetValueOrDefault("ScrollUp", Config.Buttons.ScrollUp);
         Config.Buttons.ScrollDown = buttons.GetValueOrDefault("ScrollDown", Config.Buttons.ScrollDown);
         Config.Buttons.Select = buttons.GetValueOrDefault("Select", Config.Buttons.Select);
@@ -166,7 +147,7 @@ internal static class ConfigManager
     {
         if (!model.TryGetValue("Sound", out object soundObj) || soundObj is not TomlTable sound)
             return;
-        
+
         Config.Sound.Select = sound.GetValueOrDefault("Select", Config.Sound.Select);
         Config.Sound.Exit = sound.GetValueOrDefault("Exit", Config.Sound.Exit);
         Config.Sound.ScrollUp = sound.GetValueOrDefault("ScrollUp", Config.Sound.ScrollUp);
@@ -177,7 +158,7 @@ internal static class ConfigManager
     {
         if (!model.TryGetValue("MySQL", out object mysqlObj) || mysqlObj is not TomlTable mysql)
             return;
-        
+
         Config.MySQL.Host = mysql.GetValueOrDefault("Host", Config.MySQL.Host);
         Config.MySQL.Name = mysql.GetValueOrDefault("Name", Config.MySQL.Name);
         Config.MySQL.User = mysql.GetValueOrDefault("User", Config.MySQL.User);
@@ -189,7 +170,7 @@ internal static class ConfigManager
     {
         if (!model.TryGetValue("ChatMenu", out object chatMenuObj) || chatMenuObj is not TomlTable chatMenu)
             return;
-        
+
         Config.ChatMenu.TitleColor = chatMenu.GetValueOrDefault("TitleColor", Config.ChatMenu.TitleColor.ToString()).GetChatColor();
         Config.ChatMenu.EnabledColor = chatMenu.GetValueOrDefault("EnabledColor", Config.ChatMenu.EnabledColor.ToString()).GetChatColor();
         Config.ChatMenu.DisabledColor = chatMenu.GetValueOrDefault("DisabledColor", Config.ChatMenu.DisabledColor.ToString()).GetChatColor();
@@ -202,7 +183,7 @@ internal static class ConfigManager
     {
         if (!model.TryGetValue("CenterHtmlMenu", out object centerHtmlObj) || centerHtmlObj is not TomlTable centerHtml)
             return;
-        
+
         Config.CenterHtmlMenu.TitleColor = centerHtml.GetValueOrDefault("TitleColor", Config.CenterHtmlMenu.TitleColor);
         Config.CenterHtmlMenu.EnabledColor = centerHtml.GetValueOrDefault("EnabledColor", Config.CenterHtmlMenu.EnabledColor);
         Config.CenterHtmlMenu.DisabledColor = centerHtml.GetValueOrDefault("DisabledColor", Config.CenterHtmlMenu.DisabledColor);
@@ -218,7 +199,7 @@ internal static class ConfigManager
     {
         if (!model.TryGetValue("WasdMenu", out object wasdMenuObj) || wasdMenuObj is not TomlTable wasdMenu)
             return;
-        
+
         Config.WasdMenu.TitleColor = wasdMenu.GetValueOrDefault("TitleColor", Config.WasdMenu.TitleColor);
         Config.WasdMenu.ScrollUpDownKeyColor = wasdMenu.GetValueOrDefault("ScrollUpDownKeyColor", Config.WasdMenu.ScrollUpDownKeyColor);
         Config.WasdMenu.SelectKeyColor = wasdMenu.GetValueOrDefault("SelectKeyColor", Config.WasdMenu.SelectKeyColor);
@@ -231,64 +212,16 @@ internal static class ConfigManager
         Config.WasdMenu.FreezePlayer = wasdMenu.GetValueOrDefault("FreezePlayer", Config.WasdMenu.FreezePlayer);
     }
 
-    private static void LoadScreenMenuConfig(TomlTable model)
-    {
-        if (!model.TryGetValue("ScreenMenu", out object screenMenuObj) || screenMenuObj is not TomlTable screenMenu)
-            return;
-        
-        Config.ScreenMenu.PositionX = screenMenu.GetValueOrDefault("PositionX", Config.ScreenMenu.PositionX);
-        Config.ScreenMenu.PositionY = screenMenu.GetValueOrDefault("PositionY", Config.ScreenMenu.PositionY);
-        Config.ScreenMenu.Font = screenMenu.GetValueOrDefault("Font", Config.ScreenMenu.Font);
-        Config.ScreenMenu.Size = screenMenu.GetValueOrDefault("Size", Config.ScreenMenu.Size);
-        Config.ScreenMenu.FreezePlayer = screenMenu.GetValueOrDefault("FreezePlayer", Config.ScreenMenu.FreezePlayer);
-        Config.ScreenMenu.ShowResolutionsOption = screenMenu.GetValueOrDefault("ShowResolutionsOption", Config.ScreenMenu.ShowResolutionsOption);
-        Config.ScreenMenu.MenuType = screenMenu.GetValueOrDefault("MenuType", Config.ScreenMenu.MenuType);
-
-        if (screenMenu.TryGetValue("TextColor", out object textColorObj))
-        {
-            string textColor = textColorObj.ToString()!;
-            Config.ScreenMenu.TextColor = textColor.StartsWith('#') ?
-                textColor.HexToColor() :
-                Color.FromName(textColor);
-        }
-
-        if (!screenMenu.TryGetValue("DisabledTextColor", out object disabledTextColorObj))
-        {
-            string disabledTextColor = disabledTextColorObj.ToString()!;
-            Config.ScreenMenu.DisabledTextColor = disabledTextColor.StartsWith('#') ?
-                disabledTextColor.HexToColor() :
-                Color.FromName(disabledTextColor);
-        }
-    }
-
-    private static void LoadResolutions(TomlTable model)
-    {
-        if (!model.TryGetValue("Resolutions", out object resolutionsObj) || resolutionsObj is not TomlTable resolutions)
-            return;
-        
-        foreach (KeyValuePair<string, object> resolution in resolutions)
-        {
-            if (resolution.Value is TomlTable resolutionTable)
-            {
-                Config.Resolutions[resolution.Key] = new Resolution
-                {
-                    PositionX = resolutionTable.GetValueOrDefault("PositionX", 0f),
-                    PositionY = resolutionTable.GetValueOrDefault("PositionY", 0f)
-                };
-            }
-        }
-    }
-
     private static void LoadLanguages(TomlTable model)
     {
         if (!model.TryGetValue("Lang", out object langObj) || langObj is not TomlTable langTable)
             return;
-        
+
         foreach (KeyValuePair<string, object> lang in langTable)
         {
             if (lang.Value is not TomlTable translations)
                 continue;
-            
+
             Dictionary<string, string> langDict = [];
             foreach (KeyValuePair<string, object> translation in translations)
             {
@@ -302,7 +235,7 @@ internal static class ConfigManager
     {
         if (!model.TryGetValue("DefaultMenuType", out object menuTypeObj))
             return;
-        
+
         string menuType = menuTypeObj.ToString()!;
         if (MenuManager.MenuTypesList.ContainsKey(menuType))
             Config.DefaultMenuType = menuType;

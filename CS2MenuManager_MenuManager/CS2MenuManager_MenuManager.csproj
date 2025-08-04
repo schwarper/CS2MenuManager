@@ -8,7 +8,7 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-		<PackageReference Include="CounterStrikeSharp.API" Version="1.0.307" />
+		<PackageReference Include="CounterStrikeSharp.API" Version="1.0.329" />
 		<ProjectReference Include="..\CS2MenuManager\CS2MenuManager.csproj" />
 		<None Update="lang\**\*.*" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>

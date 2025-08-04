@@ -8,7 +8,7 @@ public static class ProjectInfo
     /// <summary>
     /// Gets the current version of the CS2MenuManager.
     /// </summary>
-    public const string Version = "v38";
+    public const string Version = "v39";
 
     /// <summary>
     /// Gets the author of the CS2MenuManager.

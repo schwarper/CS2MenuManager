@@ -1,7 +1,7 @@
 [DefaultMenuType]
 # Default Menu Type
 # Specifies the default menu style to use.
-# Options: ConsoleMenu, ChatMenu, WasdMenu, CenterHtmlMenu, ScreenMenu
+# Options: ConsoleMenu, ChatMenu, WasdMenu, CenterHtmlMenu
 # Default: WasdMenu
 DefaultMenuType = "WasdMenu"
 

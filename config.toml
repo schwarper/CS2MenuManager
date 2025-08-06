@@ -2,8 +2,8 @@
 # Default Menu Type
 # Specifies the default menu style to use.
 # Options: ConsoleMenu, ChatMenu, WasdMenu, CenterHtmlMenu, ScreenMenu
-# Default: ScreenMenu
-DefaultMenuType = "ScreenMenu"
+# Default: WasdMenu
+DefaultMenuType = "WasdMenu"
 
 [ForceConfigSettings]
 # Force Configuration Settings
@@ -62,17 +62,6 @@ OptionColor = "White"
 DisabledOptionColor = "Grey"
 ArrowColor = "Purple"
 FreezePlayer = false
-
-[ScreenMenu]
-TextColor = "#E89B1B"
-DisabledTextColor = "#E7D2B1"
-PositionX = -5.5
-PositionY = 0.0
-Font = "Tahoma Bold"
-Size = 32
-FreezePlayer = false
-ShowResolutionsOption = false
-MenuType = "Both" # Options: Scrollable, KeyPress, Both
 
 [Resolutions.1920x1080]
 PositionX = -9.0

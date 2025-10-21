@@ -1,4 +1,5 @@
 ﻿using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
@@ -27,6 +28,16 @@ public class CS2MenuManager_Menu : BasePlugin, IPluginConfig<Config>
     public override string ModuleAuthor => CS2MenuManager.ProjectInfo.Author;
 
     public Config Config { get; set; } = new();
+
+    [GameEventHandler]
+    public HookResult OnPlayerDisconnect(EventPlayerDisconnect @event, GameEventInfo _)
+    {
+        if (@event.Userid is not { } player)
+            return HookResult.Continue;
+
+        MenuManager.CloseActiveMenu(player);
+        return HookResult.Continue;
+    }
 
     public void OnConfigParsed(Config config)
     {

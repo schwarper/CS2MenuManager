@@ -112,7 +112,9 @@ public class CenterHtmlMenuInstance : BaseMenuInstance
     {
         base.Close(exitSound);
         Menu.Plugin.RemoveListener<OnTick>(Display);
-        Player.PrintToCenterHtml(" ");
+
+        if (Player.IsValid)
+            Player.PrintToCenterHtml(" ");
     }
 
     private void AddPageOptions(CenterHtmlMenu centerHtmlMenu, StringBuilder builder)

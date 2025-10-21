@@ -152,13 +152,17 @@ public class WasdMenuInstance : BaseMenuInstance
     {
         base.Close(exitSound);
         Menu.Plugin.RemoveListener<OnTick>(OnTick);
-        Player.PrintToCenterHtml(" ");
 
-        if (((WasdMenu)Menu).WasdMenu_FreezePlayer)
-            Player.Unfreeze(OldVelocityModifier);
+        if (Player.IsValid)
+        {
+            Player.PrintToCenterHtml(" ");
 
-        if (exitSound && !string.IsNullOrEmpty(Config.Sound.Exit))
-            Player.ExecuteClientCommand($"play {Config.Sound.Exit}");
+            if (((WasdMenu)Menu).WasdMenu_FreezePlayer)
+                Player.Unfreeze(OldVelocityModifier);
+
+            if (exitSound && !string.IsNullOrEmpty(Config.Sound.Exit))
+                Player.ExecuteClientCommand($"play {Config.Sound.Exit}");
+        }
     }
 
     /// <summary>

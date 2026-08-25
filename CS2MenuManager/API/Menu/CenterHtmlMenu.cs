@@ -50,6 +50,14 @@ public class CenterHtmlMenuInstance : BaseMenuInstance
     /// </summary>
     public override int NumPerPage => 5;
 
+    // Display runs on every tick; each of these walks the localization stack and
+    // ReplaceColorTags reflects over ChatColors, none of which changes here.
+    private readonly string _prevLabel;
+    private readonly string _exitLabel;
+    private readonly string _nextLabel;
+    private readonly StringBuilder _builder = new();
+    private CounterStrikeSharp.API.Core.EventShowSurvivalRespawnStatus? _panelEvent;
+
     /// <summary>
     /// Gets the number of items displayed per page.
     /// </summary>
@@ -70,6 +78,10 @@ public class CenterHtmlMenuInstance : BaseMenuInstance
         if (Menu is CenterHtmlMenu { CenterHtmlMenu_MaxOptionLength: > 0 } centerHtmlMenu)
             Menu.ItemOptions.ForEach(option => option.Text = option.Text.TruncateHtml(centerHtmlMenu.CenterHtmlMenu_MaxOptionLength));
 
+        _prevLabel = Player.Localizer("Prev");
+        _exitLabel = Player.Localizer("Exit");
+        _nextLabel = Player.Localizer("Next");
+
         Menu.Plugin.RegisterListener<OnTick>(Display);
     }
 
@@ -81,7 +93,8 @@ public class CenterHtmlMenuInstance : BaseMenuInstance
         if (Menu is not CenterHtmlMenu centerHtmlMenu)
             return;
 
-        StringBuilder builder = new();
+        StringBuilder builder = _builder;
+        builder.Clear();
         builder.Append($"<b><font color='{centerHtmlMenu.CenterHtmlMenu_TitleColor}'>{centerHtmlMenu.Title}</font></b><br>");
 
         int keyOffset = 1;
@@ -102,7 +115,7 @@ public class CenterHtmlMenuInstance : BaseMenuInstance
         }
 
         AddPageOptions(centerHtmlMenu, builder);
-        Player.PrintToCenterHtml(builder.ToString());
+        SendPanel(builder.ToString());
     }
 
     /// <summary>
@@ -113,15 +126,30 @@ public class CenterHtmlMenuInstance : BaseMenuInstance
         base.Close(exitSound);
         Menu.Plugin.RemoveListener<OnTick>(Display);
 
+        _panelEvent?.Free();
+        _panelEvent = null;
+
         if (Player.IsValid)
             Player.PrintToCenterHtml(" ");
     }
 
+    // The panel only stays up while it is resent, so a game event is fired every
+    // tick; building and freeing one each time is most of what that costs.
+    private void SendPanel(string text)
+    {
+        if (!Player.IsValid)
+            return;
+
+        _panelEvent ??= new CounterStrikeSharp.API.Core.EventShowSurvivalRespawnStatus(true) { Userid = Player, Duration = 5 };
+        _panelEvent.LocToken = text;
+        _panelEvent.FireEventToClient(Player);
+    }
+
     private void AddPageOptions(CenterHtmlMenu centerHtmlMenu, StringBuilder builder)
     {
-        string prevText = $"<font color='{centerHtmlMenu.CenterHtmlMenu_PrevPageColor}'>!8 &#60;</font> {Player.Localizer("Prev")}";
-        string closeText = $"<font color='{centerHtmlMenu.CenterHtmlMenu_ExitColor}'>!0 X</font> {Player.Localizer("Exit")}";
-        string nextText = $"<font color='{centerHtmlMenu.CenterHtmlMenu_NextPageColor}'>!9 ></font> {Player.Localizer("Next")}";
+        string prevText = $"<font color='{centerHtmlMenu.CenterHtmlMenu_PrevPageColor}'>!8 &#60;</font> {_prevLabel}";
+        string closeText = $"<font color='{centerHtmlMenu.CenterHtmlMenu_ExitColor}'>!0 X</font> {_exitLabel}";
+        string nextText = $"<font color='{centerHtmlMenu.CenterHtmlMenu_NextPageColor}'>!9 ></font> {_nextLabel}";
 
         if (centerHtmlMenu.CenterHtmlMenu_InlinePageOptions)
             AddInlinePageOptions(prevText, closeText, nextText, builder);
